@@ -25,7 +25,8 @@ defmodule FounderPadWeb.Router do
   scope "/", FounderPadWeb do
     pipe_through :browser
 
-    get "/", PageController, :home
+    get "/sitemap.xml", SitemapController, :index
+    live "/", LandingLive
 
     # App routes with sidebar layout
     live_session :app,

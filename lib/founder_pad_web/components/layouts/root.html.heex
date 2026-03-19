@@ -18,6 +18,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="csrf-token" content={get_csrf_token()} />
+    <FounderPadWeb.SEO.meta_tags
+      title={assigns[:page_title] || "FounderPad"}
+      description={assigns[:meta_description] || "Production-ready Phoenix SaaS boilerplate"}
+      url={assigns[:canonical_url] || "https://founderpad.io"}
+    />
     <.live_title default="FounderPad" suffix=" · Phoenix Framework">
       {assigns[:page_title]}
     </.live_title>
