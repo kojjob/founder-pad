@@ -1,11 +1,31 @@
 defmodule FounderPad.Billing.Plan do
   use Ash.Resource,
     domain: FounderPad.Billing,
-    data_layer: AshPostgres.DataLayer
+    data_layer: AshPostgres.DataLayer,
+    extensions: [AshJsonApi.Resource, AshGraphql.Resource]
 
   postgres do
     table "plans"
     repo FounderPad.Repo
+  end
+
+  json_api do
+    type "plan"
+
+    routes do
+      base "/plans"
+      index :read
+      get :read
+    end
+  end
+
+  graphql do
+    type :plan
+
+    queries do
+      list :list_plans, :read
+      get :get_plan, :read
+    end
   end
 
   attributes do

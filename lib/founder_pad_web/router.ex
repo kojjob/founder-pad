@@ -26,6 +26,24 @@ defmodule FounderPadWeb.Router do
     post "/stripe", WebhookController, :stripe
   end
 
+  # JSON:API (REST) — auto-derived from Ash resources
+  scope "/api/v1" do
+    pipe_through :api
+    forward "/", FounderPadWeb.Api.JsonApiRouter
+  end
+
+  # GraphQL — auto-derived from Ash resources
+  scope "/api" do
+    pipe_through :api
+    forward "/graphql", Absinthe.Plug, schema: FounderPadWeb.Api.GraphqlSchema
+
+    if Application.compile_env(:founder_pad, :dev_routes) do
+      forward "/graphiql", Absinthe.Plug.GraphiQL,
+        schema: FounderPadWeb.Api.GraphqlSchema,
+        interface: :playground
+    end
+  end
+
   # Enable LiveDashboard and Swoosh mailbox preview in development
   if Application.compile_env(:founder_pad, :dev_routes) do
     # If you want to use the LiveDashboard in production, you should put
