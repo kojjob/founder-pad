@@ -1,5 +1,5 @@
-<div class="min-h-screen flex bg-background text-on-surface font-body">
-  <!-- Sidebar -->
+<div class="min-h-screen flex bg-background text-on-surface font-body selection:bg-primary/30 selection:text-primary">
+  <!-- SideNavBar -->
   <aside class="h-screen w-[240px] hidden md:flex flex-col sticky top-0 left-0 bg-surface-container p-4 gap-y-4">
     <!-- Logo -->
     <div class="flex items-center gap-3 px-2 mb-6">
@@ -7,7 +7,7 @@
         <span class="material-symbols-outlined text-on-primary text-xl">architecture</span>
       </div>
       <div class="flex flex-col">
-        <span class="text-xl font-bold tracking-tight font-headline">FounderPad</span>
+        <span class="text-xl font-bold tracking-tight text-on-surface font-headline">FounderPad</span>
         <span class="text-[10px] uppercase tracking-widest text-primary font-bold">
           {Application.get_env(:founder_pad, :branding)[:tagline] || "Ship faster"}
         </span>
@@ -16,7 +16,7 @@
 
     <!-- Navigation -->
     <nav class="flex flex-col gap-1 flex-1">
-      <.nav_link href="/dashboard" icon="smart_toy" label="Agents" active={@active_nav == :agents} />
+      <.nav_link href="/agents" icon="smart_toy" label="Agents" active={@active_nav == :agents} />
       <.nav_link href="/dashboard" icon="dashboard" label="Dashboard" active={@active_nav == :dashboard} />
       <.nav_link href="/workspaces" icon="grid_view" label="Workspaces" active={@active_nav == :workspaces} />
       <.nav_link href="/activity" icon="timeline" label="Activity" active={@active_nav == :activity} />
@@ -26,7 +26,7 @@
     </nav>
 
     <!-- Workspace Switcher -->
-    <div class="mt-auto pt-4 border-t border-outline-variant/20">
+    <div class="mt-auto pt-4">
       <button class="w-full flex items-center justify-between px-3 py-2 rounded-md hover:bg-surface-container-high text-on-surface/70 text-sm font-medium transition-colors">
         <span>Switch Workspace</span>
         <span class="material-symbols-outlined text-sm">unfold_more</span>
@@ -36,49 +36,49 @@
 
   <!-- Main Content -->
   <div class="flex-1 flex flex-col min-w-0">
-    <!-- Top Header -->
-    <header class="sticky top-0 z-40 bg-background/60 backdrop-blur-md border-b border-outline-variant/10">
+    <!-- TopNavBar -->
+    <header class="sticky top-0 z-40 bg-background/60 backdrop-blur-md">
       <div class="flex justify-between items-center w-full px-6 py-3 max-w-[1280px] mx-auto">
         <div class="flex items-center gap-8 flex-1">
-          <span class="text-lg font-black font-headline md:hidden">FounderPad</span>
+          <span class="text-lg font-black font-headline md:hidden text-on-surface">FounderPad</span>
           <div class="relative max-w-md w-full hidden md:block">
             <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">search</span>
             <input
               type="text"
               placeholder="Search..."
-              class="w-full bg-surface-container-highest border-none rounded-sm pl-10 pr-4 py-1.5 text-sm focus:ring-1 focus:ring-primary text-on-surface placeholder:text-on-surface-variant/50"
+              class="w-full bg-surface-container-highest rounded-sm pl-10 pr-4 py-1.5 text-sm focus:ring-1 focus:ring-primary text-on-surface placeholder:text-on-surface-variant/50"
             />
           </div>
         </div>
         <div class="flex items-center gap-4">
-          <button class="material-symbols-outlined text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer">
-            notifications
-          </button>
+          <button class="material-symbols-outlined text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer">notifications</button>
           <!-- Theme Toggle -->
-          <button id="theme-toggle" phx-hook="ThemeToggle" class="material-symbols-outlined text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer">
-            dark_mode
-          </button>
+          <button id="theme-toggle" phx-hook="ThemeToggle" class="material-symbols-outlined text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer">dark_mode</button>
           <div class="w-px h-6 bg-outline-variant/30"></div>
-          <div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center text-sm font-bold">
-            FP
+          <button class="bg-gradient-to-br from-primary to-primary-container text-on-primary-fixed font-semibold px-4 py-1.5 rounded-lg text-sm transition-transform active:opacity-80">
+            New Agent
+          </button>
+          <div class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center">
+            <span class="material-symbols-outlined text-on-surface-variant text-lg">person</span>
           </div>
         </div>
       </div>
     </header>
 
     <!-- Page Content -->
-    <main class="flex-1 p-6 md:p-8 max-w-[1280px] mx-auto w-full">
+    <main class="flex-1 p-6 md:p-8 max-w-[1280px] mx-auto w-full space-y-8">
       <.flash_group flash={@flash} />
       {@inner_content}
     </main>
 
     <!-- Footer -->
-    <footer class="mt-auto p-8 border-t border-outline-variant/10">
-      <div class="max-w-[1280px] mx-auto flex justify-between items-center text-xs font-mono text-on-surface-variant">
-        <span>&copy; 2026 FounderPad</span>
+    <footer class="mt-auto p-8">
+      <div class="max-w-[1280px] mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
         <div class="flex items-center gap-4">
-          <a href="#" class="hover:text-primary transition-colors">Docs</a>
-          <a href="#" class="hover:text-primary transition-colors">API</a>
+          <span class="text-xs font-mono text-on-surface-variant">© 2026 FOUNDERPAD</span>
+          <div class="h-3 w-px bg-outline-variant/30"></div>
+          <a class="text-xs text-on-surface-variant hover:text-primary transition-colors" href="#">Documentation</a>
+          <a class="text-xs text-on-surface-variant hover:text-primary transition-colors" href="#">API Specs</a>
         </div>
       </div>
     </footer>

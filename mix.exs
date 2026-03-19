@@ -10,7 +10,8 @@ defmodule FounderPad.MixProject do
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
       deps: deps(),
-      consolidate_protocols: Mix.env() != :dev
+      consolidate_protocols: Mix.env() != :dev,
+      listeners: [Phoenix.CodeReloader]
     ]
   end
 

@@ -103,85 +103,126 @@
 [data-phx-session], [data-phx-teleported-src] { display: contents }
 
 /* ============================================================
-   Design Tokens from Stitch — FounderPad Design System
-   Dark theme is the default; light overrides when .dark is absent
+   Stitch Design System — "Indigo Slate Protocol"
+   Exact M3 color palette from Stitch project
    ============================================================ */
 
-/* Dark theme tokens (default) */
-:root {
-  --color-background: #0f1117;
-  --color-surface: #161b27;
+@theme {
+  /* ── Surfaces (dark-first, M3 tonal layering) ── */
+  --color-background: #0b1326;
+  --color-surface: #0b1326;
+  --color-surface-dim: #0b1326;
+  --color-surface-bright: #31394d;
+  --color-surface-tint: #c0c1ff;
+  --color-surface-variant: #2d3449;
+  --color-surface-container-lowest: #060e20;
+  --color-surface-container-low: #131b2e;
   --color-surface-container: #171f33;
-  --color-surface-container-low: #0b1326;
   --color-surface-container-high: #222a3d;
   --color-surface-container-highest: #2d3449;
-  --color-surface-bright: rgba(255, 255, 255, 0.08);
-  --color-border: #2a3148;
-  --color-accent: #6366f1;
-  --color-accent-hover: #8083ff;
-  --color-warning: #f59e0b;
-  --color-success: #10b981;
-  --color-error: #ef4444;
-  --color-text-primary: #f8fafc;
-  --color-text-secondary: #94a3b8;
-  --color-text-muted: #64748b;
 
-  /* Font families */
-  --font-display: 'Manrope', system-ui, sans-serif;
+  /* ── Primary (Indigo) ── */
+  --color-primary: #c0c1ff;
+  --color-primary-container: #8083ff;
+  --color-primary-fixed: #e1e0ff;
+  --color-primary-fixed-dim: #c0c1ff;
+  --color-on-primary: #1000a9;
+  --color-on-primary-container: #0d0096;
+  --color-on-primary-fixed: #07006c;
+  --color-on-primary-fixed-variant: #2f2ebe;
+  --color-inverse-primary: #494bd6;
+
+  /* ── Secondary (Amber) ── */
+  --color-secondary: #ffb95f;
+  --color-secondary-container: #ee9800;
+  --color-secondary-fixed: #ffddb8;
+  --color-secondary-fixed-dim: #ffb95f;
+  --color-on-secondary: #472a00;
+  --color-on-secondary-container: #5b3800;
+  --color-on-secondary-fixed: #2a1700;
+  --color-on-secondary-fixed-variant: #653e00;
+
+  /* ── Tertiary (Orange) ── */
+  --color-tertiary: #ffb783;
+  --color-tertiary-container: #d97721;
+  --color-tertiary-fixed: #ffdcc5;
+  --color-tertiary-fixed-dim: #ffb783;
+  --color-on-tertiary: #4f2500;
+  --color-on-tertiary-container: #452000;
+  --color-on-tertiary-fixed: #301400;
+  --color-on-tertiary-fixed-variant: #703700;
+
+  /* ── Semantic ── */
+  --color-error: #ffb4ab;
+  --color-error-container: #93000a;
+  --color-on-error: #690005;
+  --color-on-error-container: #ffdad6;
+
+  /* ── Neutral / Text ── */
+  --color-on-surface: #dae2fd;
+  --color-on-surface-variant: #c7c4d7;
+  --color-on-background: #dae2fd;
+  --color-inverse-surface: #dae2fd;
+  --color-inverse-on-surface: #283044;
+  --color-outline: #908fa0;
+  --color-outline-variant: #464554;
+
+  /* ── Fonts (from Stitch) ── */
+  --font-headline: 'Manrope', system-ui, sans-serif;
   --font-body: 'Inter', system-ui, sans-serif;
+  --font-label: 'Inter', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
+
+  /* ── Border radius (from Stitch) ── */
+  --radius-DEFAULT: 0.125rem;
+  --radius-lg: 0.25rem;
+  --radius-xl: 0.5rem;
+  --radius-full: 0.75rem;
 }
 
-/* Light theme overrides — applied when .dark class is NOT on <html> */
+/* ── Light theme overrides ── */
 html:not(.dark) {
-  --color-background: #ffffff;
-  --color-surface: #f8fafc;
-  --color-surface-container: #f1f5f9;
-  --color-surface-container-low: #f8fafc;
-  --color-surface-container-high: #e2e8f0;
-  --color-surface-container-highest: #cbd5e1;
-  --color-surface-bright: rgba(0, 0, 0, 0.04);
-  --color-border: #e2e8f0;
-  --color-accent: #6366f1;
-  --color-accent-hover: #4f46e5;
-  --color-warning: #f59e0b;
-  --color-success: #10b981;
-  --color-error: #ef4444;
-  --color-text-primary: #0f172a;
-  --color-text-secondary: #475569;
-  --color-text-muted: #94a3b8;
+  --color-background: #f5f5fc;
+  --color-surface: #f5f5fc;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #f0f0fa;
+  --color-surface-container: #eaeaf4;
+  --color-surface-container-high: #e4e4ee;
+  --color-surface-container-highest: #dfe0ea;
+  --color-on-surface: #1b1b22;
+  --color-on-surface-variant: #464554;
+  --color-outline: #77767f;
+  --color-outline-variant: #c7c4d7;
+  --color-primary: #494bd6;
+  --color-primary-container: #e1e0ff;
+  --color-on-primary: #ffffff;
+  --color-on-primary-container: #0d0096;
+  --color-secondary: #7e5700;
+  --color-secondary-container: #ffddb8;
+  --color-error: #ba1a1a;
+  --color-error-container: #ffdad6;
 }
 
-/* ============================================================
-   Extend Tailwind v4 theme with design token utilities
-   ============================================================ */
-@theme {
-  /* Surface colors */
-  --color-background: var(--color-background);
-  --color-surface: var(--color-surface);
-  --color-surface-container: var(--color-surface-container);
-  --color-surface-container-low: var(--color-surface-container-low);
-  --color-surface-container-high: var(--color-surface-container-high);
-  --color-surface-container-highest: var(--color-surface-container-highest);
-  --color-surface-bright: var(--color-surface-bright);
+/* ── Global body style matching Stitch ── */
+body {
+  background-color: #0b1326;
+  color: #dae2fd;
+}
 
-  /* Semantic colors */
-  --color-border: var(--color-border);
-  --color-accent: var(--color-accent);
-  --color-accent-hover: var(--color-accent-hover);
-  --color-warning: var(--color-warning);
-  --color-success: var(--color-success);
-  --color-error: var(--color-error);
+html:not(.dark) body {
+  background-color: #f5f5fc;
+  color: #1b1b22;
+}
 
-  /* Text colors */
-  --color-text-primary: var(--color-text-primary);
-  --color-text-secondary: var(--color-text-secondary);
-  --color-text-muted: var(--color-text-muted);
+/* ── Selection style from Stitch ── */
+::selection {
+  background-color: rgb(192 193 255 / 0.3);
+  color: #c0c1ff;
+}
 
-  /* Font families */
-  --font-display: var(--font-display);
-  --font-body: var(--font-body);
-  --font-mono: var(--font-mono);
+html:not(.dark) ::selection {
+  background-color: rgb(73 75 214 / 0.2);
+  color: #494bd6;
 }
 
 /* This file is for your main application CSS */

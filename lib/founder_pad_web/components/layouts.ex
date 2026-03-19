@@ -18,10 +18,10 @@ defmodule FounderPadWeb.Layouts do
     <a
       href={@href}
       class={[
-        "flex items-center gap-3 px-3 py-2 rounded-md transition-colors duration-200 text-sm",
+        "flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-transform active:scale-95",
         if(@active,
           do: "text-primary font-semibold bg-surface-container-high",
-          else: "text-on-surface/60 font-medium hover:text-on-surface hover:bg-surface-container-high"
+          else: "text-on-surface/60 font-medium hover:text-on-surface hover:bg-surface-container-high transition-colors duration-200"
         )
       ]}
     >

@@ -28,7 +28,9 @@ defmodule FounderPadWeb.Router do
     get "/", PageController, :home
 
     # App routes with sidebar layout
-    live_session :app, on_mount: [{FounderPadWeb.Hooks.AssignDefaults, :default}] do
+    live_session :app,
+      layout: {FounderPadWeb.Layouts, :app},
+      on_mount: [{FounderPadWeb.Hooks.AssignDefaults, :default}] do
       live "/dashboard", DashboardLive
       live "/activity", ActivityLive
       live "/workspaces", WorkspacesLive
