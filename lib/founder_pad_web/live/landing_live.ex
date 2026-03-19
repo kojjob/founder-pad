@@ -54,14 +54,14 @@ defmodule FounderPadWeb.LandingLive do
       <%!-- ═══════════════════════════════════════════════════════
            SECTION 1: HERO — Full viewport, commanding presence
            ═══════════════════════════════════════════════════════ --%>
-      <section class="relative min-h-screen flex items-center px-6 pt-24 pb-16 overflow-hidden">
+      <section class="relative min-h-screen flex items-center pt-24 pb-16 overflow-hidden">
         <%!-- Background glows --%>
         <div class="absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[120px] pointer-events-none"></div>
         <div class="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-secondary/5 rounded-full blur-[100px] pointer-events-none"></div>
 
-        <div class="relative max-w-[1280px] mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+        <div class="relative w-full grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-0 items-center">
           <%!-- Left Column: Copy --%>
-          <div class="space-y-8">
+          <div class="space-y-8 pl-6 md:pl-12 lg:pl-[max(2rem,calc((100vw-1280px)/2+2rem))]">
             <%!-- Announcement bar --%>
             <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-surface-container text-xs font-medium text-on-surface-variant">
               <span class="text-secondary">&#x1F680;</span>
@@ -116,9 +116,9 @@ defmodule FounderPadWeb.LandingLive do
             </div>
           </div>
 
-          <%!-- Right Column: Dashboard Screenshot --%>
-          <div class="relative">
-            <div class="rounded-2xl overflow-hidden editorial-shadow ring-1 ring-outline-variant/10">
+          <%!-- Right Column: Dashboard Screenshot — bleeds to right edge --%>
+          <div class="relative lg:pl-8">
+            <div class="rounded-l-2xl lg:rounded-r-none overflow-hidden editorial-shadow ring-1 ring-outline-variant/10 ring-r-0">
               <img
                 src="/images/dashboard-preview.png"
                 alt="FounderPad Dashboard — AI agent orchestration, billing metrics, and team activity in the Midnight Architect dark theme"
@@ -131,11 +131,11 @@ defmodule FounderPadWeb.LandingLive do
             <%!-- Glow under image --%>
             <div class="absolute -bottom-6 left-1/2 -translate-x-1/2 w-3/4 h-12 bg-primary/15 blur-[50px] rounded-full pointer-events-none"></div>
             <%!-- Floating badges --%>
-            <div class="absolute -bottom-4 -left-4 bg-surface-container-lowest glass-effect rounded-xl px-4 py-2.5 editorial-shadow flex items-center gap-2 z-10">
+            <div class="absolute -bottom-4 left-4 bg-surface-container-lowest glass-effect rounded-xl px-4 py-2.5 editorial-shadow flex items-center gap-2 z-10">
               <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
               <span class="text-xs font-mono text-on-surface">123 tests passing</span>
             </div>
-            <div class="absolute -top-4 -right-4 bg-surface-container-lowest glass-effect rounded-xl px-4 py-2.5 editorial-shadow flex items-center gap-2 z-10">
+            <div class="absolute -top-4 right-4 lg:right-8 bg-surface-container-lowest glass-effect rounded-xl px-4 py-2.5 editorial-shadow flex items-center gap-2 z-10">
               <span class="material-symbols-outlined text-primary text-sm">bolt</span>
               <span class="text-xs font-mono text-on-surface">8 Ash domains</span>
             </div>
