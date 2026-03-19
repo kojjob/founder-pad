@@ -9,8 +9,8 @@ config :founder_pad, FounderPad.Repo,
   pool: Ecto.Adapters.SQL.Sandbox,
   pool_size: System.schedulers_online() * 2
 
-# Oban: disable queues and plugins in test
-config :founder_pad, Oban, testing: :inline
+# Oban: manual mode for assert_enqueued/refute_enqueued in tests
+config :founder_pad, Oban, testing: :manual
 
 # We don't run a server during test. If one is required,
 # you can enable the server option below.
