@@ -65,4 +65,38 @@ defmodule FounderPad.Factory do
     |> Ash.Changeset.for_create(:create, params)
     |> Ash.create!()
   end
+
+  def create_agent!(org, attrs \\ %{}) do
+    default = %{
+      name: "Test Agent #{System.unique_integer([:positive])}",
+      system_prompt: "You are a helpful test assistant.",
+      model: "claude-sonnet-4-20250514",
+      provider: :anthropic,
+      organisation_id: org.id
+    }
+
+    params = Map.merge(default, Map.new(attrs))
+
+    FounderPad.AI.Agent
+    |> Ash.Changeset.for_create(:create, params)
+    |> Ash.create!()
+  end
+
+  def create_conversation_chain! do
+    org = create_organisation!()
+    user = create_user!()
+    agent = create_agent!(org)
+
+    {:ok, conversation} =
+      FounderPad.AI.Conversation
+      |> Ash.Changeset.for_create(:create, %{
+        title: "Test Conversation",
+        agent_id: agent.id,
+        organisation_id: org.id,
+        user_id: user.id
+      })
+      |> Ash.create()
+
+    {org, user, agent, conversation}
+  end
 end
