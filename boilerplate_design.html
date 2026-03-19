@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Phoenix SaaS Boilerplate — Architecture Design</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #0c0e14;
+    --surface: #13161f;
+    --surface2: #1a1e2b;
+    --border: #242838;
+    --accent: #7c6bff;
+    --accent2: #3ec9a7;
+    --accent3: #f5a623;
+    --accent4: #e05f5f;
+    --text: #e8eaf0;
+    --muted: #6b7185;
+    --code-bg: #0a0c12;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  /* HEADER */
+  header {
+    padding: 48px 48px 32px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(135deg, #0c0e14 60%, #131a2e);
+  }
+
+  .header-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  header h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 36px;
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+  }
+
+  header h1 span { color: var(--accent); }
+
+  header p {
+    color: var(--muted);
+    font-size: 14px;
+    max-width: 560px;
+  }
+
+  .stack-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 20px;
+  }
+
+  .pill {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 3px 10px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+
+  .pill.hi { color: var(--accent); border-color: rgba(124,107,255,0.3); background: rgba(124,107,255,0.07); }
+
+  /* LAYOUT */
+  .layout {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    min-height: calc(100vh - 160px);
+  }
+
+  /* SIDEBAR NAV */
+  nav {
+    border-right: 1px solid var(--border);
+    padding: 32px 0;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+
+  .nav-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 0 20px 12px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 20px;
+    cursor: pointer;
+    border-left: 2px solid transparent;
+    transition: all 0.15s;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .nav-item:hover { color: var(--text); background: var(--surface); }
+  .nav-item.active { color: var(--text); border-left-color: var(--accent); background: var(--surface); }
+
+  .nav-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--border);
+    flex-shrink: 0;
+  }
+  .nav-item.active .nav-dot { background: var(--accent); }
+
+  .nav-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    margin-left: auto;
+  }
+
+  /* MAIN CONTENT */
+  main {
+    padding: 40px 48px;
+    overflow-y: auto;
+  }
+
+  .section { display: none; }
+  .section.active { display: block; }
+
+  .section-header {
+    margin-bottom: 28px;
+  }
+
+  .section-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--accent2);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .section-header h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    margin-bottom: 8px;
+  }
+
+  .section-header p { color: var(--muted); max-width: 640px; font-size: 13.5px; }
+
+  /* CODE BLOCKS */
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px 24px;
+    overflow-x: auto;
+    margin: 20px 0;
+    position: relative;
+  }
+
+  pre code {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    line-height: 1.8;
+    color: #b8c0d4;
+  }
+
+  .code-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .c-purple { color: var(--accent); }
+  .c-green  { color: var(--accent2); }
+  .c-yellow { color: var(--accent3); }
+  .c-red    { color: var(--accent4); }
+  .c-muted  { color: var(--muted); }
+
+  /* CARDS */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 16px;
+    margin: 20px 0;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+  }
+
+  .card-icon {
+    font-size: 20px;
+    margin-bottom: 10px;
+  }
+
+  .card h4 {
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+
+  .card p { color: var(--muted); font-size: 12.5px; line-height: 1.6; }
+
+  .card.accent-purple { border-top: 2px solid var(--accent); }
+  .card.accent-green  { border-top: 2px solid var(--accent2); }
+  .card.accent-yellow { border-top: 2px solid var(--accent3); }
+  .card.accent-red    { border-top: 2px solid var(--accent4); }
+
+  /* DECISION BOXES */
+  .decision {
+    background: rgba(124,107,255,0.06);
+    border: 1px solid rgba(124,107,255,0.2);
+    border-left: 3px solid var(--accent);
+    border-radius: 6px;
+    padding: 14px 18px;
+    margin: 20px 0;
+    font-size: 13px;
+  }
+
+  .decision strong { color: var(--accent); font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; display: block; margin-bottom: 4px; }
+
+  .tradeoff {
+    background: rgba(245,166,35,0.06);
+    border: 1px solid rgba(245,166,35,0.2);
+    border-left: 3px solid var(--accent3);
+    border-radius: 6px;
+    padding: 14px 18px;
+    margin: 20px 0;
+    font-size: 13px;
+  }
+
+  .tradeoff strong { color: var(--accent3); font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; display: block; margin-bottom: 4px; }
+
+  /* FLOW DIAGRAM */
+  .flow {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 20px 0;
+    padding: 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+
+  .flow-node {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 14px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text);
+    white-space: nowrap;
+  }
+
+  .flow-node.purple { border-color: rgba(124,107,255,0.4); color: var(--accent); background: rgba(124,107,255,0.07); }
+  .flow-node.green  { border-color: rgba(62,201,167,0.4);  color: var(--accent2); background: rgba(62,201,167,0.07); }
+  .flow-node.yellow { border-color: rgba(245,166,35,0.4);  color: var(--accent3); background: rgba(245,166,35,0.07); }
+
+  .flow-arrow { color: var(--muted); font-size: 16px; }
+
+  /* TABLE */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 13px;
+  }
+
+  th {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 10px 14px;
+    text-align: left;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  td {
+    border: 1px solid var(--border);
+    padding: 10px 14px;
+    vertical-align: top;
+  }
+
+  tr:nth-child(even) td { background: var(--surface); }
+
+  td code {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    background: var(--code-bg);
+    padding: 2px 6px;
+    border-radius: 3px;
+    color: var(--accent2);
+  }
+
+  /* DIVIDER */
+  hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 28px 0;
+  }
+
+  /* PROGRESS BAR */
+  .progress-bar {
+    display: flex;
+    gap: 4px;
+    padding: 16px 48px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+  }
+
+  .prog-step {
+    flex: 1;
+    height: 3px;
+    background: var(--border);
+    border-radius: 2px;
+    transition: background 0.3s;
+  }
+
+  .prog-step.done { background: var(--accent2); }
+  .prog-step.active { background: var(--accent); }
+
+  h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    margin: 24px 0 10px;
+    color: var(--text);
+  }
+
+  p { margin-bottom: 10px; }
+  ul { padding-left: 18px; margin-bottom: 12px; }
+  li { color: var(--muted); font-size: 13px; line-height: 1.8; }
+  li strong { color: var(--text); }
+
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+  }
+
+  .badge-purple { background: rgba(124,107,255,0.15); color: var(--accent); }
+  .badge-green  { background: rgba(62,201,167,0.15);  color: var(--accent2); }
+  .badge-yellow { background: rgba(245,166,35,0.15);  color: var(--accent3); }
+  .badge-red    { background: rgba(224,95,95,0.15);   color: var(--accent4); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-tag">// Architecture Design Document</div>
+  <h1>Phoenix SaaS <span>Boilerplate</span></h1>
+  <p>Context-bounded monolith with Ash core. API-escapable via AshJsonApi + AshGraphql. Client delivery foundation.</p>
+  <div class="stack-pills">
+    <span class="pill hi">Elixir</span>
+    <span class="pill hi">Phoenix</span>
+    <span class="pill hi">Ash Framework</span>
+    <span class="pill hi">LiveView</span>
+    <span class="pill">PostgreSQL</span>
+    <span class="pill">TailwindCSS</span>
+    <span class="pill">Oban</span>
+    <span class="pill">AshAuthentication</span>
+    <span class="pill">AshJsonApi</span>
+    <span class="pill">AshGraphql</span>
+    <span class="pill">Stripe</span>
+    <span class="pill">Swoosh</span>
+  </div>
+</header>
+
+<div class="progress-bar">
+  <div class="prog-step done" title="Project Structure"></div>
+  <div class="prog-step done" title="Accounts"></div>
+  <div class="prog-step done" title="Billing"></div>
+  <div class="prog-step active" title="AI Context"></div>
+  <div class="prog-step" title="Notifications"></div>
+  <div class="prog-step" title="API Layer"></div>
+</div>
+
+<div class="layout">
+  <nav>
+    <div class="nav-label">Sections</div>
+    <div class="nav-item active" onclick="show('s1', this)">
+      <div class="nav-dot"></div> Project Structure <span class="nav-num">01</span>
+    </div>
+    <div class="nav-item" onclick="show('s2', this)">
+      <div class="nav-dot"></div> Accounts &amp; Auth <span class="nav-num">02</span>
+    </div>
+    <div class="nav-item" onclick="show('s3', this)">
+      <div class="nav-dot"></div> Billing <span class="nav-num">03</span>
+    </div>
+    <div class="nav-item" onclick="show('s4', this)">
+      <div class="nav-dot"></div> AI Agents <span class="nav-num">04</span>
+    </div>
+    <div class="nav-item" onclick="show('s5', this)">
+      <div class="nav-dot"></div> Notifications <span class="nav-num">05</span>
+    </div>
+    <div class="nav-item" onclick="show('s6', this)">
+      <div class="nav-dot"></div> API Layer <span class="nav-num">06</span>
+    </div>
+    <div style="margin-top: 32px; padding: 0 20px;">
+      <div class="nav-label">Integration Model</div>
+    </div>
+    <div class="nav-item" onclick="show('s7', this)">
+      <div class="nav-dot"></div> Cross-Framework <span class="nav-num">07</span>
+    </div>
+  </nav>
+
+  <main>
+
+    <!-- S1: PROJECT STRUCTURE -->
+    <div class="section active" id="s1">
+      <div class="section-header">
+        <div class="section-tag">Section 01</div>
+        <h2>Top-Level Project Structure</h2>
+        <p>A standard Phoenix app — not an umbrella — with disciplined internal layout. Contexts are the architectural unit. Ash resources live inside them, never exposed directly to LiveView or API layers.</p>
+      </div>
+
+      <div class="code-label">// Directory layout</div>
+      <pre><code><span class="c-green">my_saas/</span>
+├── <span class="c-purple">lib/</span>
+│   ├── <span class="c-yellow">my_saas/</span>                      <span class="c-muted"># Domain layer</span>
+│   │   ├── <span class="c-purple">accounts/</span>                 <span class="c-muted"># Users, Orgs, Memberships, Auth</span>
+│   │   │   ├── resources/            <span class="c-muted"># Ash resources</span>
+│   │   │   ├── policies/             <span class="c-muted"># Ash policy modules</span>
+│   │   │   └── accounts.ex           <span class="c-muted"># Public context API</span>
+│   │   ├── <span class="c-purple">billing/</span>                  <span class="c-muted"># Plans, Subscriptions, Usage</span>
+│   │   ├── <span class="c-purple">ai/</span>                       <span class="c-muted"># Agents, Conversations, Tools</span>
+│   │   ├── <span class="c-purple">notifications/</span>            <span class="c-muted"># Emails, Templates, Events</span>
+│   │   └── application.ex
+│   └── <span class="c-yellow">my_saas_web/</span>                  <span class="c-muted"># Presentation layer</span>
+│       ├── live/                     <span class="c-muted"># LiveView modules (per context)</span>
+│       ├── api/                      <span class="c-muted"># AshJsonApi + AshGraphql routers</span>
+│       ├── components/               <span class="c-muted"># Shared LiveView components</span>
+│       └── router.ex
+├── priv/repo/migrations/
+└── config/</code></pre>
+
+      <div class="decision">
+        <strong>Golden Rule</strong>
+        LiveView and API controllers call <em>context functions only</em> — never touch Ash resources or Ecto queries directly. Contexts own orchestration. Ash resources own persistence, validation, and policy.
+      </div>
+
+      <div class="card-grid">
+        <div class="card accent-purple">
+          <div class="card-icon">🏛️</div>
+          <h4>Domain Layer</h4>
+          <p>Pure Elixir — no Phoenix dependency. Contexts expose clean public APIs. Ash resources handle all DB interaction.</p>
+        </div>
+        <div class="card accent-green">
+          <div class="card-icon">🖥️</div>
+          <h4>Web Layer</h4>
+          <p>Phoenix + LiveView for the monolith UI. AshJsonApi + AshGraphql for API consumers. Same contexts, different surfaces.</p>
+        </div>
+        <div class="card accent-yellow">
+          <div class="card-icon">⚙️</div>
+          <h4>Background Layer</h4>
+          <p>Oban workers for Stripe webhooks, AI job queuing, email delivery. Supervised, retryable, observable.</p>
+        </div>
+        <div class="card accent-red">
+          <div class="card-icon">🗄️</div>
+          <h4>Data Layer</h4>
+          <p>AshPostgres with hybrid multi-tenancy. Row-level by default, schema-per-tenant opt-in per resource.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- S2: ACCOUNTS -->
+    <div class="section" id="s2">
+      <div class="section-header">
+        <div class="section-tag">Section 02</div>
+        <h2>Accounts &amp; Auth Context</h2>
+        <p>The load-bearing context. Everything else depends on it. Organisation is the tenant root — billing, AI quotas, and data isolation all hang off the org, not the individual.</p>
+      </div>
+
+      <div class="code-label">// Resource layout</div>
+      <pre><code><span class="c-green">accounts/</span>
+├── resources/
+│   ├── <span class="c-purple">user.ex</span>              <span class="c-muted"># AshAuthentication lives here</span>
+│   ├── <span class="c-purple">organisation.ex</span>      <span class="c-muted"># Tenant root — owns schema_prefix</span>
+│   ├── <span class="c-purple">membership.ex</span>        <span class="c-muted"># User ↔ Org join with :role enum</span>
+│   └── <span class="c-purple">token.ex</span>             <span class="c-muted"># AshAuthentication tokens</span>
+├── policies/
+│   └── membership_policy.ex <span class="c-muted"># Role-based access via Ash policies</span>
+└── accounts.ex              <span class="c-muted"># Public API: register/2, invite_member/3</span></code></pre>
+
+      <h3>Multi-Tenancy Wiring</h3>
+      <ul>
+        <li><strong>Row-level default</strong> — every tenant-scoped resource carries an <code>organisation_id</code> FK, filtered by Ash policies</li>
+        <li><strong>Schema-per-tenant opt-in</strong> — single config flag per resource in AshPostgres, no structural rework</li>
+        <li><strong>Tenant context propagation</strong> — Accounts loads <code>current_org</code> from session, passed as Ash tenant context downstream</li>
+      </ul>
+
+      <h3>Auth Stack</h3>
+      <div class="card-grid">
+        <div class="card accent-purple">
+          <h4>AshAuthentication</h4>
+          <p>Registration, login, password reset, magic link. All declarative on the User resource.</p>
+        </div>
+        <div class="card accent-green">
+          <h4>OAuth2</h4>
+          <p>Google + GitHub via <code>AshAuthentication.Strategy.OAuth2</code>. Providers toggled in config per deployment.</p>
+        </div>
+        <div class="card accent-yellow">
+          <h4>Sessions</h4>
+          <p><code>AshAuthentication.Phoenix</code> plug — works transparently with LiveView socket assigns.</p>
+        </div>
+      </div>
+
+      <div class="decision">
+        <strong>Key Design Decision</strong>
+        <code>Organisation</code> is the tenant root, not <code>User</code>. A user can belong to many orgs. This makes B2B billing, seat management, and data isolation straightforward from day one.
+      </div>
+    </div>
+
+    <!-- S3: BILLING -->
+    <div class="section" id="s3">
+      <div class="section-header">
+        <div class="section-tag">Section 03</div>
+        <h2>Billing Context</h2>
+        <p>Stripe is the source of truth. The local Subscription resource is a read-optimised mirror. No synchronous Stripe calls in the request path.</p>
+      </div>
+
+      <div class="code-label">// Resource layout</div>
+      <pre><code><span class="c-green">billing/</span>
+├── resources/
+│   ├── <span class="c-purple">plan.ex</span>              <span class="c-muted"># Stripe Product — seeded from config</span>
+│   ├── <span class="c-purple">subscription.ex</span>      <span class="c-muted"># Stripe mirror — synced via webhook</span>
+│   └── <span class="c-purple">usage_record.ex</span>      <span class="c-muted"># Per-org metered usage tracking</span>
+├── webhooks/
+│   └── <span class="c-yellow">stripe_handler.ex</span>    <span class="c-muted"># Oban worker — async event processing</span>
+└── billing.ex               <span class="c-muted"># Public API: create_subscription/2, record_usage/3</span></code></pre>
+
+      <h3>Webhook Flow</h3>
+      <div class="flow">
+        <div class="flow-node">POST /webhooks/stripe</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node yellow">Verify signature</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">Enqueue Oban job</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node green">StripeHandler worker</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node purple">Update Subscription</div>
+      </div>
+
+      <h3>Plan Seeding</h3>
+      <p style="color: var(--muted);">Plans are defined in <code>config/plans.exs</code> — not managed in the UI. A Mix task syncs them to Stripe and seeds the local DB. Clients never create plans through the app.</p>
+
+      <h3>Ash Policy Bridge</h3>
+      <div class="code-label">// Feature gating in any resource</div>
+      <pre><code><span class="c-purple">policy</span> action_type(:create) <span class="c-yellow">do</span>
+  authorize_if <span class="c-green">Billing.has_active_subscription?</span>(actor.organisation)
+<span class="c-yellow">end</span></code></pre>
+
+      <div class="decision">
+        <strong>Usage Metering</strong>
+        UsageRecord tracks consumption per org per billing period. <code>Billing.record_usage/3</code> is called from the AI context after each agent run. Oban aggregates and syncs to Stripe metered billing on a schedule.
+      </div>
+    </div>
+
+    <!-- S4: AI AGENTS -->
+    <div class="section" id="s4">
+      <div class="section-header">
+        <div class="section-tag">Section 04</div>
+        <h2>AI Agent Context</h2>
+        <p>BEAM-native agent orchestration. Concurrent agents run as supervised GenServer processes. Pluggable LLM providers. Tool calls are first-class citizens modelled as Ash resources.</p>
+      </div>
+
+      <div class="code-label">// Resource + process layout</div>
+      <pre><code><span class="c-green">ai/</span>
+├── resources/
+│   ├── <span class="c-purple">agent.ex</span>             <span class="c-muted"># Agent definition — model, tools, system prompt</span>
+│   ├── <span class="c-purple">conversation.ex</span>      <span class="c-muted"># Belongs to Org — holds message history</span>
+│   ├── <span class="c-purple">message.ex</span>           <span class="c-muted"># role: :user | :assistant | :tool_result</span>
+│   └── <span class="c-purple">tool_call.ex</span>         <span class="c-muted"># Tool invocations — auditable, replayable</span>
+├── workers/
+│   └── <span class="c-yellow">agent_runner.ex</span>      <span class="c-muted"># Oban worker — wraps GenServer agent lifecycle</span>
+├── providers/
+│   ├── <span class="c-green">anthropic.ex</span>         <span class="c-muted"># Claude — streaming via SSE</span>
+│   ├── <span class="c-green">openai.ex</span>            <span class="c-muted"># GPT-4o — streaming via SSE</span>
+│   └── <span class="c-green">behaviour.ex</span>         <span class="c-muted"># @behaviour — swap providers transparently</span>
+└── ai.ex                    <span class="c-muted"># Public API: run_agent/3, stream_response/2</span></code></pre>
+
+      <h3>Concurrency Model</h3>
+      <p style="color: var(--muted)">Each agent run is an Oban job → spawns a supervised Task → streams tokens back via Phoenix PubSub → LiveView subscribes and renders in real time. The BEAM handles hundreds of concurrent agent runs without thread pool anxiety.</p>
+
+      <div class="flow">
+        <div class="flow-node purple">AI.run_agent/3</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">Oban.insert</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node yellow">AgentRunner worker</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">Provider.stream/2</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node green">PubSub broadcast</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node purple">LiveView render</div>
+      </div>
+
+      <h3>Provider Behaviour</h3>
+      <div class="code-label">// Pluggable provider contract</div>
+      <pre><code><span class="c-purple">@callback</span> complete(messages :: [map()], opts :: keyword()) ::
+  {:ok, <span class="c-green">stream</span>} | {:error, term()}
+
+<span class="c-purple">@callback</span> supports_tools?() :: boolean()
+
+<span class="c-muted"># Config-driven provider selection per agent</span>
+<span class="c-yellow">config</span> :my_saas, AI,
+  default_provider: <span class="c-green">AI.Providers.Anthropic</span>,
+  fallback_provider: <span class="c-green">AI.Providers.OpenAI</span></code></pre>
+
+      <div class="decision">
+        <strong>Tool Calls as Resources</strong>
+        ToolCall is an Ash resource — every invocation is persisted, queryable, and auditable. This gives you a replay log, cost attribution per org, and a foundation for agent observability without a separate tracing service.
+      </div>
+
+      <div class="tradeoff">
+        <strong>Billing Integration</strong>
+        After each agent run completes, AgentRunner calls <code>Billing.record_usage(org, :ai_tokens, count)</code>. Token counting is provider-specific but abstracted behind the behaviour — swap Claude for GPT, metering stays intact.
+      </div>
+    </div>
+
+    <!-- S5: NOTIFICATIONS -->
+    <div class="section" id="s5">
+      <div class="section-header">
+        <div class="section-tag">Section 05</div>
+        <h2>Notifications Context</h2>
+        <p>Transactional and notification email via Swoosh. Template-driven, multi-provider, and observable. In-app notifications via Phoenix PubSub for real-time delivery.</p>
+      </div>
+
+      <div class="code-label">// Resource + mailer layout</div>
+      <pre><code><span class="c-green">notifications/</span>
+├── resources/
+│   ├── <span class="c-purple">notification.ex</span>      <span class="c-muted"># In-app notification — per user, per org</span>
+│   └── <span class="c-purple">email_log.ex</span>         <span class="c-muted"># Delivery audit trail — status, provider, timestamps</span>
+├── mailers/
+│   ├── <span class="c-yellow">auth_mailer.ex</span>       <span class="c-muted"># Password reset, magic link, email verify</span>
+│   ├── <span class="c-yellow">billing_mailer.ex</span>    <span class="c-muted"># Trial ending, payment failed, invoice ready</span>
+│   └── <span class="c-yellow">agent_mailer.ex</span>      <span class="c-muted"># Agent run complete, error alerts</span>
+├── templates/               <span class="c-muted"># HEEx email templates — Tailwind inline styles</span>
+└── notifications.ex         <span class="c-muted"># Public API: send_email/2, notify_user/3</span></code></pre>
+
+      <h3>Email Stack</h3>
+      <div class="card-grid">
+        <div class="card accent-purple">
+          <h4>Swoosh</h4>
+          <p>Adapter-based mailer. Resend in production, local Mailbox in dev. Swap adapters in config with zero code changes.</p>
+        </div>
+        <div class="card accent-green">
+          <h4>Oban Delivery</h4>
+          <p>All emails enqueued as Oban jobs — retryable, observable, never lost on process crash.</p>
+        </div>
+        <div class="card accent-yellow">
+          <h4>EmailLog</h4>
+          <p>Every outbound email persisted as an Ash resource. Queryable delivery audit trail per org.</p>
+        </div>
+        <div class="card accent-red">
+          <h4>In-App Notifications</h4>
+          <p>Notification resource + PubSub broadcast. LiveView subscribes on mount — real-time bell icon updates.</p>
+        </div>
+      </div>
+
+      <h3>Transactional vs Notification Split</h3>
+      <table>
+        <tr>
+          <th>Type</th>
+          <th>Mailer</th>
+          <th>Trigger</th>
+          <th>Delivery</th>
+        </tr>
+        <tr>
+          <td><span class="badge badge-purple">Transactional</span></td>
+          <td><code>AuthMailer</code></td>
+          <td>Password reset, magic link</td>
+          <td>Immediate Oban job</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-yellow">Billing</span></td>
+          <td><code>BillingMailer</code></td>
+          <td>Stripe webhook events</td>
+          <td>Chained from StripeHandler worker</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-green">Notification</span></td>
+          <td><code>AgentMailer</code></td>
+          <td>AI run complete / failure</td>
+          <td>Oban + PubSub in parallel</td>
+        </tr>
+      </table>
+
+      <div class="decision">
+        <strong>Provider Portability</strong>
+        The Swoosh adapter is set in config — clients using SendGrid, Postmark, or Resend need zero code changes. The boilerplate defaults to Resend (best DX + deliverability) but ships adapter-agnostic.
+      </div>
+    </div>
+
+    <!-- S6: API LAYER -->
+    <div class="section" id="s6">
+      <div class="section-header">
+        <div class="section-tag">Section 06</div>
+        <h2>API Layer — REST + GraphQL</h2>
+        <p>AshJsonApi and AshGraphql derive the entire API surface from Ash resource definitions. Zero hand-written controllers for CRUD. Custom actions map to non-standard endpoints cleanly.</p>
+      </div>
+
+      <div class="code-label">// API router layout</div>
+      <pre><code><span class="c-green">my_saas_web/api/</span>
+├── <span class="c-purple">json_api_router.ex</span>       <span class="c-muted"># AshJsonApi — mounted at /api/v1</span>
+├── <span class="c-purple">graphql_schema.ex</span>        <span class="c-muted"># AshGraphql — mounted at /api/graphql</span>
+└── <span class="c-purple">openapi_spec.ex</span>          <span class="c-muted"># Auto-generated OpenAPI 3.0 spec</span></code></pre>
+
+      <h3>Resource → API Mapping</h3>
+      <div class="code-label">// Ash resource — both APIs derived from one definition</div>
+      <pre><code><span class="c-purple">defmodule</span> MySaas.Accounts.User <span class="c-yellow">do</span>
+  use Ash.Resource,
+    domain: MySaas.Accounts,
+    extensions: [
+      <span class="c-green">AshJsonApi.Resource</span>,
+      <span class="c-green">AshGraphql.Resource</span>,
+      <span class="c-green">AshPostgres.DataLayer</span>
+    ]
+
+  json_api <span class="c-yellow">do</span>
+    type <span class="c-green">"user"</span>
+    routes <span class="c-yellow">do</span>
+      base <span class="c-green">"/users"</span>
+      get :read
+      index :list
+      post :register         <span class="c-muted"># custom action → POST /users/register</span>
+    <span class="c-yellow">end</span>
+  <span class="c-yellow">end</span>
+
+  graphql <span class="c-yellow">do</span>
+    type :user
+    queries <span class="c-yellow">do</span>
+      get :get_user, :read
+      list :list_users, :list
+    <span class="c-yellow">end</span>
+    mutations <span class="c-yellow">do</span>
+      create :register_user, :register
+    <span class="c-yellow">end</span>
+  <span class="c-yellow">end</span>
+<span class="c-yellow">end</span></code></pre>
+
+      <h3>Auth on the API Layer</h3>
+      <div class="card-grid">
+        <div class="card accent-purple">
+          <h4>Bearer Tokens</h4>
+          <p>API clients authenticate with Bearer tokens. AshAuthentication issues them — same token infrastructure as the web session.</p>
+        </div>
+        <div class="card accent-green">
+          <h4>Tenant Scoping</h4>
+          <p>Every API request resolves <code>org_id</code> from the token. Ash policies enforce tenant isolation automatically — no per-query filtering needed.</p>
+        </div>
+        <div class="card accent-yellow">
+          <h4>OpenAPI Spec</h4>
+          <p>AshJsonApi auto-generates an OpenAPI 3.0 spec at <code>/api/v1/open_api</code>. Rails/Django/Next.js clients can generate typed SDKs from it.</p>
+        </div>
+      </div>
+
+      <div class="decision">
+        <strong>API-Escapable Pattern</strong>
+        When a client needs Rails or Django to consume your Phoenix backend: point them at <code>/api/v1</code> (REST) or <code>/api/graphql</code>. The OpenAPI spec lets them auto-generate client SDKs. Phoenix stays the system of record — the other framework is just a consumer.
+      </div>
+    </div>
+
+    <!-- S7: CROSS-FRAMEWORK -->
+    <div class="section" id="s7">
+      <div class="section-header">
+        <div class="section-tag">Section 07</div>
+        <h2>Cross-Framework Integration</h2>
+        <p>How Rails, Django, Node.js, or Next.js plug into this boilerplate — without compromising the Phoenix core.</p>
+      </div>
+
+      <h3>The Integration Boundary</h3>
+      <div class="flow">
+        <div class="flow-node purple">Phoenix / Ash</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node green">/api/v1 (REST)</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node yellow">Rails / Django / Node</div>
+      </div>
+      <div class="flow" style="margin-top: 8px;">
+        <div class="flow-node purple">Phoenix / Ash</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node green">/api/graphql</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node yellow">Next.js / Apollo</div>
+      </div>
+
+      <table>
+        <tr>
+          <th>Framework</th>
+          <th>Integration Point</th>
+          <th>What it gets</th>
+          <th>What Phoenix owns</th>
+        </tr>
+        <tr>
+          <td><span class="badge badge-red">Rails</span></td>
+          <td>REST <code>/api/v1</code></td>
+          <td>Admin panel, reporting, backoffice</td>
+          <td>Auth, data, business logic, billing</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-green">Next.js</span></td>
+          <td>GraphQL <code>/api/graphql</code></td>
+          <td>Marketing site, SEO frontend</td>
+          <td>Auth tokens, all mutations, AI</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-yellow">Django</span></td>
+          <td>REST <code>/api/v1</code></td>
+          <td>ML pipeline, data processing</td>
+          <td>Auth, multi-tenancy, billing</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-purple">Node / Express</span></td>
+          <td>REST or GraphQL</td>
+          <td>Webhook relay, integrations</td>
+          <td>Core domain, persistence</td>
+        </tr>
+      </table>
+
+      <div class="decision">
+        <strong>The Rule</strong>
+        Other frameworks are <em>consumers</em> of the Phoenix API — never co-owners of the database. Phoenix owns the schema, migrations, and business logic. Rails/Django/Node never write to the DB directly. This prevents the "two migration systems" nightmare.
+      </div>
+
+      <div class="tradeoff">
+        <strong>What You Never Do</strong>
+        Never share the PostgreSQL database between Phoenix and another framework at the write level. Rails has its own migration system. Django has its own ORM. Letting two frameworks own the schema simultaneously is the fastest way to corrupt your data model. Read-only access via views or a reporting schema is acceptable for analytics.
+      </div>
+
+      <h3>Recommended Client Delivery Patterns</h3>
+      <div class="card-grid">
+        <div class="card accent-purple">
+          <div class="card-icon">🚀</div>
+          <h4>Default Delivery</h4>
+          <p>Full Phoenix monolith. LiveView for UI. No other framework. Fastest to ship, most cohesive. 90% of client projects.</p>
+        </div>
+        <div class="card accent-green">
+          <div class="card-icon">🔌</div>
+          <h4>API + Next.js Frontend</h4>
+          <p>Client insists on React frontend. Phoenix serves GraphQL. Next.js consumes it. LiveView dropped for this deployment.</p>
+        </div>
+        <div class="card accent-yellow">
+          <div class="card-icon">🔧</div>
+          <h4>Phoenix Core + Rails Admin</h4>
+          <p>Client has existing Rails codebase. Phoenix becomes the AI/real-time engine. Rails consumes REST API for backoffice.</p>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  function show(id, el) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    el.classList.add('active');
+
+    const steps = ['s1','s2','s3','s4','s5','s6'];
+    const bars = document.querySelectorAll('.prog-step');
+    const idx = steps.indexOf(id);
+    bars.forEach((b, i) => {
+      b.classList.remove('done', 'active');
+      if (i < idx) b.classList.add('done');
+      else if (i === idx) b.classList.add('active');
+    });
+  }
+</script>
+</body>
+</html>

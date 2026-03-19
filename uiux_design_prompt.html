@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>UI/UX Design Prompt — Phoenix SaaS Boilerplate</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #f8f7f4;
+    --surface: #ffffff;
+    --surface2: #f2f0ec;
+    --border: #e4e0d8;
+    --accent: #1a1a2e;
+    --accent2: #4a3fa0;
+    --accent3: #c8692a;
+    --text: #1c1917;
+    --muted: #78716c;
+    --tag-bg: #ede9e0;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    line-height: 1.75;
+    padding: 0 0 80px;
+  }
+
+  /* HERO */
+  .hero {
+    background: var(--accent);
+    color: #fff;
+    padding: 64px 64px 56px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 320px; height: 320px;
+    border-radius: 50%;
+    background: rgba(74,63,160,0.25);
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -40px; left: 30%;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: rgba(200,105,42,0.15);
+  }
+
+  .hero-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.45);
+    margin-bottom: 16px;
+  }
+
+  .hero h1 {
+    font-family: 'Instrument Serif', serif;
+    font-size: 52px;
+    font-weight: 400;
+    line-height: 1.05;
+    margin-bottom: 12px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero h1 em {
+    font-style: italic;
+    color: #a89fef;
+  }
+
+  .hero-sub {
+    color: rgba(255,255,255,0.55);
+    font-size: 14px;
+    max-width: 520px;
+    position: relative;
+    z-index: 1;
+    margin-bottom: 32px;
+  }
+
+  .hero-meta {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero-meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .hero-meta-item span:first-child {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.35);
+  }
+
+  .hero-meta-item span:last-child {
+    font-size: 13px;
+    color: rgba(255,255,255,0.8);
+  }
+
+  /* CONTENT */
+  .content {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 0 48px;
+  }
+
+  /* SECTION */
+  .section {
+    padding: 48px 0 0;
+  }
+
+  .section-label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .section-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+  }
+
+  .section-line {
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  h2 {
+    font-family: 'Instrument Serif', serif;
+    font-size: 28px;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    margin-bottom: 10px;
+    line-height: 1.2;
+  }
+
+  h3 {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 28px 0 10px;
+  }
+
+  p { color: var(--muted); margin-bottom: 12px; font-size: 14px; }
+
+  /* PROMPT BLOCK */
+  .prompt-block {
+    background: var(--accent);
+    color: rgba(255,255,255,0.85);
+    border-radius: 12px;
+    padding: 32px 36px;
+    margin: 24px 0;
+    font-size: 14px;
+    line-height: 1.9;
+    position: relative;
+  }
+
+  .prompt-block .copy-label {
+    position: absolute;
+    top: 16px; right: 20px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: rgba(255,255,255,0.25);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .prompt-block .hl { color: #a89fef; font-style: italic; }
+  .prompt-block .hl2 { color: #f0a06a; }
+  .prompt-block .hl3 { color: #6ee7c0; }
+
+  /* SPEC GRID */
+  .spec-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 16px 0;
+  }
+
+  .spec-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 18px 20px;
+  }
+
+  .spec-card h4 {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .spec-card ul {
+    padding-left: 14px;
+    list-style: none;
+  }
+
+  .spec-card li {
+    color: var(--muted);
+    font-size: 12.5px;
+    line-height: 1.8;
+    position: relative;
+  }
+
+  .spec-card li::before {
+    content: '—';
+    position: absolute;
+    left: -14px;
+    color: var(--border);
+  }
+
+  /* SCREEN LIST */
+  .screen-list {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin: 16px 0;
+  }
+
+  .screen-chip {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-size: 12.5px;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .screen-chip .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--border);
+    flex-shrink: 0;
+  }
+
+  .screen-chip.auth .dot   { background: #a89fef; }
+  .screen-chip.dash .dot   { background: #6ee7c0; }
+  .screen-chip.bill .dot   { background: #f0a06a; }
+  .screen-chip.ai .dot     { background: #e06fa0; }
+  .screen-chip.notif .dot  { background: #60c8e8; }
+  .screen-chip.admin .dot  { background: #a8d870; }
+
+  /* COLOR PALETTE */
+  .palette {
+    display: flex;
+    gap: 8px;
+    margin: 16px 0;
+    flex-wrap: wrap;
+  }
+
+  .swatch {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .swatch-color {
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+
+  .swatch-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+
+  /* TAG ROW */
+  .tag-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 12px 0;
+  }
+
+  .tag {
+    background: var(--tag-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 3px 10px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  /* DIVIDER */
+  hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 48px 0 0;
+  }
+
+  /* COPY BUTTON */
+  .copy-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--accent2);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 18px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: opacity 0.15s;
+    margin-top: 16px;
+  }
+
+  .copy-btn:hover { opacity: 0.85; }
+
+  .notice {
+    background: #fefce8;
+    border: 1px solid #fde68a;
+    border-left: 3px solid #f59e0b;
+    border-radius: 6px;
+    padding: 14px 18px;
+    font-size: 13px;
+    color: #92400e;
+    margin: 20px 0;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: 13px;
+  }
+
+  th {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 9px 14px;
+    text-align: left;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  td {
+    border: 1px solid var(--border);
+    padding: 9px 14px;
+    vertical-align: top;
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  td strong { color: var(--text); }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-label">// UI / UX Design Prompt</div>
+  <h1>Phoenix SaaS<br/><em>Design Brief</em></h1>
+  <p class="hero-sub">A complete design specification for the Phoenix / Ash boilerplate UI — ready to hand to a designer or feed into v0, Figma AI, or Cursor.</p>
+  <div class="hero-meta">
+    <div class="hero-meta-item">
+      <span>Stack</span>
+      <span>Phoenix LiveView + TailwindCSS</span>
+    </div>
+    <div class="hero-meta-item">
+      <span>Screens</span>
+      <span>18 core screens</span>
+    </div>
+    <div class="hero-meta-item">
+      <span>Audience</span>
+      <span>B2B SaaS teams</span>
+    </div>
+    <div class="hero-meta-item">
+      <span>Aesthetic</span>
+      <span>Refined dark-first professional</span>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+
+  <!-- MASTER PROMPT -->
+  <div class="section">
+    <div class="section-label">
+      <span class="section-num">01</span>
+      <div class="section-line"></div>
+    </div>
+    <h2>Master Prompt</h2>
+    <p>Use this as your primary generation prompt — for v0, Cursor, Figma AI, or a human designer briefing.</p>
+
+    <div class="prompt-block" id="master-prompt">
+      <span class="copy-label">MASTER PROMPT</span>
+
+      Design a <span class="hl">sleek, responsive, professional B2B SaaS application UI</span> for a multi-tenant AI-powered platform built on Phoenix LiveView and TailwindCSS. The product serves technical teams and indie founders who manage AI agents, subscriptions, and organisational workspaces.<br/><br/>
+
+      <span class="hl2">Visual Direction:</span> Refined dark-first aesthetic. Deep navy/charcoal backgrounds with crisp white surface cards. A single strong accent colour (electric indigo <span class="hl3">#6366f1</span>) used sparingly for CTAs, active states, and data highlights. Secondary warm amber accent for billing and usage indicators. Clean geometric sans-serif typography — no decorative fonts. Generous whitespace, precise 8px grid spacing system, subtle depth via layered surface elevations rather than heavy drop shadows.<br/><br/>
+
+      <span class="hl2">Layout System:</span> Full-height sidebar navigation (240px collapsed to 64px on mobile) with nested context sections. Top header bar with global search, notification bell, org switcher, and user avatar. Main content area with max-width 1280px container. Responsive breakpoints: mobile ≥ 375px, tablet ≥ 768px, desktop ≥ 1280px. All interactive surfaces must work at every breakpoint.<br/><br/>
+
+      <span class="hl2">Component Language:</span> Rounded corners (radius 8px cards, 6px buttons, 4px inputs). Monospace font for all data, IDs, tokens, and code snippets. Subtle 1px borders in dark surface colours rather than heavy outlines. Micro-interactions on hover (100ms ease transitions). Loading states with skeleton screens — no spinners. Empty states with actionable illustration placeholders. Toast notifications anchored bottom-right.<br/><br/>
+
+      <span class="hl2">Data Density:</span> Design for information-rich views — dashboards with multiple metric cards, agent run logs with status badges, billing tables with usage bars. Every table must have: sortable column headers, row hover states, inline action menus, pagination, and a "no results" empty state. Prioritise scannability over decoration.<br/><br/>
+
+      <span class="hl2">Technical Constraints:</span> All components must be implementable in Phoenix LiveView with TailwindCSS utility classes only — no custom CSS frameworks. Avoid JavaScript-heavy patterns; prefer CSS-driven interactions. Forms use LiveView phx-change and phx-submit patterns — design validation states (error, success, loading) for every form field. Real-time updates (agent streaming, notification counts) must have smooth DOM-patch-friendly designs — no full-page repaints.
+    </div>
+
+    <button class="copy-btn" onclick="copyPrompt('master-prompt')">
+      ⧉ Copy Master Prompt
+    </button>
+  </div>
+
+  <hr/>
+
+  <!-- SCREENS -->
+  <div class="section">
+    <div class="section-label">
+      <span class="section-num">02</span>
+      <div class="section-line"></div>
+    </div>
+    <h2>Screens to Design</h2>
+    <p>18 core screens spanning all 5 product contexts. Each must be designed independently and as part of a cohesive system.</p>
+
+    <h3>Authentication</h3>
+    <div class="screen-list">
+      <div class="screen-chip auth"><div class="dot"></div>Sign In</div>
+      <div class="screen-chip auth"><div class="dot"></div>Register</div>
+      <div class="screen-chip auth"><div class="dot"></div>Magic Link</div>
+      <div class="screen-chip auth"><div class="dot"></div>Password Reset</div>
+      <div class="screen-chip auth"><div class="dot"></div>OAuth Redirect</div>
+      <div class="screen-chip auth"><div class="dot"></div>Onboarding Flow</div>
+    </div>
+
+    <h3>Dashboard &amp; Navigation</h3>
+    <div class="screen-list">
+      <div class="screen-chip dash"><div class="dot"></div>Home Dashboard</div>
+      <div class="screen-chip dash"><div class="dot"></div>Org Switcher</div>
+      <div class="screen-chip dash"><div class="dot"></div>Team Members</div>
+    </div>
+
+    <h3>AI Agents</h3>
+    <div class="screen-list">
+      <div class="screen-chip ai"><div class="dot"></div>Agent List</div>
+      <div class="screen-chip ai"><div class="dot"></div>Agent Detail</div>
+      <div class="screen-chip ai"><div class="dot"></div>Live Run Stream</div>
+      <div class="screen-chip ai"><div class="dot"></div>Run History</div>
+    </div>
+
+    <h3>Billing</h3>
+    <div class="screen-list">
+      <div class="screen-chip bill"><div class="dot"></div>Plan Selection</div>
+      <div class="screen-chip bill"><div class="dot"></div>Billing Dashboard</div>
+      <div class="screen-chip bill"><div class="dot"></div>Usage Detail</div>
+    </div>
+
+    <h3>Notifications &amp; Settings</h3>
+    <div class="screen-list">
+      <div class="screen-chip notif"><div class="dot"></div>Notification Centre</div>
+      <div class="screen-chip admin"><div class="dot"></div>Org Settings</div>
+    </div>
+  </div>
+
+  <hr/>
+
+  <!-- COLOUR + TYPE -->
+  <div class="section">
+    <div class="section-label">
+      <span class="section-num">03</span>
+      <div class="section-line"></div>
+    </div>
+    <h2>Colour &amp; Typography System</h2>
+
+    <h3>Colour Palette</h3>
+    <div class="palette">
+      <div class="swatch">
+        <div class="swatch-color" style="background:#0f1117;"></div>
+        <span class="swatch-label">#0f1117<br/>BG Base</span>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#161b27;"></div>
+        <span class="swatch-label">#161b27<br/>Surface 1</span>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#1e2536;"></div>
+        <span class="swatch-label">#1e2536<br/>Surface 2</span>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#2a3148;"></div>
+        <span class="swatch-label">#2a3148<br/>Border</span>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#6366f1;"></div>
+        <span class="swatch-label">#6366f1<br/>Accent</span>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#818cf8;"></div>
+        <span class="swatch-label">#818cf8<br/>Accent Hover</span>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#f59e0b;"></div>
+        <span class="swatch-label">#f59e0b<br/>Warning/Usage</span>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#10b981;"></div>
+        <span class="swatch-label">#10b981<br/>Success</span>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#ef4444;"></div>
+        <span class="swatch-label">#ef4444<br/>Error</span>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#e2e8f0;"></div>
+        <span class="swatch-label">#e2e8f0<br/>Text Primary</span>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#64748b;"></div>
+        <span class="swatch-label">#64748b<br/>Text Muted</span>
+      </div>
+    </div>
+
+    <h3>Typography Scale</h3>
+    <table>
+      <tr>
+        <th>Role</th>
+        <th>Font</th>
+        <th>Size</th>
+        <th>Weight</th>
+        <th>Use</th>
+      </tr>
+      <tr>
+        <td><strong>Display</strong></td>
+        <td>Inter or Geist</td>
+        <td>32–48px</td>
+        <td>700</td>
+        <td>Page hero titles, onboarding</td>
+      </tr>
+      <tr>
+        <td><strong>Heading 1</strong></td>
+        <td>Inter or Geist</td>
+        <td>24px</td>
+        <td>600</td>
+        <td>Section headings, modal titles</td>
+      </tr>
+      <tr>
+        <td><strong>Heading 2</strong></td>
+        <td>Inter or Geist</td>
+        <td>18px</td>
+        <td>600</td>
+        <td>Card headings, sidebar labels</td>
+      </tr>
+      <tr>
+        <td><strong>Body</strong></td>
+        <td>Inter or Geist</td>
+        <td>14px</td>
+        <td>400</td>
+        <td>Default prose, descriptions</td>
+      </tr>
+      <tr>
+        <td><strong>Label</strong></td>
+        <td>Inter or Geist</td>
+        <td>12px</td>
+        <td>500</td>
+        <td>Form labels, table headers</td>
+      </tr>
+      <tr>
+        <td><strong>Mono</strong></td>
+        <td>JetBrains Mono</td>
+        <td>12px</td>
+        <td>400</td>
+        <td>IDs, tokens, code, metrics</td>
+      </tr>
+      <tr>
+        <td><strong>Caption</strong></td>
+        <td>Inter or Geist</td>
+        <td>11px</td>
+        <td>400</td>
+        <td>Timestamps, metadata, tooltips</td>
+      </tr>
+    </table>
+  </div>
+
+  <hr/>
+
+  <!-- SCREEN PROMPTS -->
+  <div class="section">
+    <div class="section-label">
+      <span class="section-num">04</span>
+      <div class="section-line"></div>
+    </div>
+    <h2>Per-Screen Prompts</h2>
+    <p>Use each block as a targeted prompt for individual screen generation.</p>
+
+    <h3>Home Dashboard</h3>
+    <div class="prompt-block" id="p-dashboard">
+      <span class="copy-label">SCREEN PROMPT</span>
+      Design the <span class="hl">main dashboard screen</span> for a multi-tenant AI SaaS platform. Dark background (#0f1117). Top header with org name, global search bar, notification bell with unread badge, and user avatar dropdown.<br/><br/>
+      Left sidebar (240px) with navigation groups: Overview, Agents, Billing, Team, Settings. Active state uses left border accent + subtle background tint. Collapse to icon-only at tablet breakpoint.<br/><br/>
+      Main content area: <span class="hl2">4 metric cards</span> in a row — Active Agents, AI Tokens Used This Month, Team Members, Current Plan. Each card has an icon, large numeric value in monospace, percentage change badge (green/red), and sparkline chart.<br/><br/>
+      Below: <span class="hl3">Recent Agent Runs table</span> (agent name, status badge, duration, tokens used, triggered by, timestamp) and a <span class="hl3">Usage Over Time</span> line chart (30 days, token consumption, colour-filled area under the line). Bottom: upcoming billing date notice bar.
+    </div>
+    <button class="copy-btn" onclick="copyPrompt('p-dashboard')">⧉ Copy</button>
+
+    <h3>AI Agent Live Run</h3>
+    <div class="prompt-block" id="p-agent">
+      <span class="copy-label">SCREEN PROMPT</span>
+      Design the <span class="hl">live agent run screen</span> — the most interactive screen in the product. Split-pane layout: left pane (40%) shows agent config (model, system prompt, tools enabled, temperature). Right pane (60%) is the live output stream.<br/><br/>
+      Output stream: scrollable message thread. User messages in right-aligned bubbles. Assistant messages left-aligned, streaming token by token with a blinking cursor. Tool call blocks styled as collapsible code cards with tool name, input JSON, and result JSON. Status bar at bottom: tokens used, elapsed time, model name.<br/><br/>
+      <span class="hl2">State variants required:</span> idle (run button prominent), running (animated pulsing status indicator, abort button), complete (summary card with cost, token count, run ID in monospace), error (red alert card with error message and retry button).<br/><br/>
+      All transitions must be <span class="hl3">LiveView-patch-friendly</span> — no full DOM replacement during streaming. New message tokens append to existing DOM nodes.
+    </div>
+    <button class="copy-btn" onclick="copyPrompt('p-agent')">⧉ Copy</button>
+
+    <h3>Billing Dashboard</h3>
+    <div class="prompt-block" id="p-billing">
+      <span class="copy-label">SCREEN PROMPT</span>
+      Design the <span class="hl">billing and usage dashboard</span>. Top section: current plan card (plan name, price, renewal date, upgrade/downgrade CTA). Status badge: ACTIVE in green, TRIAL in amber, PAST DUE in red.<br/><br/>
+      Usage section: <span class="hl2">horizontal progress bars</span> for each metered resource (AI tokens, API calls, team seats) — value / limit with colour shift from green → amber → red as limit approaches. Overage warning banner when at 80%+.<br/><br/>
+      Invoice table: date, description, amount, status badge (paid/pending/failed), download PDF link. Stripe-hosted portal link as secondary CTA.<br/><br/>
+      <span class="hl3">Payment method card</span>: masked card number, expiry, card brand icon, "Update" link. Design a trial countdown card variant: days remaining as a large number, progress ring, upgrade prompt.
+    </div>
+    <button class="copy-btn" onclick="copyPrompt('p-billing')">⧉ Copy</button>
+
+    <h3>Authentication — Sign In</h3>
+    <div class="prompt-block" id="p-auth">
+      <span class="copy-label">SCREEN PROMPT</span>
+      Design the <span class="hl">sign in screen</span>. Full-height split layout: left half is a dark branded panel with product logo, tagline, and a subtle abstract geometric pattern or grid. Right half is the auth form on white/light surface.<br/><br/>
+      Form: email input, password input (show/hide toggle), "Remember me" checkbox, "Forgot password?" link. Primary CTA: "Sign in" button (full width, accent colour). Divider: "or continue with". OAuth buttons: Google and GitHub (outlined, icon + label).<br/><br/>
+      <span class="hl2">State variants:</span> default, loading (button shows spinner + "Signing in…"), error (inline red error message above submit), success (redirect animation). Footer: "Don't have an account? Sign up" link.<br/><br/>
+      <span class="hl3">Responsive:</span> stacked single column on mobile, left panel hidden on screens below 768px.
+    </div>
+    <button class="copy-btn" onclick="copyPrompt('p-auth')">⧉ Copy</button>
+
+    <h3>Team Members</h3>
+    <div class="prompt-block" id="p-team">
+      <span class="copy-label">SCREEN PROMPT</span>
+      Design the <span class="hl">team members management screen</span>. Page header with member count and "Invite Member" primary button (opens a slide-over panel).<br/><br/>
+      Members table: avatar + name, email, role badge (:owner / :admin / :member in distinct colours), joined date, last active timestamp, actions menu (Edit Role, Remove). Current user's row subtly highlighted. Owner row has crown icon, non-removable.<br/><br/>
+      <span class="hl2">Pending invites section</span> below the table: email, invited by, sent date, "Resend" and "Revoke" actions. Empty state: illustration + "No pending invites".<br/><br/>
+      <span class="hl3">Invite slide-over panel:</span> email input, role selector (radio group), optional personal message textarea, "Send Invite" CTA. Slide in from right, backdrop blur behind.
+    </div>
+    <button class="copy-btn" onclick="copyPrompt('p-team')">⧉ Copy</button>
+  </div>
+
+  <hr/>
+
+  <!-- COMPONENT SPECS -->
+  <div class="section">
+    <div class="section-label">
+      <span class="section-num">05</span>
+      <div class="section-line"></div>
+    </div>
+    <h2>Component Specifications</h2>
+    <p>Every component must be designed in all relevant states.</p>
+
+    <div class="spec-grid">
+      <div class="spec-card">
+        <h4>🔘 Buttons</h4>
+        <ul>
+          <li>Primary — filled accent</li>
+          <li>Secondary — outlined</li>
+          <li>Ghost — text only</li>
+          <li>Danger — red filled</li>
+          <li>Icon-only variant</li>
+          <li>Loading state (spinner)</li>
+          <li>Disabled state</li>
+        </ul>
+      </div>
+      <div class="spec-card">
+        <h4>📝 Form Inputs</h4>
+        <ul>
+          <li>Text / Email / Password</li>
+          <li>Textarea</li>
+          <li>Select dropdown</li>
+          <li>Radio + Checkbox groups</li>
+          <li>Toggle switch</li>
+          <li>Error + success states</li>
+          <li>Inline validation message</li>
+        </ul>
+      </div>
+      <div class="spec-card">
+        <h4>🏷️ Badges &amp; Status</h4>
+        <ul>
+          <li>Status: active / trialing / past_due / cancelled</li>
+          <li>Role: owner / admin / member</li>
+          <li>Run: running / complete / error / queued</li>
+          <li>Plan tier: free / pro / enterprise</li>
+        </ul>
+      </div>
+      <div class="spec-card">
+        <h4>📊 Data Display</h4>
+        <ul>
+          <li>Metric card + sparkline</li>
+          <li>Usage progress bar</li>
+          <li>Sortable data table</li>
+          <li>Empty state block</li>
+          <li>Skeleton loader</li>
+          <li>Pagination control</li>
+        </ul>
+      </div>
+      <div class="spec-card">
+        <h4>🔔 Feedback</h4>
+        <ul>
+          <li>Toast (success / error / info)</li>
+          <li>Alert banner (inline)</li>
+          <li>Confirmation modal</li>
+          <li>Slide-over panel</li>
+          <li>Tooltip</li>
+          <li>Notification dropdown</li>
+        </ul>
+      </div>
+      <div class="spec-card">
+        <h4>🧭 Navigation</h4>
+        <ul>
+          <li>Sidebar — expanded + collapsed</li>
+          <li>Top header bar</li>
+          <li>Org switcher dropdown</li>
+          <li>Breadcrumb trail</li>
+          <li>Tab bar (horizontal)</li>
+          <li>Mobile bottom nav</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <hr/>
+
+  <!-- FIGMA / V0 TIPS -->
+  <div class="section">
+    <div class="section-label">
+      <span class="section-num">06</span>
+      <div class="section-line"></div>
+    </div>
+    <h2>Tool-Specific Tips</h2>
+
+    <h3>v0 by Vercel</h3>
+    <div class="notice">
+      Prefix every v0 prompt with: <strong>"Using TailwindCSS utility classes only, no custom CSS. Dark theme. shadcn/ui components where applicable."</strong> Then paste the screen prompt. v0 responds best to single-screen prompts — do not combine multiple screens in one generation.
+    </div>
+
+    <h3>Figma AI / Figma Make</h3>
+    <div class="notice">
+      Use the Master Prompt as the design system brief first. Then use per-screen prompts as individual frame briefs. Ask Figma to generate a component library from the colour palette and typography scale before generating screens.
+    </div>
+
+    <h3>Cursor / Claude Artifacts</h3>
+    <div class="notice">
+      Prepend: <strong>"Generate as a single-file Phoenix LiveView HEEx template using TailwindCSS."</strong> For interactive components, append: <strong>"Include phx-click, phx-change, and phx-submit bindings where appropriate. All state managed via LiveView assigns."</strong>
+    </div>
+
+    <div class="tag-row">
+      <span class="tag">TailwindCSS</span>
+      <span class="tag">Phoenix LiveView</span>
+      <span class="tag">HEEx Templates</span>
+      <span class="tag">shadcn/ui</span>
+      <span class="tag">Headless UI</span>
+      <span class="tag">Heroicons</span>
+      <span class="tag">JetBrains Mono</span>
+      <span class="tag">Inter / Geist</span>
+      <span class="tag">Lucide Icons</span>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function copyPrompt(id) {
+  const el = document.getElementById(id);
+  const text = el.innerText.replace('SCREEN PROMPT', '').replace('MASTER PROMPT', '').trim();
+  navigator.clipboard.writeText(text).then(() => {
+    const btns = el.parentElement.querySelectorAll('.copy-btn');
+    btns.forEach(b => { b.textContent = '✓ Copied!'; setTimeout(() => b.textContent = '⧉ Copy', 2000); });
+  });
+}
+</script>
+</body>
+</html>

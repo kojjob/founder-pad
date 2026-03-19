@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Midnight Architect - Agent Directory</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;800&amp;family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "secondary-fixed": "#ffddb8",
+              "tertiary-fixed-dim": "#ffb783",
+              "surface-container-low": "#131b2e",
+              "error-container": "#93000a",
+              "on-primary-fixed-variant": "#2f2ebe",
+              "surface-container": "#171f33",
+              "on-tertiary-fixed-variant": "#703700",
+              "surface-container-highest": "#2d3449",
+              "on-tertiary": "#4f2500",
+              "secondary-fixed-dim": "#ffb95f",
+              "surface-bright": "#31394d",
+              "surface-tint": "#c0c1ff",
+              "primary-fixed": "#e1e0ff",
+              "on-tertiary-container": "#452000",
+              "surface-variant": "#2d3449",
+              "inverse-on-surface": "#283044",
+              "on-surface-variant": "#c7c4d7",
+              "inverse-primary": "#494bd6",
+              "inverse-surface": "#dae2fd",
+              "primary": "#c0c1ff",
+              "secondary": "#ffb95f",
+              "background": "#0b1326",
+              "outline": "#908fa0",
+              "on-error-container": "#ffdad6",
+              "surface-dim": "#0b1326",
+              "on-surface": "#dae2fd",
+              "error": "#ffb4ab",
+              "outline-variant": "#464554",
+              "on-error": "#690005",
+              "surface": "#0b1326",
+              "tertiary-fixed": "#ffdcc5",
+              "tertiary": "#ffb783",
+              "on-primary": "#1000a9",
+              "on-secondary-fixed-variant": "#653e00",
+              "on-primary-container": "#0d0096",
+              "secondary-container": "#ee9800",
+              "tertiary-container": "#d97721",
+              "on-secondary-container": "#5b3800",
+              "surface-container-lowest": "#060e20",
+              "on-secondary-fixed": "#2a1700",
+              "on-background": "#dae2fd",
+              "on-secondary": "#472a00",
+              "primary-container": "#8083ff",
+              "on-tertiary-fixed": "#301400",
+              "surface-container-high": "#222a3d",
+              "on-primary-fixed": "#07006c",
+              "primary-fixed-dim": "#c0c1ff"
+            },
+            fontFamily: {
+              "headline": ["Manrope"],
+              "body": ["Inter"],
+              "label": ["Inter"],
+              "mono": ["JetBrains Mono"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #0b1326;
+            color: #dae2fd;
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="flex min-h-screen">
+<!-- SideNavBar Component (Execution from JSON) -->
+<aside class="h-screen w-[240px] hidden md:flex flex-col sticky top-0 left-0 bg-[#171f33] border-r border-[#2d3449]/20 p-4 gap-y-4">
+<div class="flex items-center gap-3 mb-6">
+<div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary" data-icon="architecture">architecture</span>
+</div>
+<div>
+<h1 class="text-xl font-bold tracking-tight text-[#dae2fd] font-headline">Midnight AI</h1>
+<p class="text-[10px] uppercase tracking-widest text-primary font-bold">Enterprise Plan</p>
+</div>
+</div>
+<nav class="flex flex-col gap-y-1 flex-grow">
+<!-- Active: Agents -->
+<a class="flex items-center gap-3 px-3 py-2 text-[#c0c1ff] font-semibold bg-[#222a3d] rounded-md transition-transform active:scale-95" href="#">
+<span class="material-symbols-outlined" data-icon="smart_toy">smart_toy</span>
+<span class="text-sm">Agents</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-[#dae2fd]/60 font-medium hover:text-[#dae2fd] hover:bg-[#222a3d] transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="grid_view">grid_view</span>
+<span class="text-sm">Workspaces</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-[#dae2fd]/60 font-medium hover:text-[#dae2fd] hover:bg-[#222a3d] transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="payments">payments</span>
+<span class="text-sm">Billing</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-[#dae2fd]/60 font-medium hover:text-[#dae2fd] hover:bg-[#222a3d] transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="text-sm">Settings</span>
+</a>
+</nav>
+<div class="mt-auto pt-4 border-t border-[#2d3449]/20">
+<button class="w-full flex items-center justify-between px-3 py-2 rounded-md hover:bg-[#222a3d] transition-colors group">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded bg-surface-container-highest flex items-center justify-center">
+<span class="material-symbols-outlined text-xs" data-icon="sync">sync</span>
+</div>
+<span class="text-xs font-medium text-on-surface-variant group-hover:text-on-surface">Switch Workspace</span>
+</div>
+</button>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-grow flex flex-col min-w-0 bg-surface">
+<!-- TopNavBar Component (Execution from JSON) -->
+<header class="docked full-width top-0 sticky z-40 bg-[#0b1326]/60 backdrop-blur-md border-b border-[#2d3449]/10">
+<div class="flex justify-between items-center w-full px-6 py-3 max-w-[1280px] mx-auto">
+<div class="flex items-center gap-8">
+<span class="text-lg font-black text-[#dae2fd] font-headline">Midnight Architect</span>
+<div class="hidden lg:flex items-center bg-surface-container-low px-3 py-1.5 rounded-lg border border-outline-variant/10 focus-within:border-primary/50 transition-all">
+<span class="material-symbols-outlined text-on-surface-variant text-lg" data-icon="search">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm w-64 text-on-surface placeholder:text-on-surface-variant/50" placeholder="Global search..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<div class="h-6 w-[1px] bg-outline-variant/20 mx-1"></div>
+<button class="bg-gradient-to-br from-primary to-primary-container text-on-primary px-4 py-1.5 rounded-md text-sm font-bold shadow-lg shadow-primary/10 active:opacity-80 transition-all">
+                        New Agent
+                    </button>
+<img alt="User Avatar" class="w-8 h-8 rounded-full border border-primary/20 object-cover" data-alt="Professional user profile portrait close up" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCyAwiMX2EeQGOIC90sM6Fqo8PhQJxQkGUwh7iH56-XtqmHx19c1nOQTI_H_F6fPaNs9LzShTs8KrE7f8Edke4u3YWZkFuOuEZAKfr0NKefGWDbackWW0JujkfaIjQeHpm6puUlyuO7XWFhiYHTNrOCjh6qxF5W132ocaUttcs4686__4ZCppWwMNTJ9Qky8u32mEC2glcez7XdfUZORiQKRdTPF4XUhR174UZC0DXF3_tZzRG3-DksLqFjsiFEU3oONnGL7w6cXg"/>
+</div>
+</div>
+</header>
+<!-- Canvas Content -->
+<div class="flex-grow p-6 lg:p-10 max-w-[1280px] mx-auto w-full">
+<!-- Header Section -->
+<div class="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+<div>
+<h2 class="text-4xl font-extrabold font-headline tracking-tight text-on-surface mb-2">Agent Directory</h2>
+<p class="text-on-surface-variant font-body">Manage and orchestrate your autonomous workforce across clusters.</p>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex items-center bg-surface-container-high rounded-lg p-1">
+<button class="p-2 text-primary bg-surface-container-highest rounded-md">
+<span class="material-symbols-outlined" data-icon="grid_view">grid_view</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:text-on-surface">
+<span class="material-symbols-outlined" data-icon="view_list">view_list</span>
+</button>
+</div>
+<div class="relative group">
+<button class="flex items-center gap-2 bg-surface-container-high px-4 py-2 rounded-lg border border-outline-variant/20 hover:border-outline-variant transition-colors">
+<span class="text-sm font-medium">Filter by Status</span>
+<span class="material-symbols-outlined text-sm" data-icon="expand_more">expand_more</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Bento Grid - Agent Cards -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<!-- Agent Card 1 -->
+<div class="group relative bg-surface-container p-6 rounded-lg border border-transparent hover:border-primary/20 transition-all duration-300 flex flex-col h-full">
+<div class="flex justify-between items-start mb-6">
+<div class="w-12 h-12 rounded-xl bg-surface-container-highest flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-3xl" data-icon="neurology">neurology</span>
+</div>
+<div class="px-2 py-1 rounded bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-wider">
+                            Active
+                        </div>
+</div>
+<h3 class="text-lg font-bold font-headline mb-1 group-hover:text-primary transition-colors">NeuralScribe v2</h3>
+<code class="text-xs font-mono text-on-surface-variant/60 mb-4 block">ID: AG-9923-FF-01</code>
+<p class="text-sm text-on-surface-variant line-clamp-2 mb-6">Autonomous technical documentation agent specializing in API reference generation.</p>
+<div class="mt-auto flex items-center justify-between pt-4 border-t border-outline-variant/10">
+<div class="flex flex-col">
+<span class="text-[10px] uppercase text-on-surface-variant/40 font-bold">Created</span>
+<span class="text-xs font-medium">Oct 12, 2023</span>
+</div>
+<button class="text-primary hover:text-white transition-colors">
+<span class="material-symbols-outlined" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Agent Card 2 -->
+<div class="group relative bg-surface-container p-6 rounded-lg border border-transparent hover:border-primary/20 transition-all duration-300 flex flex-col h-full">
+<div class="flex justify-between items-start mb-6">
+<div class="w-12 h-12 rounded-xl bg-surface-container-highest flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-3xl" data-icon="query_stats">query_stats</span>
+</div>
+<div class="px-2 py-1 rounded bg-secondary/10 text-secondary text-[10px] font-bold uppercase tracking-wider">
+                            Idle
+                        </div>
+</div>
+<h3 class="text-lg font-bold font-headline mb-1 group-hover:text-primary transition-colors">QuantAnalyst_04</h3>
+<code class="text-xs font-mono text-on-surface-variant/60 mb-4 block">ID: AG-4451-BA-99</code>
+<p class="text-sm text-on-surface-variant line-clamp-2 mb-6">Financial data ingestion and pattern recognition for market volatility signals.</p>
+<div class="mt-auto flex items-center justify-between pt-4 border-t border-outline-variant/10">
+<div class="flex flex-col">
+<span class="text-[10px] uppercase text-on-surface-variant/40 font-bold">Created</span>
+<span class="text-xs font-medium">Sep 28, 2023</span>
+</div>
+<button class="text-primary hover:text-white transition-colors">
+<span class="material-symbols-outlined" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Agent Card 3 (Featured/Asymmetric) -->
+<div class="group relative bg-surface-container-high p-6 rounded-lg border border-primary/10 flex flex-col h-full lg:row-span-1 shadow-2xl shadow-black/20">
+<div class="absolute -top-3 -right-3">
+<div class="bg-primary-container text-on-primary-container text-[10px] font-bold px-3 py-1 rounded-full shadow-lg">NEW DEPLOYMENT</div>
+</div>
+<div class="flex justify-between items-start mb-6">
+<div class="w-12 h-12 rounded-xl bg-primary flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined text-3xl" data-icon="shield_person">shield_person</span>
+</div>
+<div class="px-2 py-1 rounded bg-primary/20 text-primary text-[10px] font-bold uppercase tracking-wider">
+                            Running
+                        </div>
+</div>
+<h3 class="text-xl font-extrabold font-headline mb-1 text-on-surface">SecuritySentinel AI</h3>
+<code class="text-xs font-mono text-primary/70 mb-4 block">ID: AG-8800-XC-72</code>
+<p class="text-sm text-on-surface-variant mb-6">Real-time threat detection and automated firewall response protocols for edge nodes.</p>
+<div class="mt-auto flex items-center justify-between pt-4 border-t border-outline-variant/10">
+<div class="flex flex-col">
+<span class="text-[10px] uppercase text-on-surface-variant/40 font-bold">Created</span>
+<span class="text-xs font-medium">Nov 02, 2023</span>
+</div>
+<div class="flex gap-2">
+<button class="bg-surface-container-highest p-2 rounded-md hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-sm" data-icon="settings">settings</span>
+</button>
+<button class="bg-primary text-on-primary p-2 rounded-md hover:bg-primary-container transition-colors">
+<span class="material-symbols-outlined text-sm" data-icon="bolt">bolt</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Empty State Illustration Placeholder (demonstrated below the grid) -->
+<div class="mt-20 py-20 bg-surface-container-lowest/50 rounded-2xl border border-dashed border-outline-variant/20 flex flex-col items-center justify-center text-center px-4">
+<div class="w-24 h-24 mb-6 relative">
+<div class="absolute inset-0 bg-primary/5 rounded-full animate-pulse"></div>
+<div class="relative flex items-center justify-center h-full">
+<span class="material-symbols-outlined text-6xl text-outline-variant/40" data-icon="person_search">person_search</span>
+</div>
+</div>
+<h4 class="text-2xl font-bold font-headline text-on-surface mb-2">No results for "Legacy Bot"</h4>
+<p class="text-on-surface-variant max-w-sm mb-8">We couldn't find any agents matching your current search or filter criteria. Try adjusting your status filter or search term.</p>
+<div class="flex items-center gap-4">
+<button class="bg-surface-container-highest text-on-surface px-6 py-2.5 rounded-lg text-sm font-semibold hover:bg-surface-bright transition-colors">
+                        Clear Filters
+                    </button>
+<button class="text-primary hover:underline text-sm font-medium flex items-center gap-2">
+                        View Documentation <span class="material-symbols-outlined text-sm" data-icon="open_in_new">open_in_new</span>
+</button>
+</div>
+</div>
+<!-- Asymmetric Data Visualization Row -->
+<div class="mt-12 grid grid-cols-1 lg:grid-cols-4 gap-6">
+<div class="lg:col-span-3 bg-surface-container rounded-lg p-6 overflow-hidden relative">
+<div class="absolute top-0 right-0 p-4">
+<span class="text-[10px] font-mono text-primary/30">METRIC_STREAM_LIVE</span>
+</div>
+<h5 class="text-sm font-bold uppercase tracking-widest text-on-surface-variant mb-6">Fleet Performance (24h)</h5>
+<div class="h-32 flex items-end gap-1">
+<!-- Simulated bar chart -->
+<div class="flex-grow bg-primary/20 h-[40%] rounded-t-sm hover:bg-primary transition-all"></div>
+<div class="flex-grow bg-primary/20 h-[55%] rounded-t-sm hover:bg-primary transition-all"></div>
+<div class="flex-grow bg-primary/20 h-[45%] rounded-t-sm hover:bg-primary transition-all"></div>
+<div class="flex-grow bg-primary/20 h-[70%] rounded-t-sm hover:bg-primary transition-all"></div>
+<div class="flex-grow bg-primary/20 h-[90%] rounded-t-sm hover:bg-primary transition-all"></div>
+<div class="flex-grow bg-primary h-[85%] rounded-t-sm"></div>
+<div class="flex-grow bg-primary/20 h-[65%] rounded-t-sm hover:bg-primary transition-all"></div>
+<div class="flex-grow bg-primary/20 h-[50%] rounded-t-sm hover:bg-primary transition-all"></div>
+<div class="flex-grow bg-primary/20 h-[40%] rounded-t-sm hover:bg-primary transition-all"></div>
+<div class="flex-grow bg-primary/20 h-[30%] rounded-t-sm hover:bg-primary transition-all"></div>
+</div>
+</div>
+<div class="bg-gradient-to-br from-surface-container-high to-surface-container-highest rounded-lg p-6 flex flex-col justify-between">
+<div>
+<span class="material-symbols-outlined text-secondary text-3xl mb-2" data-icon="account_balance_wallet" data-weight="fill">account_balance_wallet</span>
+<h5 class="text-xs font-bold text-on-surface-variant/60 uppercase">Cluster Spend</h5>
+</div>
+<div>
+<span class="text-3xl font-mono font-bold text-on-surface">$1,420.50</span>
+<div class="flex items-center gap-1 text-xs text-error mt-1">
+<span class="material-symbols-outlined text-xs" data-icon="trending_up">trending_up</span>
+<span>12% from last week</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 left-0 right-0 bg-[#0b1326] border-t border-[#2d3449]/20 h-16 flex items-center justify-around px-2 z-50">
+<a class="flex flex-col items-center justify-center text-[#c0c1ff]" href="#">
+<span class="material-symbols-outlined" data-icon="smart_toy">smart_toy</span>
+<span class="text-[10px] mt-1">Agents</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#dae2fd]/60" href="#">
+<span class="material-symbols-outlined" data-icon="grid_view">grid_view</span>
+<span class="text-[10px] mt-1">Spaces</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#dae2fd]/60" href="#">
+<span class="material-symbols-outlined" data-icon="payments">payments</span>
+<span class="text-[10px] mt-1">Billing</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#dae2fd]/60" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="text-[10px] mt-1">Settings</span>
+</a>
+</nav>
+</body></html>

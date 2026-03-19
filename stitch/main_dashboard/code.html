@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Midnight Architect | Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&amp;family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "secondary-fixed": "#ffddb8",
+                        "tertiary-fixed-dim": "#ffb783",
+                        "surface-container-low": "#131b2e",
+                        "error-container": "#93000a",
+                        "on-primary-fixed-variant": "#2f2ebe",
+                        "surface-container": "#171f33",
+                        "on-tertiary-fixed-variant": "#703700",
+                        "surface-container-highest": "#2d3449",
+                        "on-tertiary": "#4f2500",
+                        "secondary-fixed-dim": "#ffb95f",
+                        "surface-bright": "#31394d",
+                        "surface-tint": "#c0c1ff",
+                        "primary-fixed": "#e1e0ff",
+                        "on-tertiary-container": "#452000",
+                        "surface-variant": "#2d3449",
+                        "inverse-on-surface": "#283044",
+                        "on-surface-variant": "#c7c4d7",
+                        "inverse-primary": "#494bd6",
+                        "inverse-surface": "#dae2fd",
+                        "primary": "#c0c1ff",
+                        "secondary": "#ffb95f",
+                        "background": "#0b1326",
+                        "outline": "#908fa0",
+                        "on-error-container": "#ffdad6",
+                        "surface-dim": "#0b1326",
+                        "on-surface": "#dae2fd",
+                        "error": "#ffb4ab",
+                        "outline-variant": "#464554",
+                        "on-error": "#690005",
+                        "surface": "#0b1326",
+                        "tertiary-fixed": "#ffdcc5",
+                        "tertiary": "#ffb783",
+                        "on-primary": "#1000a9",
+                        "on-secondary-fixed-variant": "#653e00",
+                        "on-primary-container": "#0d0096",
+                        "secondary-container": "#ee9800",
+                        "tertiary-container": "#d97721",
+                        "on-secondary-container": "#5b3800",
+                        "surface-container-lowest": "#060e20",
+                        "on-secondary-fixed": "#2a1700",
+                        "on-background": "#dae2fd",
+                        "on-secondary": "#472a00",
+                        "primary-container": "#8083ff",
+                        "on-tertiary-fixed": "#301400",
+                        "surface-container-high": "#222a3d",
+                        "on-primary-fixed": "#07006c",
+                        "primary-fixed-dim": "#c0c1ff"
+                    },
+                    fontFamily: {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"],
+                        "mono": ["JetBrains Mono"]
+                    },
+                    borderRadius: { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #0b1326;
+            color: #dae2fd;
+        }
+    </style>
+</head>
+<body class="font-body selection:bg-primary/30 selection:text-primary min-h-screen flex">
+<!-- SideNavBar (Authority: JSON & Design System) -->
+<aside class="h-screen w-[240px] hidden md:flex flex-col sticky top-0 left-0 bg-[#171f33] border-r border-[#2d3449]/20 p-4 gap-y-4">
+<div class="flex items-center gap-3 px-2 mb-6">
+<div class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary text-xl">architecture</span>
+</div>
+<div class="flex flex-col">
+<span class="text-xl font-bold tracking-tight text-[#dae2fd] font-headline">Midnight AI</span>
+<span class="text-[10px] uppercase tracking-widest text-primary font-bold">Enterprise Plan</span>
+</div>
+</div>
+<nav class="flex flex-col gap-1 flex-1">
+<a class="flex items-center gap-3 px-3 py-2 text-[#c0c1ff] font-semibold bg-[#222a3d] rounded-md transition-transform active:scale-95" href="#">
+<span class="material-symbols-outlined">smart_toy</span>
+<span class="text-sm">Agents</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-[#dae2fd]/60 font-medium hover:text-[#dae2fd] hover:bg-[#222a3d] transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">grid_view</span>
+<span class="text-sm">Workspaces</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-[#dae2fd]/60 font-medium hover:text-[#dae2fd] hover:bg-[#222a3d] transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span class="text-sm">Billing</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-[#dae2fd]/60 font-medium hover:text-[#dae2fd] hover:bg-[#222a3d] transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-sm">Settings</span>
+</a>
+</nav>
+<div class="mt-auto pt-4 border-t border-[#2d3449]/20">
+<button class="w-full flex items-center justify-between px-3 py-2 rounded-md hover:bg-[#222a3d] text-[#dae2fd]/70 text-sm font-medium transition-colors">
+<span>Switch Workspace</span>
+<span class="material-symbols-outlined text-sm">unfold_more</span>
+</button>
+</div>
+</aside>
+<div class="flex-1 flex flex-col min-w-0">
+<!-- TopNavBar (Authority: JSON & Design System) -->
+<header class="docked full-width top-0 sticky z-40 bg-[#0b1326]/60 backdrop-blur-md border-b border-[#2d3449]/10">
+<div class="flex justify-between items-center w-full px-6 py-3 max-w-[1280px] mx-auto">
+<div class="flex items-center gap-8 flex-1">
+<span class="text-lg font-black text-[#dae2fd] font-headline">Midnight Architect</span>
+<div class="relative max-w-md w-full">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">search</span>
+<input class="w-full bg-surface-container-highest border-none rounded-sm pl-10 pr-4 py-1.5 text-sm focus:ring-1 focus:ring-primary text-on-surface" placeholder="Search architectural patterns..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer">notifications</button>
+<div class="w-px h-6 bg-outline-variant/30"></div>
+<button class="bg-gradient-to-br from-primary to-primary-container text-on-primary-fixed font-semibold px-4 py-1.5 rounded-lg text-sm transition-transform active:opacity-80">
+                        New Agent
+                    </button>
+<img class="w-8 h-8 rounded-full border border-primary/20 object-cover" data-alt="User profile avatar male" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBiKv09gJzQurqbWdPjT5a_x2jASNa4jJbGOErdHiBkDTt9E_vmJTLvSx9u4PZv9rhyvNaeWehisE5hUoG7mMzmMS6xwTeGMooTT7kTFUCWNVhKdnKSQFiTRjLZeVYb3FsCA3pJovzcOoIiEMLwznLZAcK9kd2FyaEgTFhkyPfd4RKMtCXRu87oWZ64Cmq1Dettv25nGS-eZxcyYYrmpzULby-Dgsmcfjs6SklN_GKaVEFtUJ3Jl7mUmyngKlxUbh8TKoqz1lawYw"/>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 p-6 md:p-8 max-w-[1280px] mx-auto w-full space-y-8">
+<!-- Dashboard Editorial Header -->
+<section class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div class="space-y-1">
+<h1 class="text-4xl font-extrabold font-headline tracking-tight text-on-surface">Architect Command</h1>
+<p class="text-on-surface-variant font-medium">System Health: <span class="text-primary">Nominal</span> • Latency: <span class="font-mono text-xs">24ms</span></p>
+</div>
+<div class="flex items-center gap-2 text-sm font-mono text-on-surface-variant bg-surface-container-low px-3 py-1.5 rounded-sm border border-outline-variant/10">
+<span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
+                    LAST_SYNC: 14:02:44 UTC
+                </div>
+</section>
+<!-- Metrics Grid (Asymmetric Bento) -->
+<section class="grid grid-cols-1 md:grid-cols-12 gap-6">
+<!-- Primary Metric Card -->
+<div class="md:col-span-4 bg-surface-container p-6 rounded-lg relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-6xl">smart_toy</span>
+</div>
+<p class="text-sm font-medium text-on-surface-variant mb-4">Active Agents</p>
+<div class="flex items-baseline gap-2">
+<span class="text-5xl font-mono font-medium text-primary">42</span>
+<span class="text-xs font-mono text-secondary">+12% vs LY</span>
+</div>
+<div class="mt-6 h-1 w-full bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-primary w-3/4"></div>
+</div>
+</div>
+<!-- Secondary Metric Card -->
+<div class="md:col-span-4 bg-surface-container p-6 rounded-lg border border-transparent hover:border-outline-variant/20 transition-all">
+<p class="text-sm font-medium text-on-surface-variant mb-4">Total Inference</p>
+<div class="flex items-baseline gap-2">
+<span class="text-5xl font-mono font-medium text-on-surface">892.4k</span>
+</div>
+<div class="mt-4 flex gap-1 items-end h-12">
+<div class="bg-primary/20 w-full h-[40%] rounded-t-sm"></div>
+<div class="bg-primary/20 w-full h-[60%] rounded-t-sm"></div>
+<div class="bg-primary/20 w-full h-[55%] rounded-t-sm"></div>
+<div class="bg-primary/20 w-full h-[80%] rounded-t-sm"></div>
+<div class="bg-primary/20 w-full h-[70%] rounded-t-sm"></div>
+<div class="bg-primary w-full h-full rounded-t-sm"></div>
+</div>
+</div>
+<!-- Token Usage Card (Amber Accent) -->
+<div class="md:col-span-4 bg-surface-container p-6 rounded-lg">
+<div class="flex justify-between items-start mb-4">
+<p class="text-sm font-medium text-on-surface-variant">Token Usage</p>
+<span class="text-[10px] font-mono bg-secondary/10 text-secondary px-2 py-0.5 rounded-full">QUOTA REACHED 82%</span>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="text-5xl font-mono font-medium text-secondary">4.2M</span>
+</div>
+<div class="mt-6 flex gap-1.5 h-8">
+<!-- Usage bars with secondary amber accent -->
+<div class="flex-1 bg-secondary h-4 mt-auto rounded-sm opacity-40"></div>
+<div class="flex-1 bg-secondary h-6 mt-auto rounded-sm opacity-60"></div>
+<div class="flex-1 bg-secondary h-5 mt-auto rounded-sm opacity-50"></div>
+<div class="flex-1 bg-secondary h-8 mt-auto rounded-sm"></div>
+<div class="flex-1 bg-surface-container-highest h-8 mt-auto rounded-sm"></div>
+<div class="flex-1 bg-surface-container-highest h-8 mt-auto rounded-sm"></div>
+</div>
+</div>
+<!-- Large Data Visualization / Success Rate -->
+<div class="md:col-span-8 bg-surface-container-low border border-outline-variant/10 rounded-lg p-8 flex flex-col justify-between">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="text-xl font-bold font-headline mb-1">Execution Success Rate</h3>
+<p class="text-sm text-on-surface-variant">Across all clusters in past 24 hours</p>
+</div>
+<div class="flex gap-4">
+<div class="text-right">
+<p class="text-xs font-mono text-on-surface-variant">AVG_LATENCY</p>
+<p class="font-mono text-primary">182ms</p>
+</div>
+<div class="text-right">
+<p class="text-xs font-mono text-on-surface-variant">ERROR_RATE</p>
+<p class="font-mono text-error">0.02%</p>
+</div>
+</div>
+</div>
+<div class="mt-12 relative h-48 flex items-end justify-between gap-1">
+<!-- Dynamic Success Wave Representation -->
+<div class="w-full bg-primary/5 h-[60%] rounded-t-lg"></div>
+<div class="w-full bg-primary/10 h-[65%] rounded-t-lg"></div>
+<div class="w-full bg-primary/15 h-[72%] rounded-t-lg"></div>
+<div class="w-full bg-primary/20 h-[85%] rounded-t-lg"></div>
+<div class="w-full bg-primary/30 h-[82%] rounded-t-lg"></div>
+<div class="w-full bg-primary/40 h-[92%] rounded-t-lg"></div>
+<div class="w-full bg-primary/50 h-[88%] rounded-t-lg"></div>
+<div class="w-full bg-primary h-[98%] rounded-t-lg shadow-[0_0_20px_rgba(192,193,255,0.3)]"></div>
+<div class="w-full bg-primary/50 h-[85%] rounded-t-lg"></div>
+</div>
+</div>
+<!-- Snapshot Panel -->
+<div class="md:col-span-4 space-y-6">
+<div class="bg-surface-container-highest/30 p-6 rounded-lg border border-outline-variant/10">
+<h4 class="text-sm font-bold uppercase tracking-wider text-on-surface-variant mb-4">Quick Insights</h4>
+<div class="space-y-4">
+<div class="flex items-center justify-between">
+<span class="text-sm">Cost Efficiency</span>
+<span class="font-mono text-secondary">A+</span>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-sm">Compute Load</span>
+<span class="font-mono text-on-surface">34.2%</span>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-sm">API Uptime</span>
+<span class="font-mono text-primary">99.99%</span>
+</div>
+</div>
+</div>
+<div class="bg-gradient-to-br from-surface-container to-surface-container-high p-6 rounded-lg border border-outline-variant/10">
+<p class="text-xs font-mono text-primary mb-2">// SECURITY_ADVISORY</p>
+<p class="text-sm leading-relaxed text-on-surface-variant">Three agents are currently using legacy endpoints. Migration is recommended to maintain optimal inference speed.</p>
+<button class="mt-4 text-primary font-semibold text-sm hover:underline flex items-center gap-1">
+                            Resolve Now <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Recent Activity Section (Table Style without borders) -->
+<section class="space-y-4">
+<div class="flex items-center justify-between">
+<h2 class="text-2xl font-bold font-headline">Recent Agent Activity</h2>
+<button class="text-sm font-medium text-primary hover:text-primary-fixed-dim transition-colors">View All Streams</button>
+</div>
+<div class="bg-surface-container-lowest rounded-lg overflow-hidden">
+<div class="grid grid-cols-12 gap-4 px-6 py-4 border-b border-outline-variant/5 bg-surface-container/30 text-xs font-mono uppercase tracking-widest text-on-surface-variant">
+<div class="col-span-4">Agent Identifier</div>
+<div class="col-span-3">Activity Type</div>
+<div class="col-span-2">Latency</div>
+<div class="col-span-2">Status</div>
+<div class="col-span-1"></div>
+</div>
+<!-- Row 1 -->
+<div class="grid grid-cols-12 gap-4 px-6 py-4 items-center hover:bg-surface-container-high/50 transition-colors group">
+<div class="col-span-4 flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-surface-container-highest flex items-center justify-center">
+<span class="material-symbols-outlined text-lg text-primary">bolt</span>
+</div>
+<div>
+<p class="text-sm font-semibold">Cortex-Omega-9</p>
+<p class="text-xs font-mono text-on-surface-variant">ID: 0x82f...a1</p>
+</div>
+</div>
+<div class="col-span-3 text-sm text-on-surface-variant">Natural Language Synthesis</div>
+<div class="col-span-2 font-mono text-sm">142ms</div>
+<div class="col-span-2">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-sm bg-primary/10 text-primary text-[10px] font-bold border border-primary/20">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+                                Running
+                            </span>
+</div>
+<div class="col-span-1 text-right">
+<button class="material-symbols-outlined text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity">more_vert</button>
+</div>
+</div>
+<!-- Row 2 -->
+<div class="grid grid-cols-12 gap-4 px-6 py-4 items-center hover:bg-surface-container-high/50 transition-colors group">
+<div class="col-span-4 flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-surface-container-highest flex items-center justify-center">
+<span class="material-symbols-outlined text-lg text-secondary">dataset</span>
+</div>
+<div>
+<p class="text-sm font-semibold">Data-Miner-Alpha</p>
+<p class="text-xs font-mono text-on-surface-variant">ID: 0x93a...c4</p>
+</div>
+</div>
+<div class="col-span-3 text-sm text-on-surface-variant">Recursive Indexing</div>
+<div class="col-span-2 font-mono text-sm">--</div>
+<div class="col-span-2">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-sm bg-on-surface-variant/10 text-on-surface-variant text-[10px] font-bold border border-outline-variant/20">
+<span class="w-1.5 h-1.5 rounded-full bg-on-surface-variant/50"></span>
+                                Paused
+                            </span>
+</div>
+<div class="col-span-1 text-right">
+<button class="material-symbols-outlined text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity">more_vert</button>
+</div>
+</div>
+<!-- Row 3 -->
+<div class="grid grid-cols-12 gap-4 px-6 py-4 items-center hover:bg-surface-container-high/50 transition-colors group">
+<div class="col-span-4 flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-surface-container-highest flex items-center justify-center">
+<span class="material-symbols-outlined text-lg text-error">dangerous</span>
+</div>
+<div>
+<p class="text-sm font-semibold">Neural-Link-Edge</p>
+<p class="text-xs font-mono text-on-surface-variant">ID: 0x11b...09</p>
+</div>
+</div>
+<div class="col-span-3 text-sm text-on-surface-variant">Edge Device Sync</div>
+<div class="col-span-2 font-mono text-sm">ERR</div>
+<div class="col-span-2">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-sm bg-error/10 text-error text-[10px] font-bold border border-error/20">
+<span class="w-1.5 h-1.5 rounded-full bg-error"></span>
+                                Failed
+                            </span>
+</div>
+<div class="col-span-1 text-right">
+<button class="material-symbols-outlined text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity">more_vert</button>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer Editorial Info -->
+<footer class="mt-auto p-8 border-t border-outline-variant/10">
+<div class="max-w-[1280px] mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+<div class="flex items-center gap-4">
+<span class="text-xs font-mono text-on-surface-variant">© 2024 MIDNIGHT_ARCHITECT</span>
+<div class="h-3 w-px bg-outline-variant/30"></div>
+<a class="text-xs text-on-surface-variant hover:text-primary transition-colors" href="#">Documentation</a>
+<a class="text-xs text-on-surface-variant hover:text-primary transition-colors" href="#">API Specs</a>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex -space-x-2">
+<img class="w-6 h-6 rounded-full border border-background" data-alt="Active user team member female" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBM0CQ_tny3fJBXMRQEAUZQxfDvv0vEuDcYPNCib7MvoXuYOe2YHPQmf-DcBl0vel7Uo-dL5Im6tfGGbxXr46uyfbeo3qraAmFVQwUawFIJQCYyL1p0IXZXK0Q-mMIM2fbAWEa7RQwLHilMWDoCQZgxM64dYUYuu26dI2TD1RSCPbeGJh4T9iQb0IESm7oCJO5-SD0HycGQZYkfspsYGVLfl6YDWrh5Lr7FqYj5RgHX-WP2hlxpfLfT2uIee_jrJFYrGHJKkDmAGQ"/>
+<img class="w-6 h-6 rounded-full border border-background" data-alt="Active user team member male" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDHR8lgRruRGcV0N10y_FeJvUbdQBOlwYYAVP1sfFWsK7Ee3hwjGBOP8eV-eKUBbTz1MvGb1Wgn-h5rZUlyrdfx_Xdu9PAE3_rajIggVidj49dENmXwZ1mDlNekTT-FiIqcWYNity-01e3979Bi7pHKSUMfckCGP-bWORWAHYhckZARRaSHWQPMErmMrKaf1GdNHGInfYEKcJDchOgMi6PsELe5Fcz8p2atWfoj-xA89oQVJ7J42abbU84_Yegc2oVU7H_Xom0Fzw"/>
+<div class="w-6 h-6 rounded-full border border-background bg-surface-container-highest flex items-center justify-center text-[10px] font-bold">+8</div>
+</div>
+<span class="text-xs font-mono text-on-surface-variant">Active Architects: <span class="text-primary">11</span></span>
+</div>
+</div>
+</footer>
+</div>
+</body></html>

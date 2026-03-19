@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Boilerplate Suggestions</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Epilogue:wght@300;400;500;700;900&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+
+:root {
+  --bg:        #080b10;
+  --bg2:       #0d1117;
+  --surface:   #111720;
+  --surface2:  #161d28;
+  --border:    #1e2a3a;
+  --border2:   #263344;
+  --text:      #d4dbe8;
+  --muted:     #556070;
+  --muted2:    #3a4655;
+
+  --arch:      #4f8fff;
+  --arch-bg:   rgba(79,143,255,.07);
+  --arch-bd:   rgba(79,143,255,.22);
+
+  --ui:        #34d399;
+  --ui-bg:     rgba(52,211,153,.07);
+  --ui-bd:     rgba(52,211,153,.22);
+
+  --del:       #fb923c;
+  --del-bg:    rgba(251,146,60,.07);
+  --del-bd:    rgba(251,146,60,.22);
+
+  --high:      #f87171;
+  --med:       #fbbf24;
+  --low:       #60a5fa;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Epilogue', sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── GRID BG ── */
+body::before {
+  content:'';
+  position:fixed;inset:0;
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 40px 40px;
+  opacity: .35;
+  pointer-events:none;
+  z-index:0;
+}
+
+/* ── HEADER ── */
+header {
+  position: relative;
+  z-index: 10;
+  padding: 56px 56px 40px;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(180deg, rgba(8,11,16,0) 0%, rgba(8,11,16,.6) 100%);
+  backdrop-filter: blur(2px);
+}
+
+.header-eyebrow {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.header-eyebrow::before {
+  content:'';
+  display: inline-block;
+  width: 24px; height: 1px;
+  background: var(--muted);
+}
+
+header h1 {
+  font-family: 'Epilogue', sans-serif;
+  font-size: clamp(28px, 4vw, 48px);
+  font-weight: 900;
+  letter-spacing: -.03em;
+  line-height: 1.0;
+  margin-bottom: 14px;
+}
+
+header h1 span.hl { color: var(--arch); }
+
+header p {
+  color: var(--muted);
+  font-size: 14px;
+  max-width: 480px;
+  font-weight: 300;
+  margin-bottom: 28px;
+}
+
+/* STATS ROW */
+.stats {
+  display: flex;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.stat-num {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 22px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.stat-label {
+  font-size: 11px;
+  color: var(--muted);
+  font-family: 'IBM Plex Mono', monospace;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+/* ── FILTERS ── */
+.filters {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: rgba(8,11,16,.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 56px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.filter-btn {
+  background: transparent;
+  border: 1px solid var(--border2);
+  color: var(--muted);
+  padding: 6px 14px;
+  border-radius: 4px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all .15s;
+}
+
+.filter-btn:hover { color: var(--text); border-color: var(--border2); }
+.filter-btn.active { color: var(--bg); background: var(--text); border-color: var(--text); }
+.filter-btn.arch.active   { background: var(--arch); border-color: var(--arch); color: var(--bg); }
+.filter-btn.ui.active     { background: var(--ui);   border-color: var(--ui);   color: var(--bg); }
+.filter-btn.del.active    { background: var(--del);  border-color: var(--del);  color: var(--bg); }
+
+.filter-sep {
+  width: 1px; height: 20px;
+  background: var(--border);
+  margin: 0 4px;
+}
+
+.priority-filter {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.pf-btn {
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  padding: 4px 10px;
+  font-family: inherit;
+  font-size: 10px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all .15s;
+}
+
+.pf-btn[data-p="high"]   { color: var(--high);  border-color: rgba(248,113,113,.25); }
+.pf-btn[data-p="medium"] { color: var(--med);   border-color: rgba(251,191,36,.25); }
+.pf-btn[data-p="high"].active   { background: rgba(248,113,113,.12); border-color: rgba(248,113,113,.5); }
+.pf-btn[data-p="medium"].active { background: rgba(251,191,36,.12);  border-color: rgba(251,191,36,.5); }
+
+/* ── MAIN ── */
+main {
+  position: relative;
+  z-index: 5;
+  padding: 48px 56px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+/* ── COLUMN ── */
+.column-header {
+  grid-column: span 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: -8px;
+}
+
+.col-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.col-title {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.col-count {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  margin-left: auto;
+}
+
+/* ── CARD ── */
+.card {
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  cursor: pointer;
+  transition: border-color .2s, background .2s, transform .15s;
+  overflow: hidden;
+  animation: fadeup .4s both;
+}
+
+@keyframes fadeup {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.card:hover {
+  transform: translateY(-2px);
+}
+
+.card.arch:hover  { border-color: var(--arch-bd); background: var(--arch-bg); }
+.card.ui:hover    { border-color: var(--ui-bd);   background: var(--ui-bg);   }
+.card.del:hover   { border-color: var(--del-bd);  background: var(--del-bg);  }
+
+.card.arch.open   { border-color: var(--arch-bd); background: var(--arch-bg); }
+.card.ui.open     { border-color: var(--ui-bd);   background: var(--ui-bg);   }
+.card.del.open    { border-color: var(--del-bd);  background: var(--del-bg);  }
+
+.card.hidden { display: none; }
+
+.card-top {
+  padding: 18px 20px 16px;
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.card-icon {
+  width: 34px; height: 34px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.card.arch .card-icon { background: var(--arch-bg); border: 1px solid var(--arch-bd); }
+.card.ui   .card-icon { background: var(--ui-bg);   border: 1px solid var(--ui-bd);   }
+.card.del  .card-icon { background: var(--del-bg);  border: 1px solid var(--del-bd);  }
+
+.card-meta { flex: 1; min-width: 0; }
+
+.card-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -.01em;
+  margin-bottom: 3px;
+  line-height: 1.3;
+}
+
+.card-sub {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: .04em;
+}
+
+.card-badges {
+  display: flex;
+  gap: 5px;
+  flex-direction: column;
+  align-items: flex-end;
+  flex-shrink: 0;
+}
+
+.badge {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+
+.badge-high   { background: rgba(248,113,113,.12); color: var(--high);  border: 1px solid rgba(248,113,113,.25); }
+.badge-medium { background: rgba(251,191,36,.10);  color: var(--med);   border: 1px solid rgba(251,191,36,.25); }
+.badge-new    { background: rgba(79,143,255,.10);  color: var(--arch);  border: 1px solid rgba(79,143,255,.25); }
+
+.chevron {
+  color: var(--muted2);
+  font-size: 14px;
+  transition: transform .2s;
+  align-self: center;
+  flex-shrink: 0;
+}
+
+.card.open .chevron { transform: rotate(90deg); }
+
+/* EXPANDED BODY */
+.card-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height .3s ease;
+}
+
+.card.open .card-body { max-height: 600px; }
+
+.card-body-inner {
+  padding: 0 20px 20px;
+  border-top: 1px solid var(--border);
+  margin-top: 0;
+}
+
+.card-desc {
+  font-size: 13px;
+  color: var(--muted);
+  font-weight: 300;
+  margin-top: 14px;
+  margin-bottom: 14px;
+  line-height: 1.75;
+}
+
+.card-desc strong { color: var(--text); font-weight: 500; }
+
+/* CODE SNIPPET */
+.code-block {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 14px 16px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11.5px;
+  line-height: 1.8;
+  color: #7a8fa6;
+  margin-top: 12px;
+  overflow-x: auto;
+}
+
+.code-block .kw  { color: var(--arch); }
+.code-block .fn  { color: var(--ui); }
+.code-block .str { color: var(--del); }
+.code-block .cm  { color: var(--muted); font-style: italic; }
+
+/* WHY ROW */
+.why-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+
+.why-chip {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-family: 'IBM Plex Mono', monospace;
+  color: var(--muted);
+  letter-spacing: .04em;
+}
+
+/* ── FOOTER ── */
+footer {
+  position: relative;
+  z-index: 5;
+  border-top: 1px solid var(--border);
+  padding: 24px 56px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.footer-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.legend-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+}
+
+/* RESPONSIVE */
+@media (max-width: 960px) {
+  main { grid-template-columns: 1fr 1fr; padding: 32px; }
+  header, .filters, footer { padding-left: 32px; padding-right: 32px; }
+}
+
+@media (max-width: 600px) {
+  main { grid-template-columns: 1fr; padding: 20px; }
+  header, .filters, footer { padding-left: 20px; padding-right: 20px; }
+  header h1 { font-size: 26px; }
+  .stats { gap: 20px; }
+  .priority-filter { margin-left: 0; margin-top: 8px; width: 100%; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="header-eyebrow">Phoenix SaaS Boilerplate — Design Review</div>
+  <h1>19 <span class="hl">Suggestions</span><br/>Worth Building</h1>
+  <p>Gaps and improvements across architecture, UI/UX, and delivery strategy. Click any card to see why and how.</p>
+  <div class="stats">
+    <div class="stat">
+      <span class="stat-num" id="total-count">19</span>
+      <span class="stat-label">Total suggestions</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num" style="color:var(--high)">9</span>
+      <span class="stat-label">High priority</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num" style="color:var(--med)">10</span>
+      <span class="stat-label">Medium priority</span>
+    </div>
+  </div>
+</header>
+
+<!-- FILTERS -->
+<div class="filters">
+  <button class="filter-btn active" data-filter="all" onclick="setFilter('all',this)">All</button>
+  <div class="filter-sep"></div>
+  <button class="filter-btn arch" data-filter="arch" onclick="setFilter('arch',this)">Architecture</button>
+  <button class="filter-btn ui"   data-filter="ui"   onclick="setFilter('ui',this)">UI / UX</button>
+  <button class="filter-btn del"  data-filter="del"  onclick="setFilter('del',this)">Delivery</button>
+  <div class="priority-filter">
+    Priority:
+    <button class="pf-btn active" data-p="high"   onclick="togglePriority('high',this)">High</button>
+    <button class="pf-btn active" data-p="medium" onclick="togglePriority('medium',this)">Medium</button>
+  </div>
+</div>
+
+<!-- MAIN GRID -->
+<main id="grid">
+
+  <!-- ══════════════ ARCHITECTURE ══════════════ -->
+  <div class="column-header" data-col="arch">
+    <div class="col-dot" style="background:var(--arch)"></div>
+    <span class="col-title" style="color:var(--arch)">Architecture</span>
+    <span class="col-count" id="arch-count">7 items</span>
+  </div>
+
+  <div class="card arch" data-cat="arch" data-priority="high" onclick="toggle(this)" style="animation-delay:.05s">
+    <div class="card-top">
+      <div class="card-icon">🗂️</div>
+      <div class="card-meta">
+        <div class="card-title">Audit Log Context</div>
+        <div class="card-sub">ash_notifier + AuditLog resource</div>
+      </div>
+      <div class="card-badges">
+        <span class="badge badge-high">High</span>
+      </div>
+      <div class="chevron">›</div>
+    </div>
+    <div class="card-body">
+      <div class="card-body-inner">
+        <div class="card-desc">Every significant action in the system — resource creation, deletion, policy decisions, billing events — persisted as an immutable <strong>AuditLog</strong> record. Wired in via an Ash notifier so you never forget to add it manually. Queryable per org, per actor, per resource type.</div>
+        <div class="code-block">
+<span class="cm"># lib/my_saas/audit/resources/audit_log.ex</span>
+<span class="kw">defmodule</span> MySaas.Audit.AuditLog <span class="kw">do</span>
+  use Ash.Resource, domain: MySaas.Audit
+
+  attributes <span class="kw">do</span>
+    attribute :<span class="fn">actor_id</span>,    :uuid
+    attribute :<span class="fn">org_id</span>,      :uuid
+    attribute :<span class="fn">action</span>,      :atom
+    attribute :<span class="fn">resource</span>,    :string
+    attribute :<span class="fn">changes</span>,     :map
+    attribute :<span class="fn">ip_address</span>,  :string
+    create_timestamp :<span class="str">inserted_at</span>
+  <span class="kw">end</span>
+<span class="kw">end</span></div>
+        <div class="why-row">
+          <span class="why-chip">GDPR compliance</span>
+          <span class="why-chip">Debugging in prod</span>
+          <span class="why-chip">Enterprise requirement</span>
+          <span class="why-chip">SOC2 audit trail</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card arch" data-cat="arch" data-priority="high" onclick="toggle(this)" style="animation-delay:.08s">
+    <div class="card-top">
+      <div class="card-icon">🚩</div>
+      <div class="card-meta">
+        <div class="card-title">Feature Flags</div>
+        <div class="card-sub">FeatureFlag resource, plan-gated</div>
+      </div>
+      <div class="card-badges">
+        <span class="badge badge-high">High</span>
+      </div>
+      <div class="chevron">›</div>
+    </div>
+    <div class="card-body">
+      <div class="card-body-inner">
+        <div class="card-desc">A <strong>FeatureFlag</strong> Ash resource scoped per org and per plan tier. Ship features behind a flag and gate them without a code deploy. Plan upgrades become instant — flip the flag, the feature appears. Also enables beta programs: enable a flag for select orgs before general release.</div>
+        <div class="code-block">
+<span class="cm"># Usage in any context</span>
+<span class="kw">if</span> FeatureFlags.<span class="fn">enabled?</span>(:ai_agents, org) <span class="kw">do</span>
+  <span class="cm"># render AI agent UI</span>
+<span class="kw">end</span>
+
+<span class="cm"># Ash policy integration</span>
+policy action_type(:create) <span class="kw">do</span>
+  authorize_if FeatureFlags.<span class="fn">enabled?</span>(:agents, actor.org)
+<span class="kw">end</span></div>
+        <div class="why-row">
+          <span class="why-chip">Zero-downtime releases</span>
+          <span class="why-chip">Beta programs</span>
+          <span class="why-chip">Plan gating</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card arch" data-cat="arch" data-priority="high" onclick="toggle(this)" style="animation-delay:.11s">
+    <div class="card-top">
+      <div class="card-icon">🔒</div>
+      <div class="card-meta">
+        <div class="card-title">API Rate Limiting</div>
+        <div class="card-sub">Hammer plug, per token + per org</div>
+      </div>
+      <div class="card-badges">
+        <span class="badge badge-high">High</span>
+      </div>
+      <div class="chevron">›</div>
+    </div>
+    <div class="card-body">
+      <div class="card-body-inner">
+        <div class="card-desc">Essential once you expose <strong>AshJsonApi</strong> and <strong>AshGraphql</strong> publicly. Without it, one runaway client can saturate your database. Use <strong>Hammer</strong> with ETS backend for speed, Redis backend for multi-node. Limits per API token, per org, and globally. Return <code>429</code> with <code>Retry-After</code> headers.</div>
+        <div class="code-block">
+<span class="cm"># plug in your API router</span>
+plug MySaasWeb.Plugs.RateLimit,
+  limit: <span class="str">1000</span>,
+  window_ms: <span class="str">60_000</span>,
+  key: &amp;<span class="fn">extract_token_id/1</span>
+
+<span class="cm"># per-plan limits from config</span>
+@limits %{free: 100, pro: 1000, enterprise: :unlimited}</div>
+        <div class="why-row">
+          <span class="why-chip">Abuse prevention</span>
+          <span class="why-chip">DB protection</span>
+          <span class="why-chip">SLA enforcement</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card arch" data-cat="arch" data-priority="high" onclick="toggle(this)" style="animation-delay:.14s">
+    <div class="card-top">
+      <div class="card-icon">📡</div>
+      <div class="card-meta">
+        <div class="card-title">Outbound Webhooks</div>
+        <div class="card-sub">Client-defined endpoints, Stripe-style</div>
+      </div>
+      <div class="card-badges">
+        <span class="badge badge-high">High</span>
+      </div>
+      <div class="chevron">›</div>
+    </div>
+    <div class="card-body">
+      <div class="card-body-inner">
+        <div class="card-desc">Your platform publishing events to client-defined endpoints. Critical once clients build automations on top of your AI agents — they need to know when a run completes, fails, or produces output. <strong>OutboundWebhook</strong> resource stores endpoint URLs + secret. Oban handles delivery, retry, and signature verification.</div>
+        <div class="code-block">
+<span class="cm"># Events published by the platform</span>
+agent.run.completed
+agent.run.failed
+billing.subscription.activated
+billing.payment.failed
+org.member.invited</div>
+        <div class="why-row">
+          <span class="why-chip">Client automations</span>
+          <span class="why-chip">Zapier / Make.com</span>
+          <span class="why-chip">Integration layer</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card arch" data-cat="arch" data-priority="medium" onclick="toggle(this)" style="animation-delay:.17s">
+    <div class="card-top">
+      <div class="card-icon">⚙️</div>
+      <div class="card-meta">
+        <div class="card-title">Mix Task Suite</div>
+        <div class="card-sub">setup, sync_plans, seed, reset</div>
+      </div>
+      <div class="card-badges">
+        <span class="badge badge-medium">Medium</span>
+      </div>
+      <div class="chevron">›</div>
+    </div>
+    <div class="card-body">
+      <div class="card-body-inner">
+        <div class="card-desc">A suite of project-specific Mix tasks that make dev and deployment operations predictable. One command per operation. No documentation needed — the task names are self-describing. Critical for client handoffs where the client's dev team needs to bootstrap without your tribal knowledge.</div>
+        <div class="code-block">
+mix my_saas.setup        <span class="cm"># deps + db + seeds</span>
+mix my_saas.sync_plans   <span class="cm"># sync Stripe products → DB</span>
+mix my_saas.seed         <span class="cm"># realistic demo data</span>
+mix my_saas.reset        <span class="cm"># drop + recreate + seed</span></div>
+        <div class="why-row">
+          <span class="why-chip">Client handoffs</span>
+          <span class="why-chip">CI/CD pipelines</span>
+          <span class="why-chip">Onboarding speed</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card arch" data-cat="arch" data-priority="medium" onclick="toggle(this)" style="animation-delay:.2s">
+    <div class="card-top">
+      <div class="card-icon">📊</div>
+      <div class="card-meta">
+        <div class="card-title">Observability Layer</div>
+        <div class="card-sub">Oban Web + Telemetry + LiveDashboard</div>
+      </div>
+      <div class="card-badges">
+        <span class="badge badge-medium">Medium</span>
+      </div>
+      <div class="chevron">›</div>
+    </div>
+    <div class="card-body">
+      <div class="card-body-inner">
+        <div class="card-desc">Clients running AI agents in production need visibility into job queues without SSH access. Mount <strong>Oban Web</strong> at <code>/admin/oban</code> behind admin policy. Wire <strong>:telemetry</strong> events for agent runs, billing events, and API latency. <strong>Phoenix LiveDashboard</strong> gives system metrics for free.</div>
+        <div class="code-block">
+<span class="cm"># router.ex — admin scope</span>
+scope <span class="str">"/admin"</span>, <span class="kw">do</span>
+  pipe_through [:browser, :admin_auth]
+  live_dashboard <span class="str">"/dashboard"</span>
+  forward <span class="str">"/oban"</span>, Oban.Web.Router
+<span class="kw">end</span></div>
+        <div class="why-row">
+          <span class="why-chip">Job visibility</span>
+          <span class="why-chip">Perf monitoring</span>
+          <span class="why-chip">Incident response</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card arch" data-cat="arch" data-priority="medium" onclick="toggle(this)" style="animation-delay:.23s">
+    <div class="card-top">
+      <div class="card-icon">🚀</div>
+      <div class="card-meta">
+        <div class="card-title">Deploy Config</div>
+        <div class="card-sub">Fly.io + Docker, baked in</div>
+      </div>
+      <div class="card-badges">
+        <span class="badge badge-medium">Medium</span>
+      </div>
+      <div class="chevron">›</div>
+    </div>
+    <div class="card-body">
+      <div class="card-body-inner">
+        <div class="card-desc">Ship a <strong>Dockerfile</strong>, <code>fly.toml</code>, and <code>docker-compose.yml</code> in the boilerplate root. Clients should be able to go from clone to deployed in under 10 minutes. Include a <code>releases.ex</code> config for production secrets via environment variables. Add a GitHub Actions workflow for CI on push.</div>
+        <div class="code-block">
+fly launch --name my-saas
+fly secrets set DATABASE_URL=...
+fly deploy               <span class="cm"># zero-config production</span></div>
+        <div class="why-row">
+          <span class="why-chip">10-min deploys</span>
+          <span class="why-chip">Client handoffs</span>
+          <span class="why-chip">Reproducible envs</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══════════════ UI / UX ══════════════ -->
+  <div class="column-header" data-col="ui" style="margin-top: 32px;">
+    <div class="col-dot" style="background:var(--ui)"></div>
+    <span class="col-title" style="color:var(--ui)">UI / UX</span>
+    <span class="col-count" id="ui-count">6 items</span>
+  </div>
+
+  <div class="card ui" data-cat="ui" data-priority="high" onclick="toggle(this)" style="animation-delay:.12s">
+    <div class="card-top">
+      <div class="card-icon">🎯</div>
+      <div class="card-meta">
+        <div class="card-title">Onboarding Flow</div>
+        <div class="card-sub">Org setup → invite → first run</div>
+      </div>
+      <div class="card-badges">
+        <span class="badge badge-high">High</span>
+        <span class="badge badge-new">Missing</span>
+      </div>
+      <div class="chevron">›</div>
+    </div>
+    <div class="card-body">
+      <div class="card-body-inner">
+        <div class="card-desc">The current prompt lists onboarding as a screen but has no spec. It is the most conversion-critical screen in the product. Design as a <strong>4-step wizard</strong>: (1) Name your org, (2) Invite your first teammate, (3) Configure your first AI agent, (4) Watch it run. Progress stepper at top. Skip all = straight to dashboard.</div>
+        <div class="why-row">
+          <span class="why-chip">Activation rate</span>
+          <span class="why-chip">Time to first value</span>
+          <span class="why-chip">Churn prevention</span>
+          <span class="why-chip">Trial conversion</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card ui" data-cat="ui" data-priority="high" onclick="toggle(this)" style="animation-delay:.15s">
+    <div class="card-top">
+      <div class="card-icon">🌓</div>
+      <div class="card-meta">
+        <div class="card-title">Dark + Light Mode</div>
+        <div class="card-sub">Tailwind dark: classes + system pref</div>
+      </div>
+      <div class="card-badges">
+        <span class="badge badge-high">High</span>
+      </div>
+      <div class="chevron">›</div>
+    </div>
+    <div class="card-body">
+      <div class="card-body-inner">
+        <div class="card-desc">The design prompt specifies dark-first, but never mentions a light mode variant. Many clients' end users expect light mode. <strong>Tailwind's dark: prefix</strong> handles this with zero JavaScript — respects system preference by default, overridable via a class toggle stored in localStorage. Design both themes and test every component in each.</div>
+        <div class="code-block">
+<span class="cm">&lt;!-- tailwind.config.js --&gt;</span>
+darkMode: <span class="str">'class'</span>  <span class="cm">// or 'media' for system only</span>
+
+<span class="cm">&lt;!-- every surface needs both --&gt;</span>
+class="bg-gray-900 dark:bg-gray-950
+       text-gray-100 dark:text-gray-50"</div>
+        <div class="why-row">
+          <span class="why-chip">User preference</span>
+          <span class="why-chip">Accessibility</span>
+          <span class="why-chip">Professionalism</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card ui" data-cat="ui" data-priority="high" onclick="toggle(this)" style="animation-delay:.18s">
+    <div class="card-top">
+      <div class="card-icon">🔑</div>
+      <div class="card-meta">
+        <div class="card-title">API Keys Screen</div>
+        <div class="card-sub">Create, revoke, scope, copy once</div>
+      </div>
+      <div class="card-badges">
+        <span class="badge badge-high">High</span>
+        <span class="badge badge-new">Missing</span>
+      </div>
+      <div class="chevron">›</div>
+    </div>
+    <div class="card-body">
+      <div class="card-body-inner">
+        <div class="card-desc">Not in the current UI prompt at all. Essential for the API-escapable model — Rails/Django/Next.js consumers need API keys to authenticate. Design: table of keys with name, prefix (<code>sk_live_••••••8f2a</code>), scopes, last used, created date. <strong>Show full key once</strong> on creation with a "Copy" button then never again. Revoke with confirmation modal.</div>
+        <div class="why-row">
+          <span class="why-chip">API-escapable model</span>
+          <span class="why-chip">Client integrations</span>
+          <span class="why-chip">Security UX</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card ui" data-cat="ui" data-priority="high" onclick="toggle(this)" style="animation-delay:.21s">
+    <div class="card-top">
+      <div class="card-icon">⚙️</div>
+      <div class="card-meta">
+        <div class="card-title">Settings Architecture</div>
+        <div class="card-sub">Org vs Personal vs API — split</div>
+      </div>
+      <div class="card-badges">
+        <span class="badge badge-high">High</span>
+      </div>
+      <div class="chevron">›</div>
+    </div>
+    <div class="card-body">
+      <div class="card-body-inner">
+        <div class="card-desc">The current prompt has a single "Org Settings" screen. This is wrong. Split into <strong>three separate settings areas</strong>: (1) <strong>Org Settings</strong> — name, logo, domain, danger zone; (2) <strong>Personal Settings</strong> — profile, password, notification prefs, connected accounts; (3) <strong>API Settings</strong> — API keys, webhooks, rate limit info. Mixing them is the most common settings UX anti-pattern.</div>
+        <div class="why-row">
+          <span class="why-chip">User mental model</span>
+          <span class="why-chip">Permission clarity</span>
+          <span class="why-chip">Scalability</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card ui" data-cat="ui" data-priority="medium" onclick="toggle(this)" style="animation-delay:.24s">
+    <div class="card-top">
+      <div class="card-icon">💀</div>
+      <div class="card-meta">
+        <div class="card-title">Empty + Error States</div>
+        <div class="card-sub">400, 404, 500 + contextual empties</div>
+      </div>
+      <div class="card-badges">
+        <span class="badge badge-medium">Medium</span>
+      </div>
+      <div class="chevron">›</div>
+    </div>
+    <div class="card-body">
+      <div class="card-body-inner">
+        <div class="card-desc">The UI prompt mentions empty states vaguely. Be explicit: every list view needs a bespoke empty state with an <strong>actionable CTA</strong> ("Create your first agent →"), not just a generic "No results." Design custom <strong>400, 404, 503</strong> error pages consistent with the product's visual language. These are client-facing and often the first screen new users see when something goes wrong.</div>
+        <div class="why-row">
+          <span class="why-chip">First-use experience</span>
+          <span class="why-chip">Error recovery</span>
+          <span class="why-chip">Brand consistency</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card ui" data-cat="ui" data-priority="medium" onclick="toggle(this)" style="animation-delay:.27s">
+    <div class="card-top">
+      <div class="card-icon">📱</div>
+      <div class="card-meta">
+        <div class="card-title">Mobile-First LiveView</div>
+        <div class="card-sub">Bottom nav, drawer, touch targets</div>
+      </div>
+      <div class="card-badges">
+        <span class="badge badge-medium">Medium</span>
+      </div>
+      <div class="chevron">›</div>
+    </div>
+    <div class="card-body">
+      <div class="card-body-inner">
+        <div class="card-desc">The current prompt handles responsive breakpoints but doesn't address LiveView-specific mobile patterns. Design a <strong>bottom navigation bar</strong> for mobile (replaces sidebar), a <strong>slide-up drawer</strong> pattern for secondary actions, and ensure all touch targets are ≥44px. LiveView's DOM-patch model is mobile-friendly by default — but test every phx-click on touch devices explicitly.</div>
+        <div class="why-row">
+          <span class="why-chip">Touch usability</span>
+          <span class="why-chip">LiveView compatibility</span>
+          <span class="why-chip">PWA readiness</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══════════════ DELIVERY ══════════════ -->
+  <div class="column-header" data-col="del" style="margin-top: 32px;">
+    <div class="col-dot" style="background:var(--del)"></div>
+    <span class="col-title" style="color:var(--del)">Delivery strategy</span>
+    <span class="col-count" id="del-count">6 items</span>
+  </div>
+
+  <div class="card del" data-cat="del" data-priority="high" onclick="toggle(this)" style="animation-delay:.1s">
+    <div class="card-top">
+      <div class="card-icon">🎪</div>
+      <div class="card-meta">
+        <div class="card-title">Demo Mode</div>
+        <div class="card-sub">Seeded read-only login, no signup</div>
+      </div>
+      <div class="card-badges">
+        <span class="badge badge-high">High</span>
+      </div>
+      <div class="chevron">›</div>
+    </div>
+    <div class="card-body">
+      <div class="card-body-inner">
+        <div class="card-desc">The single highest-ROI addition to the boilerplate. A seeded login (<code>demo@example.com / demo</code>) that lands in a fully-populated read-only environment — realistic org, agents with run history, billing data, team members. Clients click a link, see the full product running with data, and immediately understand what they're buying. <strong>No demo mode = longer sales cycles.</strong></div>
+        <div class="code-block">
+<span class="cm"># One env variable activates demo mode</span>
+DEMO_MODE=true
+
+<span class="cm"># All mutations blocked in demo</span>
+policy action_type(:create) <span class="kw">do</span>
+  forbid_if actor.is_demo_user
+<span class="kw">end</span></div>
+        <div class="why-row">
+          <span class="why-chip">Faster sales cycles</span>
+          <span class="why-chip">Self-serve trials</span>
+          <span class="why-chip">Investor demos</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card del" data-cat="del" data-priority="high" onclick="toggle(this)" style="animation-delay:.13s">
+    <div class="card-top">
+      <div class="card-icon">🔧</div>
+      <div class="card-meta">
+        <div class="card-title">Mix Generator</div>
+        <div class="card-sub">mix phx.gen.saas — module picker</div>
+      </div>
+      <div class="card-badges">
+        <span class="badge badge-high">High</span>
+      </div>
+      <div class="chevron">›</div>
+    </div>
+    <div class="card-body">
+      <div class="card-body-inner">
+        <div class="card-desc">Instead of clients manually deleting modules they don't need, ship a <strong>Mix generator</strong> that lets them pick modules at project creation time. Not every client needs AI agents. Some don't need multi-tenancy. The generator scaffolds only what was selected, keeping the codebase clean from day one. Similar to Rails generators but for your specific boilerplate.</div>
+        <div class="code-block">
+mix phx.gen.saas MyApp \
+  --modules auth,billing,ai \
+  --tenancy row_level \
+  --api rest,graphql</div>
+        <div class="why-row">
+          <span class="why-chip">Faster starts</span>
+          <span class="why-chip">Cleaner codebases</span>
+          <span class="why-chip">Client autonomy</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card del" data-cat="del" data-priority="high" onclick="toggle(this)" style="animation-delay:.16s">
+    <div class="card-top">
+      <div class="card-icon">🧪</div>
+      <div class="card-meta">
+        <div class="card-title">Test Scaffolding</div>
+        <div class="card-sub">ExMachina factories + DataCase</div>
+      </div>
+      <div class="card-badges">
+        <span class="badge badge-high">High</span>
+      </div>
+      <div class="chevron">›</div>
+    </div>
+    <div class="card-body">
+      <div class="card-body-inner">
+        <div class="card-desc">Ship the test infrastructure as first-class citizens — not an afterthought. <strong>ExMachina factories</strong> for every resource (User, Org, Membership, Subscription, Agent). A custom <strong>DataCase</strong> with multi-tenancy helpers: <code>build_org/1</code>, <code>build_member/2</code>. LiveView test helpers for common interactions. This is what makes TDD on a new client project actually possible from day one.</div>
+        <div class="code-block">
+<span class="cm"># test/support/factory.ex</span>
+<span class="kw">def</span> <span class="fn">org_factory</span> <span class="kw">do</span>
+  %Organisation{name: sequence("Org ")}
+<span class="kw">end</span>
+
+<span class="cm"># Ready to use in every test</span>
+insert(:org)
+insert(:member, org: org, role: :admin)</div>
+        <div class="why-row">
+          <span class="why-chip">TDD from day 1</span>
+          <span class="why-chip">CI reliability</span>
+          <span class="why-chip">Client handoff quality</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card del" data-cat="del" data-priority="medium" onclick="toggle(this)" style="animation-delay:.19s">
+    <div class="card-top">
+      <div class="card-icon">🏷️</div>
+      <div class="card-meta">
+        <div class="card-title">White-Label Config</div>
+        <div class="card-sub">Logo, brand colour, domain — config only</div>
+      </div>
+      <div class="card-badges">
+        <span class="badge badge-medium">Medium</span>
+      </div>
+      <div class="chevron">›</div>
+    </div>
+    <div class="card-body">
+      <div class="card-body-inner">
+        <div class="card-desc">Every client project you deliver looks different. Make branding a first-class concern in the boilerplate. A <code>config/branding.exs</code> file with logo path, primary colour, product name, and support email. LiveView layouts read from this config — no hardcoded brand anywhere. A client who wants to rebrand changes one file and redeploys.</div>
+        <div class="code-block">
+<span class="cm"># config/branding.exs</span>
+config :my_saas, :branding,
+  product_name: <span class="str">"AcmeSaaS"</span>,
+  primary_color: <span class="str">"#6366f1"</span>,
+  logo_path:    <span class="str">"/images/logo.svg"</span>,
+  support_email:<span class="str">"support@acme.com"</span></div>
+        <div class="why-row">
+          <span class="why-chip">Client rebranding</span>
+          <span class="why-chip">White-label delivery</span>
+          <span class="why-chip">Multi-client reuse</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card del" data-cat="del" data-priority="medium" onclick="toggle(this)" style="animation-delay:.22s">
+    <div class="card-top">
+      <div class="card-icon">📚</div>
+      <div class="card-meta">
+        <div class="card-title">Docs Site</div>
+        <div class="card-sub">ExDoc — module-by-module reference</div>
+      </div>
+      <div class="card-badges">
+        <span class="badge badge-medium">Medium</span>
+      </div>
+      <div class="chevron">›</div>
+    </div>
+    <div class="card-body">
+      <div class="card-body-inner">
+        <div class="card-desc">Your boilerplate's biggest competitor is "I'll just build it myself." Documentation is the counterargument. <strong>ExDoc</strong> auto-generates a reference site from your module docs. Add a hand-written <code>guides/</code> folder with: Getting Started, Context Architecture, Adding a Module, Deploying. Ship the docs site at a subdomain of your product site. Clients reference it instead of asking you.</div>
+        <div class="why-row">
+          <span class="why-chip">Client autonomy</span>
+          <span class="why-chip">Async support</span>
+          <span class="why-chip">Positioning</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card del" data-cat="del" data-priority="medium" onclick="toggle(this)" style="animation-delay:.25s">
+    <div class="card-top">
+      <div class="card-icon">📦</div>
+      <div class="card-meta">
+        <div class="card-title">Version + Changelog</div>
+        <div class="card-sub">GitHub template, semver, CHANGELOG.md</div>
+      </div>
+      <div class="card-badges">
+        <span class="badge badge-medium">Medium</span>
+      </div>
+      <div class="chevron">›</div>
+    </div>
+    <div class="card-body">
+      <div class="card-body-inner">
+        <div class="card-desc">Treat the boilerplate as a versioned product, not a one-time scaffold. Publish it as a <strong>GitHub template repository</strong>. Tag releases with semver. Maintain a <code>CHANGELOG.md</code> in Keep a Changelog format. Clients who adopted v1.0 can track what changed in v1.2 and selectively apply updates. This also signals seriousness to prospective clients evaluating the boilerplate.</div>
+        <div class="why-row">
+          <span class="why-chip">Client trust</span>
+          <span class="why-chip">Update tracking</span>
+          <span class="why-chip">Product positioning</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <span class="footer-label">Legend</span>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--arch)"></div>Architecture</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--ui)"></div>UI / UX</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--del)"></div>Delivery</div>
+  <div style="margin-left:auto" class="legend-item"><div class="legend-dot" style="background:var(--high)"></div>High priority</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--med)"></div>Medium priority</div>
+</footer>
+
+<script>
+const priorities = { high: true, medium: true };
+let activeFilter = 'all';
+
+function toggle(card) {
+  card.classList.toggle('open');
+}
+
+function setFilter(cat, btn) {
+  activeFilter = cat;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  applyFilters();
+}
+
+function togglePriority(p, btn) {
+  priorities[p] = !priorities[p];
+  btn.classList.toggle('active');
+  applyFilters();
+}
+
+function applyFilters() {
+  const cards = document.querySelectorAll('.card');
+  let counts = { arch: 0, ui: 0, del: 0 };
+  let total = 0;
+
+  cards.forEach(c => {
+    const cat = c.dataset.cat;
+    const pri = c.dataset.priority;
+    const catMatch = activeFilter === 'all' || cat === activeFilter;
+    const priMatch = priorities[pri];
+    const show = catMatch && priMatch;
+    c.classList.toggle('hidden', !show);
+    if (show) { counts[cat]++; total++; }
+  });
+
+  document.getElementById('arch-count').textContent = counts.arch + ' item' + (counts.arch !== 1 ? 's' : '');
+  document.getElementById('ui-count').textContent   = counts.ui   + ' item' + (counts.ui   !== 1 ? 's' : '');
+  document.getElementById('del-count').textContent  = counts.del  + ' item' + (counts.del  !== 1 ? 's' : '');
+  document.getElementById('total-count').textContent = total;
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Agent Detail View - Midnight Architect</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;800&amp;family=Inter:wght@400;500;600&amp;family=JetBrains+Mono&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "secondary-fixed": "#ffddb8",
+              "tertiary-fixed-dim": "#ffb783",
+              "surface-container-low": "#131b2e",
+              "error-container": "#93000a",
+              "on-primary-fixed-variant": "#2f2ebe",
+              "surface-container": "#171f33",
+              "on-tertiary-fixed-variant": "#703700",
+              "surface-container-highest": "#2d3449",
+              "on-tertiary": "#4f2500",
+              "secondary-fixed-dim": "#ffb95f",
+              "surface-bright": "#31394d",
+              "surface-tint": "#c0c1ff",
+              "primary-fixed": "#e1e0ff",
+              "on-tertiary-container": "#452000",
+              "surface-variant": "#2d3449",
+              "inverse-on-surface": "#283044",
+              "on-surface-variant": "#c7c4d7",
+              "inverse-primary": "#494bd6",
+              "inverse-surface": "#dae2fd",
+              "primary": "#c0c1ff",
+              "secondary": "#ffb95f",
+              "background": "#0b1326",
+              "outline": "#908fa0",
+              "on-error-container": "#ffdad6",
+              "surface-dim": "#0b1326",
+              "on-surface": "#dae2fd",
+              "error": "#ffb4ab",
+              "outline-variant": "#464554",
+              "on-error": "#690005",
+              "surface": "#0b1326",
+              "tertiary-fixed": "#ffdcc5",
+              "tertiary": "#ffb783",
+              "on-primary": "#1000a9",
+              "on-secondary-fixed-variant": "#653e00",
+              "on-primary-container": "#0d0096",
+              "secondary-container": "#ee9800",
+              "tertiary-container": "#d97721",
+              "on-secondary-container": "#5b3800",
+              "surface-container-lowest": "#060e20",
+              "on-secondary-fixed": "#2a1700",
+              "on-background": "#dae2fd",
+              "on-secondary": "#472a00",
+              "primary-container": "#8083ff",
+              "on-tertiary-fixed": "#301400",
+              "surface-container-high": "#222a3d",
+              "on-primary-fixed": "#07006c",
+              "primary-fixed-dim": "#c0c1ff"
+            },
+            fontFamily: {
+              "headline": ["Manrope"],
+              "body": ["Inter"],
+              "label": ["Inter"],
+              "mono": ["JetBrains Mono"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3 { font-family: 'Manrope', sans-serif; }
+        .mono-text { font-family: 'JetBrains Mono', monospace; }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #2d3449; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-background text-on-surface flex min-h-screen">
+<!-- SideNavBar Component -->
+<aside class="h-screen w-[240px] hidden md:flex flex-col sticky top-0 left-0 bg-[#171f33] border-r border-[#2d3449]/20 p-4 gap-y-4">
+<div class="flex items-center gap-3 px-2 mb-6">
+<div class="w-8 h-8 rounded bg-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary-fixed" style="font-variation-settings: 'FILL' 1;">architecture</span>
+</div>
+<div>
+<div class="text-xl font-bold tracking-tight text-[#dae2fd]">Midnight AI</div>
+<div class="text-[10px] uppercase tracking-widest text-primary font-bold">Enterprise Plan</div>
+</div>
+</div>
+<nav class="flex flex-col gap-1">
+<a class="flex items-center gap-3 px-3 py-2 text-[#c0c1ff] font-semibold bg-[#222a3d] rounded-md transition-transform active:scale-95" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+<span class="text-sm">Agents</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-[#dae2fd]/60 font-medium hover:text-[#dae2fd] hover:bg-[#222a3d] transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">grid_view</span>
+<span class="text-sm">Workspaces</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-[#dae2fd]/60 font-medium hover:text-[#dae2fd] hover:bg-[#222a3d] transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span class="text-sm">Billing</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-[#dae2fd]/60 font-medium hover:text-[#dae2fd] hover:bg-[#222a3d] transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-sm">Settings</span>
+</a>
+</nav>
+<div class="mt-auto pt-4 border-t border-[#2d3449]/20">
+<button class="w-full flex items-center justify-between px-3 py-2 rounded hover:bg-[#222a3d] text-[#dae2fd]/60 text-sm transition-colors">
+<span>Switch Workspace</span>
+<span class="material-symbols-outlined text-xs">unfold_more</span>
+</button>
+</div>
+</aside>
+<main class="flex-1 flex flex-col min-w-0">
+<!-- TopNavBar Component -->
+<header class="docked full-width top-0 sticky z-40 bg-[#0b1326]/60 backdrop-blur-md border-b border-[#2d3449]/10">
+<div class="flex justify-between items-center w-full px-6 py-3 max-w-[1280px] mx-auto">
+<div class="flex items-center gap-8">
+<span class="text-lg font-black text-[#dae2fd] tracking-tighter">Midnight Architect</span>
+<div class="relative hidden lg:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-sm">search</span>
+<input class="bg-surface-container-highest border-none rounded-xl pl-10 pr-4 py-1.5 text-sm w-64 focus:ring-1 focus:ring-primary text-on-surface" placeholder="Search commands..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-[#dae2fd]/70 hover:text-[#dae2fd] cursor-pointer">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="bg-gradient-to-br from-primary to-primary-container text-on-primary px-4 py-1.5 rounded-xl text-sm font-bold shadow-lg shadow-primary/10 active:opacity-80 transition-opacity">
+                        New Agent
+                    </button>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant/30">
+<img class="w-full h-full object-cover" data-alt="User profile avatar circle" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCj45m_Iour6c7o_G5qkU0-hsXZlV0r2eG1Me3WuDCe5Kd98eUF5dw6OcDKzHT_rj3bEDWSOWwmvbzlw9tYwsyp7WVskU1ks1pss3TVH_52w2mbroE7m7gL7kXAMwGVl8iM2hGeS5RqikOfrPAifk2br0dp628P9Xfv0_ICYTgutAEVQIYiXrxYesFybDCPYjkjEo-4cpDkKvEMbA9NKer0PUA4uuRhg7N9xlCwH7pVXOSn1RQZr_LEe9xh1CK8BRzHODLaXFIszg"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Content Canvas -->
+<div class="p-6 lg:p-10 max-w-[1400px] mx-auto w-full flex flex-col gap-8">
+<!-- Breadcrumb & Header -->
+<section class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div>
+<nav class="flex items-center gap-2 text-xs text-outline mb-2">
+<span>Agents</span>
+<span class="material-symbols-outlined text-[10px]">chevron_right</span>
+<span class="text-on-surface-variant">Nexus-VII-Deployer</span>
+</nav>
+<div class="flex items-center gap-4">
+<h1 class="text-4xl font-extrabold tracking-tight text-on-surface">Nexus-VII-Deployer</h1>
+<span class="flex items-center gap-1.5 px-2.5 py-1 bg-surface-container-high text-primary rounded-lg text-xs font-semibold">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+                            ACTIVE
+                        </span>
+</div>
+<p class="text-on-surface-variant mt-2 max-w-xl">Autonomous infrastructure scaling agent specializing in multi-region Kubernetes clusters with predictive load balancing.</p>
+</div>
+<div class="flex gap-3">
+<button class="flex items-center gap-2 px-4 py-2 bg-surface-container-highest text-on-surface rounded-xl text-sm font-medium hover:bg-surface-bright transition-colors">
+<span class="material-symbols-outlined text-sm">pause</span>
+                        Pause
+                    </button>
+<button class="flex items-center gap-2 px-4 py-2 bg-error-container text-on-error-container rounded-xl text-sm font-medium hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined text-sm">stop</span>
+                        Terminate
+                    </button>
+</div>
+</section>
+<!-- Metrics Bento Row -->
+<section class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+<div class="bg-surface-container border-none p-5 rounded-lg flex flex-col gap-1">
+<span class="text-outline text-[10px] uppercase font-bold tracking-widest">Total Run Time</span>
+<div class="text-3xl mono-text font-semibold text-primary">142:23:09</div>
+<span class="text-xs text-on-surface-variant mt-1">Uptime 99.8%</span>
+</div>
+<div class="bg-surface-container border-none p-5 rounded-lg flex flex-col gap-1">
+<span class="text-outline text-[10px] uppercase font-bold tracking-widest">Compute Cost</span>
+<div class="text-3xl mono-text font-semibold text-secondary">$312.45</div>
+<span class="text-xs text-on-surface-variant mt-1">Estimated monthly: $1.2k</span>
+</div>
+<div class="bg-surface-container border-none p-5 rounded-lg flex flex-col gap-1">
+<span class="text-outline text-[10px] uppercase font-bold tracking-widest">Tokens Processed</span>
+<div class="text-3xl mono-text font-semibold text-on-surface">4.2M</div>
+<span class="text-xs text-secondary mt-1">Llama 3.1 405B Cluster</span>
+</div>
+<div class="bg-surface-container-high border-none p-5 rounded-lg flex flex-col justify-center">
+<div class="flex items-center justify-between mb-2">
+<span class="text-outline text-[10px] uppercase font-bold tracking-widest">Model Latency</span>
+<span class="text-[10px] mono-text text-primary">124ms</span>
+</div>
+<div class="h-10 flex items-end gap-1">
+<div class="flex-1 bg-primary/20 rounded-sm h-[40%]"></div>
+<div class="flex-1 bg-primary/20 rounded-sm h-[60%]"></div>
+<div class="flex-1 bg-primary/20 rounded-sm h-[30%]"></div>
+<div class="flex-1 bg-primary/40 rounded-sm h-[80%]"></div>
+<div class="flex-1 bg-primary rounded-sm h-[100%]"></div>
+<div class="flex-1 bg-primary/60 rounded-sm h-[50%]"></div>
+<div class="flex-1 bg-primary/30 rounded-sm h-[20%]"></div>
+</div>
+</div>
+</section>
+<!-- Tabs Navigation -->
+<div class="border-b border-outline-variant/10 flex gap-8">
+<button class="pb-3 text-primary border-b-2 border-primary text-sm font-semibold flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">analytics</span>
+                    Activity
+                </button>
+<button class="pb-3 text-on-surface-variant hover:text-on-surface text-sm font-medium flex items-center gap-2 transition-colors">
+<span class="material-symbols-outlined text-sm">terminal</span>
+                    Logs
+                </button>
+<button class="pb-3 text-on-surface-variant hover:text-on-surface text-sm font-medium flex items-center gap-2 transition-colors">
+<span class="material-symbols-outlined text-sm">tune</span>
+                    Configuration
+                </button>
+<button class="pb-3 text-on-surface-variant hover:text-on-surface text-sm font-medium flex items-center gap-2 transition-colors">
+<span class="material-symbols-outlined text-sm">integration_instructions</span>
+                    Integration
+                </button>
+</div>
+<!-- Main Workspace Area -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+<!-- Terminal/Logs Section -->
+<div class="lg:col-span-8 flex flex-col gap-4">
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden border border-outline-variant/10 shadow-2xl">
+<div class="bg-surface-container-high px-4 py-2 flex items-center justify-between border-b border-outline-variant/10">
+<div class="flex items-center gap-2">
+<div class="flex gap-1.5">
+<div class="w-2.5 h-2.5 rounded-full bg-error/40"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-secondary/40"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-primary/40"></div>
+</div>
+<span class="text-[11px] mono-text text-outline ml-4">nexus-terminal — bash — 80x24</span>
+</div>
+<div class="flex items-center gap-3">
+<span class="text-[10px] text-outline mono-text">CONNECTED: WS-01</span>
+<span class="material-symbols-outlined text-sm text-outline cursor-pointer hover:text-on-surface">content_copy</span>
+</div>
+</div>
+<div class="p-4 h-[400px] overflow-y-auto custom-scrollbar mono-text text-sm leading-relaxed">
+<div class="flex gap-4 mb-1">
+<span class="text-outline shrink-0">14:02:11</span>
+<span class="text-secondary">[INFO]</span>
+<span class="text-on-surface-variant">Scanning cluster us-east-1-prod...</span>
+</div>
+<div class="flex gap-4 mb-1">
+<span class="text-outline shrink-0">14:02:12</span>
+<span class="text-primary">[DEBUG]</span>
+<span class="text-on-surface-variant">Latency spike detected in node group: x86_64-xlarge</span>
+</div>
+<div class="flex gap-4 mb-1">
+<span class="text-outline shrink-0">14:02:15</span>
+<span class="text-tertiary">[SYSTEM]</span>
+<span class="text-on-surface-variant">Allocating additional 4 pods to namespace 'api-gateway'</span>
+</div>
+<div class="flex gap-4 mb-1">
+<span class="text-outline shrink-0">14:02:18</span>
+<span class="text-error">[WARN]</span>
+<span class="text-error">Resource limit approaching for RDS instance 'main-db'</span>
+</div>
+<div class="flex gap-4 mb-1">
+<span class="text-outline shrink-0">14:02:22</span>
+<span class="text-secondary">[INFO]</span>
+<span class="text-on-surface-variant">Initiating horizontal scaling for consumer-group-A</span>
+</div>
+<div class="flex gap-4 mb-1">
+<span class="text-outline shrink-0">14:02:23</span>
+<span class="text-primary">[DEBUG]</span>
+<span class="text-on-surface-variant">Success: Scaling complete. Current replicas: 12</span>
+</div>
+<div class="flex gap-4 mb-1">
+<span class="text-outline shrink-0">14:03:01</span>
+<span class="text-secondary">[INFO]</span>
+<span class="text-on-surface-variant">Monitoring load balance status...</span>
+</div>
+<div class="mt-4 flex gap-2 items-center text-primary">
+<span class="shrink-0">$</span>
+<div class="w-2 h-4 bg-primary animate-[pulse_1s_infinite]"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Config Pane Section -->
+<div class="lg:col-span-4 flex flex-col gap-6">
+<div class="bg-surface-container-high p-6 rounded-xl border border-outline-variant/10">
+<h3 class="text-lg font-bold mb-6 flex items-center justify-between">
+                            Parameters
+                            <span class="material-symbols-outlined text-sm text-primary">auto_fix_high</span>
+</h3>
+<form class="space-y-6">
+<div class="space-y-2">
+<label class="text-xs font-bold text-outline uppercase tracking-wider">Agent Autonomy Level</label>
+<div class="flex items-center gap-4">
+<input class="flex-1 accent-primary h-1.5 bg-surface-container-highest rounded-lg appearance-none cursor-pointer" type="range"/>
+<span class="mono-text text-sm text-primary">0.85</span>
+</div>
+</div>
+<div class="space-y-2">
+<label class="text-xs font-bold text-outline uppercase tracking-wider">Model Variant</label>
+<select class="w-full bg-surface-container-highest border-none rounded-lg text-sm text-on-surface py-2 focus:ring-1 focus:ring-primary">
+<option>Llama-3.1-405B (Prod)</option>
+<option>GPT-4o-Mini (Experimental)</option>
+<option>Claude-3.5-Sonnet</option>
+</select>
+</div>
+<div class="space-y-2">
+<label class="text-xs font-bold text-outline uppercase tracking-wider">Memory Buffer (GB)</label>
+<div class="grid grid-cols-4 gap-2">
+<button class="py-1.5 bg-surface-container-highest rounded text-xs hover:bg-surface-bright transition-colors" type="button">8</button>
+<button class="py-1.5 bg-primary text-on-primary rounded text-xs font-bold" type="button">16</button>
+<button class="py-1.5 bg-surface-container-highest rounded text-xs hover:bg-surface-bright transition-colors" type="button">32</button>
+<button class="py-1.5 bg-surface-container-highest rounded text-xs hover:bg-surface-bright transition-colors" type="button">64</button>
+</div>
+</div>
+<div class="flex items-center justify-between p-3 bg-surface-container-lowest rounded-lg">
+<div class="flex flex-col">
+<span class="text-sm font-medium">Auto-Recovery</span>
+<span class="text-[10px] text-outline">Reboot on kernel crash</span>
+</div>
+<div class="w-10 h-5 bg-primary rounded-full relative cursor-pointer">
+<div class="absolute right-0.5 top-0.5 w-4 h-4 bg-white rounded-full"></div>
+</div>
+</div>
+<div class="pt-4">
+<button class="w-full py-3 bg-surface-bright border border-outline-variant/20 rounded-xl text-sm font-bold hover:bg-surface-container-highest transition-colors active:scale-[0.98]" type="submit">
+                                    Update Configuration
+                                </button>
+</div>
+</form>
+</div>
+<div class="bg-surface-container p-5 rounded-xl border border-outline-variant/5">
+<div class="flex items-center gap-3 mb-4">
+<span class="material-symbols-outlined text-secondary">security</span>
+<span class="text-sm font-bold">Security Context</span>
+</div>
+<p class="text-xs text-on-surface-variant leading-relaxed mb-4">
+                            This agent has <span class="text-secondary mono-text">WRITE</span> access to the production VPC. Auditing is enabled via CloudTrail.
+                        </p>
+<a class="text-xs text-primary font-bold hover:underline flex items-center gap-1" href="#">
+                            Review Policy
+                            <span class="material-symbols-outlined text-xs">arrow_outward</span>
+</a>
+</div>
+</div>
+</div>
+<!-- Asymmetric Recent Events Table -->
+<section class="mt-4">
+<div class="flex items-center justify-between mb-6">
+<h2 class="text-2xl font-bold tracking-tight">Recent Activity</h2>
+<button class="text-sm text-outline hover:text-on-surface transition-colors">View All History</button>
+</div>
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden">
+<table class="w-full text-left text-sm">
+<thead>
+<tr class="bg-surface-container-high/50">
+<th class="px-6 py-4 font-bold text-outline text-[10px] uppercase tracking-wider">Timestamp</th>
+<th class="px-6 py-4 font-bold text-outline text-[10px] uppercase tracking-wider">Action</th>
+<th class="px-6 py-4 font-bold text-outline text-[10px] uppercase tracking-wider">Entity</th>
+<th class="px-6 py-4 font-bold text-outline text-[10px] uppercase tracking-wider text-right">Impact</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/5">
+<tr class="hover:bg-surface-container transition-colors group">
+<td class="px-6 py-4 mono-text text-outline text-xs">2023-10-24 14:02:15</td>
+<td class="px-6 py-4 font-medium">Cluster Upscale</td>
+<td class="px-6 py-4"><span class="px-2 py-0.5 bg-surface-container-highest rounded text-[11px] mono-text">us-east-1a</span></td>
+<td class="px-6 py-4 text-right text-primary font-bold">+4 Nodes</td>
+</tr>
+<tr class="hover:bg-surface-container transition-colors group">
+<td class="px-6 py-4 mono-text text-outline text-xs">2023-10-24 13:45:02</td>
+<td class="px-6 py-4 font-medium">Policy Refresh</td>
+<td class="px-6 py-4"><span class="px-2 py-0.5 bg-surface-container-highest rounded text-[11px] mono-text">IAM_ROOT</span></td>
+<td class="px-6 py-4 text-right text-on-surface-variant font-bold">Success</td>
+</tr>
+<tr class="hover:bg-surface-container transition-colors group">
+<td class="px-6 py-4 mono-text text-outline text-xs">2023-10-24 12:11:58</td>
+<td class="px-6 py-4 font-medium">OOM Mitigation</td>
+<td class="px-6 py-4"><span class="px-2 py-0.5 bg-surface-container-highest rounded text-[11px] mono-text">redis-cache</span></td>
+<td class="px-6 py-4 text-right text-secondary font-bold">Recycled</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</div>
+<!-- Footer spacer -->
+<footer class="py-12"></footer>
+</main>
+<!-- Contextual FAB - Restricted to Top Level but allowed here for Action -->
+<button class="fixed bottom-8 right-8 w-14 h-14 rounded-full bg-gradient-to-br from-primary to-primary-container text-on-primary shadow-2xl flex items-center justify-center hover:scale-105 transition-transform z-50">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">add</span>
+</button>
+</body></html>
