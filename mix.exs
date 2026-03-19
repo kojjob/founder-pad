@@ -82,6 +82,9 @@ defmodule FounderPad.MixProject do
       # Security
       {:bcrypt_elixir, "~> 3.0"},
 
+      # SAT solver (required by Ash policies)
+      {:simple_sat, "~> 0.1"},
+
       # Utilities
       {:gettext, "~> 0.26"},
       {:jason, "~> 1.4"},
