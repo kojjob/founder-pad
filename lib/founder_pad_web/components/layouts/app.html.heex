@@ -50,17 +50,62 @@
             />
           </div>
         </div>
-        <div class="flex items-center gap-4">
-          <button class="material-symbols-outlined text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer">notifications</button>
-          <!-- Theme Toggle -->
-          <button id="theme-toggle" phx-hook="ThemeToggle" class="material-symbols-outlined text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer">dark_mode</button>
-          <div class="w-px h-6 bg-outline-variant/30"></div>
-          <button class="bg-gradient-to-br from-primary to-primary-container text-on-primary-fixed font-semibold px-4 py-1.5 rounded-lg text-sm transition-transform active:opacity-80">
-            New Agent
-          </button>
-          <div class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center">
-            <span class="material-symbols-outlined text-on-surface-variant text-lg">person</span>
+        <div class="flex items-center gap-3">
+          <!-- Notifications -->
+          <div class="relative">
+            <button class="p-2 text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer rounded-lg hover:bg-surface-container-high">
+              <span class="material-symbols-outlined text-xl">notifications</span>
+            </button>
+            <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-error"></span>
           </div>
+
+          <div class="w-px h-6 bg-outline-variant/30"></div>
+
+          <!-- User Dropdown -->
+          <div class="relative group">
+            <button class="flex items-center gap-2 p-1.5 rounded-lg hover:bg-surface-container-high transition-colors cursor-pointer">
+              <div class="w-8 h-8 rounded-full bg-primary-fixed flex items-center justify-center text-xs font-bold text-primary font-headline">
+                FP
+              </div>
+              <div class="hidden md:block text-left">
+                <p class="text-sm font-medium text-on-surface leading-none">User</p>
+                <p class="text-[10px] text-on-surface-variant leading-none mt-0.5">Pro Plan</p>
+              </div>
+              <span class="material-symbols-outlined text-on-surface-variant text-sm hidden md:block">expand_more</span>
+            </button>
+            <!-- Dropdown Menu -->
+            <div class="absolute right-0 top-full mt-2 w-56 py-2 bg-surface-container-lowest rounded-xl editorial-shadow glass-effect opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
+              <div class="px-4 py-3">
+                <p class="text-sm font-semibold text-on-surface">FounderPad User</p>
+                <p class="text-xs text-on-surface-variant">user@founderpad.io</p>
+              </div>
+              <div class="h-px bg-outline-variant/10 mx-3"></div>
+              <a href="/settings" class="flex items-center gap-3 px-4 py-2.5 text-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/50 transition-colors">
+                <span class="material-symbols-outlined text-lg">settings</span>
+                Settings
+              </a>
+              <a href="/billing" class="flex items-center gap-3 px-4 py-2.5 text-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/50 transition-colors">
+                <span class="material-symbols-outlined text-lg">payments</span>
+                Billing
+              </a>
+              <a href="#" class="flex items-center gap-3 px-4 py-2.5 text-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/50 transition-colors">
+                <span class="material-symbols-outlined text-lg">help</span>
+                Help &amp; Support
+              </a>
+              <div class="h-px bg-outline-variant/10 mx-3"></div>
+              <a href="/auth/login" class="flex items-center gap-3 px-4 py-2.5 text-sm text-error/80 hover:text-error hover:bg-error/5 transition-colors">
+                <span class="material-symbols-outlined text-lg">logout</span>
+                Sign Out
+              </a>
+            </div>
+          </div>
+
+          <div class="w-px h-6 bg-outline-variant/30"></div>
+
+          <!-- Theme Toggle (rightmost) -->
+          <button id="theme-toggle" phx-hook="ThemeToggle" class="p-2 text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer rounded-lg hover:bg-surface-container-high">
+            <span class="material-symbols-outlined text-xl">dark_mode</span>
+          </button>
         </div>
       </div>
     </header>
