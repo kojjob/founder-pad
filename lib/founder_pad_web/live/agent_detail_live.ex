@@ -1,16 +1,75 @@
 defmodule FounderPadWeb.AgentDetailLive do
   use FounderPadWeb, :live_view
 
-  def mount(%{"id" => _id}, _session, socket) do
-    agent = sample_agent()
+  require Ash.Query
 
-    {:ok,
-     assign(socket,
-       active_nav: :agents,
-       page_title: agent.name,
-       agent: agent,
-       messages: sample_messages()
-     )}
+  def mount(%{"id" => agent_id}, _session, socket) do
+    case Ash.get(FounderPad.AI.Agent, agent_id) do
+      {:ok, agent} ->
+        user = socket.assigns[:current_user]
+        conversation = get_or_create_conversation(agent, user)
+        messages = load_messages(conversation.id)
+
+        if connected?(socket) do
+          Phoenix.PubSub.subscribe(FounderPad.PubSub, "conversation:#{conversation.id}")
+        end
+
+        {:ok,
+         assign(socket,
+           active_nav: :agents,
+           page_title: agent.name,
+           agent: agent,
+           conversation: conversation,
+           messages: messages,
+           message_input: "",
+           streaming: false
+         )}
+
+      {:error, _} ->
+        {:ok, push_navigate(socket, to: "/agents")}
+    end
+  end
+
+  def handle_event("send_message", %{"message" => content}, socket)
+      when content != "" do
+    conversation = socket.assigns.conversation
+    agent = socket.assigns.agent
+
+    %{
+      conversation_id: conversation.id,
+      message_content: content,
+      organisation_id: agent.organisation_id
+    }
+    |> FounderPad.AI.Workers.AgentRunner.new()
+    |> Oban.insert()
+
+    user_msg = %{role: :user, content: content, time: "Just now"}
+
+    {:noreply,
+     socket
+     |> assign(messages: socket.assigns.messages ++ [user_msg])
+     |> assign(message_input: "")
+     |> assign(streaming: true)}
+  end
+
+  def handle_event("send_message", _params, socket) do
+    {:noreply, socket}
+  end
+
+  def handle_info({:message_complete, response}, socket) do
+    assistant_msg = %{role: :assistant, content: response, time: "Just now"}
+
+    {:noreply,
+     socket
+     |> assign(messages: socket.assigns.messages ++ [assistant_msg])
+     |> assign(streaming: false)}
+  end
+
+  def handle_info({:error, reason}, socket) do
+    {:noreply,
+     socket
+     |> put_flash(:error, "Agent error: #{inspect(reason)}")
+     |> assign(streaming: false)}
   end
 
   def render(assigns) do
@@ -71,9 +130,11 @@ defmodule FounderPadWeb.AgentDetailLive do
       <section class="bg-surface-container-low rounded-lg border border-outline-variant/10 overflow-hidden">
         <div class="px-6 py-4 border-b border-outline-variant/10 flex items-center justify-between">
           <h3 class="font-bold font-headline">Recent Conversation</h3>
-          <span class="text-xs font-mono text-on-surface-variant">ID: conv_82fa3...1d</span>
+          <span class="text-xs font-mono text-on-surface-variant">
+            ID: {String.slice(@conversation.id, 0..11)}...
+          </span>
         </div>
-        <div class="p-6 space-y-6 max-h-[500px] overflow-y-auto">
+        <div class="p-6 space-y-6 max-h-[500px] overflow-y-auto" id="messages-container" phx-hook="ScrollBottom">
           <div :for={msg <- @messages} class="flex gap-4">
             <div class={[
               "w-8 h-8 rounded-lg flex items-center justify-center shrink-0",
@@ -93,56 +154,89 @@ defmodule FounderPadWeb.AgentDetailLive do
               <div class="text-sm leading-relaxed">{msg.content}</div>
             </div>
           </div>
+          <div :if={@streaming} class="flex gap-4">
+            <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 bg-primary/10">
+              <span class="material-symbols-outlined text-sm text-primary">smart_toy</span>
+            </div>
+            <div class="flex-1">
+              <p class="text-xs font-mono text-on-surface-variant mb-1">{@agent.name} • thinking...</p>
+              <div class="flex gap-1">
+                <span class="w-2 h-2 bg-primary/50 rounded-full animate-bounce"></span>
+                <span class="w-2 h-2 bg-primary/50 rounded-full animate-bounce [animation-delay:0.15s]"></span>
+                <span class="w-2 h-2 bg-primary/50 rounded-full animate-bounce [animation-delay:0.3s]"></span>
+              </div>
+            </div>
+          </div>
         </div>
         <%!-- Input --%>
         <div class="px-6 py-4 border-t border-outline-variant/10">
-          <div class="flex gap-3">
+          <form phx-submit="send_message" class="flex gap-3">
             <input
               type="text"
-              placeholder="Send a message..."
-              class="flex-1 bg-surface-container-highest border-none rounded-lg px-4 py-2.5 text-sm text-on-surface placeholder:text-on-surface-variant/50 focus:ring-1 focus:ring-primary"
+              name="message"
+              value={@message_input}
+              placeholder={if @streaming, do: "Agent is thinking...", else: "Send a message..."}
+              disabled={@streaming}
+              class="flex-1 bg-surface-container-highest border-none rounded-lg px-4 py-2.5 text-sm text-on-surface placeholder:text-on-surface-variant/50 focus:ring-1 focus:ring-primary disabled:opacity-50"
+              autofocus
             />
-            <button class="primary-gradient px-4 py-2.5 rounded-lg text-sm font-semibold transition-transform active:scale-95">
-              <span class="material-symbols-outlined text-lg">send</span>
+            <button
+              type="submit"
+              disabled={@streaming}
+              class="primary-gradient px-4 py-2.5 rounded-lg text-sm font-semibold transition-transform active:scale-95 disabled:opacity-50"
+            >
+              <span class="material-symbols-outlined text-lg">
+                {if @streaming, do: "hourglass_top", else: "send"}
+              </span>
             </button>
-          </div>
+          </form>
         </div>
       </section>
     </div>
     """
   end
 
-  defp sample_agent do
-    %{
-      name: "Research Assistant",
-      description:
-        "Deep research across documents, papers, and web sources with citation tracking.",
-      provider: "Anthropic",
-      model: "Claude Sonnet 4",
-      temperature: 0.7,
-      max_tokens: 4096
-    }
+  # -- Private helpers --------------------------------------------------------
+
+  defp get_or_create_conversation(agent, user) do
+    case FounderPad.AI.Conversation
+         |> Ash.Query.filter(agent_id: agent.id, status: :active)
+         |> Ash.Query.limit(1)
+         |> Ash.Query.sort(inserted_at: :desc)
+         |> Ash.read() do
+      {:ok, [conversation | _]} ->
+        conversation
+
+      _ ->
+        {:ok, conversation} =
+          FounderPad.AI.Conversation
+          |> Ash.Changeset.for_create(:create, %{
+            title: "Chat with #{agent.name}",
+            agent_id: agent.id,
+            organisation_id: agent.organisation_id,
+            user_id: user && user.id
+          })
+          |> Ash.create()
+
+        conversation
+    end
   end
 
-  defp sample_messages do
-    [
-      %{
-        role: :user,
-        content:
-          "Can you analyze the competitive landscape for AI SaaS boilerplates in the Phoenix/Elixir ecosystem?",
-        time: "2 min ago"
-      },
-      %{
-        role: :assistant,
-        content:
-          "I'll research the current landscape. Based on my analysis, the Phoenix/Elixir ecosystem has a few notable SaaS boilerplates, but none with comprehensive AI agent integration. The main competitors are: 1) Petal Pro — focused on UI components, 2) LiveSaaS — basic auth/billing, 3) SaaSKit — Rails-based competitor. FounderPad's differentiator is the built-in AI agent orchestration with multi-provider support.",
-        time: "1 min ago"
-      },
-      %{
-        role: :user,
-        content: "What about pricing models? How do they compare?",
-        time: "30s ago"
-      }
-    ]
+  defp load_messages(conversation_id) do
+    case FounderPad.AI.Message
+         |> Ash.Query.filter(conversation_id: conversation_id)
+         |> Ash.Query.sort(inserted_at: :asc)
+         |> Ash.read() do
+      {:ok, messages} ->
+        Enum.map(messages, fn msg ->
+          %{role: msg.role, content: msg.content, time: format_time(msg.inserted_at)}
+        end)
+
+      _ ->
+        []
+    end
   end
+
+  defp format_time(nil), do: "---"
+  defp format_time(dt), do: Calendar.strftime(dt, "%H:%M")
 end

@@ -2,11 +2,17 @@ defmodule FounderPadWeb.AgentsLive do
   use FounderPadWeb, :live_view
 
   def mount(_params, _session, socket) do
+    agents =
+      case FounderPad.AI.Agent |> Ash.read() do
+        {:ok, agents} -> Enum.map(agents, &format_agent/1)
+        _ -> []
+      end
+
     {:ok,
      assign(socket,
        active_nav: :agents,
        page_title: "AI Agents",
-       agents: sample_agents(),
+       agents: if(agents == [], do: sample_agents(), else: agents),
        filter: :all
      )}
   end
@@ -113,6 +119,20 @@ defmodule FounderPadWeb.AgentsLive do
 
   defp filtered_agents(agents, status) do
     Enum.filter(agents, fn agent -> agent.status == status end)
+  end
+
+  defp format_agent(agent) do
+    %{
+      name: agent.name,
+      description: agent.description || "No description",
+      provider: agent.provider |> to_string() |> String.capitalize(),
+      model: agent.model,
+      icon: "smart_toy",
+      status: if(agent.active, do: :active, else: :paused),
+      conversations: 0,
+      tokens_used: "0",
+      last_used: "Never"
+    }
   end
 
   defp sample_agents do

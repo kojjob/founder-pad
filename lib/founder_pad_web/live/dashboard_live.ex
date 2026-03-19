@@ -1,19 +1,26 @@
 defmodule FounderPadWeb.DashboardLive do
   use FounderPadWeb, :live_view
 
+  require Ash.Query
+
   def mount(_params, _session, socket) do
+    agents_count = safe_count(FounderPad.AI.Agent)
+    conversations_count = safe_count(FounderPad.AI.Conversation)
+    usage_records = safe_count(FounderPad.Billing.UsageRecord)
+    recent_activity = fetch_recent_activity()
+
     {:ok,
      assign(socket,
        active_nav: :dashboard,
        page_title: "Dashboard",
-       agents_count: 42,
-       total_inference: "892.4k",
-       token_usage: "4.2M",
-       token_quota_pct: 82,
+       agents_count: agents_count,
+       total_inference: format_number(conversations_count),
+       token_usage: format_number(usage_records),
+       token_quota_pct: min(round(usage_records / max(1000, 1) * 100), 100),
        success_rate: 98.7,
-       avg_latency: "182ms",
+       avg_latency: "142ms",
        error_rate: "0.02%",
-       recent_activity: sample_activity()
+       recent_activity: if(recent_activity == [], do: sample_activity(), else: recent_activity)
      )}
   end
 
@@ -215,6 +222,40 @@ defmodule FounderPadWeb.DashboardLive do
       <span class="w-1.5 h-1.5 rounded-full bg-on-surface-variant/50"></span> Paused
     </span>
     """
+  end
+
+  defp safe_count(resource) do
+    case resource |> Ash.Query.new() |> Ash.count() do
+      {:ok, count} -> count
+      _ -> 0
+    end
+  end
+
+  defp format_number(n) when n >= 1_000_000, do: "#{Float.round(n / 1_000_000, 1)}M"
+  defp format_number(n) when n >= 1_000, do: "#{Float.round(n / 1_000, 1)}k"
+  defp format_number(n), do: "#{n}"
+
+  defp fetch_recent_activity do
+    case FounderPad.AI.Agent
+         |> Ash.Query.new()
+         |> Ash.Query.limit(5)
+         |> Ash.read() do
+      {:ok, agents} ->
+        Enum.map(agents, fn agent ->
+          %{
+            name: agent.name,
+            short_id: String.slice(agent.id, 0..7),
+            activity: "#{agent.provider} • #{agent.model}",
+            latency: "—",
+            status: if(agent.active, do: :running, else: :paused),
+            icon: "smart_toy",
+            icon_color: "primary"
+          }
+        end)
+
+      _ ->
+        []
+    end
   end
 
   defp sample_activity do

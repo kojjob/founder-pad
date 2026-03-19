@@ -33,6 +33,7 @@ defmodule FounderPadWeb.Router do
     pipe_through :browser
 
     get "/sitemap.xml", SitemapController, :index
+    post "/checkout/:plan_slug", CheckoutController, :create
     live "/", LandingLive
 
     # App routes with sidebar layout

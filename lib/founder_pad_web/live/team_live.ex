@@ -1,18 +1,31 @@
 defmodule FounderPadWeb.TeamLive do
   use FounderPadWeb, :live_view
 
+  require Ash.Query
+
   def mount(_params, _session, socket) do
+    members =
+      case FounderPad.Accounts.Membership
+           |> Ash.Query.new()
+           |> Ash.Query.load([:user])
+           |> Ash.read() do
+        {:ok, memberships} -> Enum.map(memberships, &format_member/1)
+        _ -> []
+      end
+
+    members = if(members == [], do: sample_members(), else: members)
+
     {:ok,
      assign(socket,
        active_nav: :team,
        page_title: "Team",
        search_query: "",
        current_page: 1,
-       members: sample_members(),
+       members: members,
        total_seats: 30,
-       used_seats: 24,
-       active_now: 12,
-       pending: 3,
+       used_seats: length(members),
+       active_now: Enum.count(members, fn m -> m.status == :active end),
+       pending: 0,
        next_billing: "Oct 24"
      )}
   end
@@ -321,6 +334,19 @@ defmodule FounderPadWeb.TeamLive do
   defp status_label(:active), do: "Active"
   defp status_label(:offline), do: "Offline"
   defp status_label(_), do: "Offline"
+
+  defp format_member(membership) do
+    user = membership.user
+
+    %{
+      name: user.name || "Unnamed User",
+      email: to_string(user.email),
+      role: membership.role,
+      status: :active,
+      last_active: Calendar.strftime(membership.updated_at, "%Y-%m-%d %H:%M:%S"),
+      avatar: user.avatar_url
+    }
+  end
 
   defp sample_members do
     [

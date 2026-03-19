@@ -2,19 +2,19 @@ defmodule FounderPadWeb.BillingLive do
   use FounderPadWeb, :live_view
 
   def mount(_params, _session, socket) do
+    plans =
+      case FounderPad.Billing.Plan |> Ash.read() do
+        {:ok, plans} -> Enum.sort_by(plans, & &1.sort_order)
+        _ -> []
+      end
+
+    current_plan = format_current_plan(List.first(plans))
+
     {:ok,
      assign(socket,
        active_nav: :billing,
        page_title: "Billing & Subscriptions",
-       current_plan: %{
-         name: "Pro Architect",
-         price: "$149.00",
-         features: [
-           "Unlimited AI Agents",
-           "Advanced Vector Memory",
-           "Priority API Access"
-         ]
-       },
+       current_plan: current_plan,
        usage: %{
          compute_display: "842 / 1,000",
          compute_pct: 84,
@@ -38,6 +38,36 @@ defmodule FounderPadWeb.BillingLive do
          %{id: "INV-2024-006", date: "Jul 12, 2024", amount: "$89.00", status: :paid}
        ]
      )}
+  end
+
+  defp format_current_plan(nil) do
+    %{
+      name: "Pro Architect",
+      price: "$149.00",
+      features: [
+        "Unlimited AI Agents",
+        "Advanced Vector Memory",
+        "Priority API Access"
+      ]
+    }
+  end
+
+  defp format_current_plan(plan) do
+    price_dollars = plan.price_cents / 100
+
+    %{
+      name: plan.name,
+      price: "$#{:erlang.float_to_binary(price_dollars / 1, decimals: 2)}",
+      features:
+        if(plan.features == [],
+          do: [
+            "#{plan.max_agents} AI Agents",
+            "#{plan.max_seats} Team Seats",
+            "#{plan.max_api_calls_per_month} API Calls/mo"
+          ],
+          else: plan.features
+        )
+    }
   end
 
   def render(assigns) do
@@ -84,10 +114,13 @@ defmodule FounderPadWeb.BillingLive do
                   {@current_plan.price}
                 </span>
               </div>
-              <button class="w-full primary-gradient text-on-primary-fixed font-bold py-3 rounded-lg flex items-center justify-center gap-2 hover:shadow-[0_0_20px_rgba(128,131,255,0.3)] transition-all">
-                <span>Upgrade Plan</span>
-                <span class="material-symbols-outlined">rocket_launch</span>
-              </button>
+              <form method="post" action="/checkout/pro">
+                <input type="hidden" name="_csrf_token" value={Plug.CSRFProtection.get_csrf_token()} />
+                <button type="submit" class="w-full primary-gradient text-on-primary-fixed font-bold py-3 rounded-lg flex items-center justify-center gap-2 hover:shadow-[0_0_20px_rgba(128,131,255,0.3)] transition-all">
+                  <span>Upgrade Plan</span>
+                  <span class="material-symbols-outlined">rocket_launch</span>
+                </button>
+              </form>
             </div>
           </div>
         </div>
