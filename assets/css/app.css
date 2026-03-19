@@ -1,0 +1,343 @@
+/* See the Tailwind configuration guide for advanced usage
+   https://tailwindcss.com/docs/configuration */
+
+@import "tailwindcss" source(none);
+@source "../css";
+@source "../js";
+@source "../../lib/founder_pad_web";
+
+/* A Tailwind plugin that makes "hero-#{ICON}" classes available.
+   The heroicons installation itself is managed by your mix.exs */
+@plugin "../vendor/heroicons";
+
+/* daisyUI Tailwind Plugin. You can update this file by fetching the latest version with:
+   curl -sLO https://github.com/saadeghi/daisyui/releases/latest/download/daisyui.js
+   Make sure to look at the daisyUI changelog: https://daisyui.com/docs/changelog/ */
+@plugin "../vendor/daisyui" {
+  themes: false;
+}
+
+/* daisyUI theme plugin. You can update this file by fetching the latest version with:
+  curl -sLO https://github.com/saadeghi/daisyui/releases/latest/download/daisyui-theme.js
+  We ship with two themes, a light one inspired on Phoenix colors and a dark one inspired
+  on Elixir colors. Build your own at: https://daisyui.com/theme-generator/ */
+@plugin "../vendor/daisyui-theme" {
+  name: "dark";
+  default: false;
+  prefersdark: true;
+  color-scheme: "dark";
+  --color-base-100: oklch(30.33% 0.016 252.42);
+  --color-base-200: oklch(25.26% 0.014 253.1);
+  --color-base-300: oklch(20.15% 0.012 254.09);
+  --color-base-content: oklch(97.807% 0.029 256.847);
+  --color-primary: oklch(58% 0.233 277.117);
+  --color-primary-content: oklch(96% 0.018 272.314);
+  --color-secondary: oklch(58% 0.233 277.117);
+  --color-secondary-content: oklch(96% 0.018 272.314);
+  --color-accent: oklch(60% 0.25 292.717);
+  --color-accent-content: oklch(96% 0.016 293.756);
+  --color-neutral: oklch(37% 0.044 257.287);
+  --color-neutral-content: oklch(98% 0.003 247.858);
+  --color-info: oklch(58% 0.158 241.966);
+  --color-info-content: oklch(97% 0.013 236.62);
+  --color-success: oklch(60% 0.118 184.704);
+  --color-success-content: oklch(98% 0.014 180.72);
+  --color-warning: oklch(66% 0.179 58.318);
+  --color-warning-content: oklch(98% 0.022 95.277);
+  --color-error: oklch(58% 0.253 17.585);
+  --color-error-content: oklch(96% 0.015 12.422);
+  --radius-selector: 0.25rem;
+  --radius-field: 0.25rem;
+  --radius-box: 0.5rem;
+  --size-selector: 0.21875rem;
+  --size-field: 0.21875rem;
+  --border: 1.5px;
+  --depth: 1;
+  --noise: 0;
+}
+
+@plugin "../vendor/daisyui-theme" {
+  name: "light";
+  default: true;
+  prefersdark: false;
+  color-scheme: "light";
+  --color-base-100: oklch(98% 0 0);
+  --color-base-200: oklch(96% 0.001 286.375);
+  --color-base-300: oklch(92% 0.004 286.32);
+  --color-base-content: oklch(21% 0.006 285.885);
+  --color-primary: oklch(70% 0.213 47.604);
+  --color-primary-content: oklch(98% 0.016 73.684);
+  --color-secondary: oklch(55% 0.027 264.364);
+  --color-secondary-content: oklch(98% 0.002 247.839);
+  --color-accent: oklch(0% 0 0);
+  --color-accent-content: oklch(100% 0 0);
+  --color-neutral: oklch(44% 0.017 285.786);
+  --color-neutral-content: oklch(98% 0 0);
+  --color-info: oklch(62% 0.214 259.815);
+  --color-info-content: oklch(97% 0.014 254.604);
+  --color-success: oklch(70% 0.14 182.503);
+  --color-success-content: oklch(98% 0.014 180.72);
+  --color-warning: oklch(66% 0.179 58.318);
+  --color-warning-content: oklch(98% 0.022 95.277);
+  --color-error: oklch(58% 0.253 17.585);
+  --color-error-content: oklch(96% 0.015 12.422);
+  --radius-selector: 0.25rem;
+  --radius-field: 0.25rem;
+  --radius-box: 0.5rem;
+  --size-selector: 0.21875rem;
+  --size-field: 0.21875rem;
+  --border: 1.5px;
+  --depth: 1;
+  --noise: 0;
+}
+
+/* Add variants based on LiveView classes */
+@custom-variant phx-click-loading (.phx-click-loading&, .phx-click-loading &);
+@custom-variant phx-submit-loading (.phx-submit-loading&, .phx-submit-loading &);
+@custom-variant phx-change-loading (.phx-change-loading&, .phx-change-loading &);
+
+/* Use the class strategy for dark mode */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Make LiveView wrapper divs transparent for layout */
+[data-phx-session], [data-phx-teleported-src] { display: contents }
+
+/* ============================================================
+   Stitch Design System — "Indigo Slate Protocol"
+   CSS variable-based theming for dark/light mode switching.
+   Variables defined in :root (dark default), overridden in html:not(.dark).
+   @theme references vars so Tailwind utilities respond to theme changes.
+   ============================================================ */
+
+/* ── Dark theme (default) ── */
+:root {
+  --fp-background: #0b1326;
+  --fp-surface: #0b1326;
+  --fp-surface-dim: #0b1326;
+  --fp-surface-bright: #31394d;
+  --fp-surface-tint: #c0c1ff;
+  --fp-surface-variant: #2d3449;
+  --fp-surface-container-lowest: #060e20;
+  --fp-surface-container-low: #131b2e;
+  --fp-surface-container: #171f33;
+  --fp-surface-container-high: #222a3d;
+  --fp-surface-container-highest: #2d3449;
+  --fp-primary: #c0c1ff;
+  --fp-primary-container: #8083ff;
+  --fp-primary-fixed: #e1e0ff;
+  --fp-primary-fixed-dim: #c0c1ff;
+  --fp-on-primary: #1000a9;
+  --fp-on-primary-container: #0d0096;
+  --fp-on-primary-fixed: #07006c;
+  --fp-on-primary-fixed-variant: #2f2ebe;
+  --fp-inverse-primary: #494bd6;
+  --fp-secondary: #9c5c09;
+  --fp-secondary-container: #a96c03;
+  --fp-secondary-fixed: #ffddb8;
+  --fp-secondary-fixed-dim: #e29025;
+  --fp-on-secondary: #472a00;
+  --fp-on-secondary-container: #5b3800;
+  --fp-on-secondary-fixed: #2a1700;
+  --fp-on-secondary-fixed-variant: #653e00;
+  --fp-tertiary: #ffb783;
+  --fp-tertiary-container: #b65d0f;
+  --fp-on-tertiary: #4f2500;
+  --fp-error: #ffb4ab;
+  --fp-error-container: #93000a;
+  --fp-on-error: #690005;
+  --fp-on-error-container: #ffdad6;
+  --fp-on-surface: #dae2fd;
+  --fp-on-surface-variant: #c7c4d7;
+  --fp-on-background: #dae2fd;
+  --fp-inverse-surface: #dae2fd;
+  --fp-inverse-on-surface: #283044;
+  --fp-outline: #908fa0;
+  --fp-outline-variant: #464554;
+}
+
+/* ── Light theme (from Stitch team light mode) ── */
+html:not(.dark) {
+  --fp-background: #f7f9fb;
+  --fp-surface: #f7f9fb;
+  --fp-surface-dim: #d8dadc;
+  --fp-surface-bright: #f7f9fb;
+  --fp-surface-tint: #494bd6;
+  --fp-surface-variant: #e0e3e5;
+  --fp-surface-container-lowest: #ffffff;
+  --fp-surface-container-low: #f2f4f6;
+  --fp-surface-container: #eceef0;
+  --fp-surface-container-high: #e6e8ea;
+  --fp-surface-container-highest: #e0e3e5;
+  --fp-primary: #4648d4;
+  --fp-primary-container: #6063ee;
+  --fp-primary-fixed: #e1e0ff;
+  --fp-primary-fixed-dim: #c0c1ff;
+  --fp-on-primary: #ffffff;
+  --fp-on-primary-container: #fffbff;
+  --fp-on-primary-fixed: #07006c;
+  --fp-on-primary-fixed-variant: #2f2ebe;
+  --fp-inverse-primary: #c0c1ff;
+  --fp-secondary: #855300;
+  --fp-secondary-container: #fea619;
+  --fp-secondary-fixed: #ffddb8;
+  --fp-secondary-fixed-dim: #ffb95f;
+  --fp-on-secondary: #ffffff;
+  --fp-on-secondary-container: #684000;
+  --fp-on-secondary-fixed: #2a1700;
+  --fp-on-secondary-fixed-variant: #653e00;
+  --fp-tertiary: #904900;
+  --fp-tertiary-container: #b55d00;
+  --fp-on-tertiary: #ffffff;
+  --fp-error: #ba1a1a;
+  --fp-error-container: #ffdad6;
+  --fp-on-error: #ffffff;
+  --fp-on-error-container: #93000a;
+  --fp-on-surface: #191c1e;
+  --fp-on-surface-variant: #464554;
+  --fp-on-background: #191c1e;
+  --fp-inverse-surface: #2d3133;
+  --fp-inverse-on-surface: #eff1f3;
+  --fp-outline: #767586;
+  --fp-outline-variant: #c7c4d7;
+}
+
+/* ── Light mode editorial utilities (from Stitch team design) ── */
+.editorial-shadow {
+  box-shadow: 0 12px 40px rgba(70, 72, 212, 0.08);
+}
+
+.primary-gradient {
+  background: linear-gradient(135deg, #4648d4 0%, #6063ee 100%);
+  color: #ffffff;
+}
+
+.glass-effect {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(20px);
+}
+
+.dark .editorial-shadow {
+  box-shadow: none;
+}
+
+.dark .glass-effect {
+  background: rgba(11, 19, 38, 0.6);
+  backdrop-filter: blur(12px);
+}
+
+/* ── Register vars with @theme so Tailwind generates utilities ── */
+@theme {
+  --color-background: var(--fp-background);
+  --color-surface: var(--fp-surface);
+  --color-surface-dim: var(--fp-surface-dim);
+  --color-surface-bright: var(--fp-surface-bright);
+  --color-surface-tint: var(--fp-surface-tint);
+  --color-surface-variant: var(--fp-surface-variant);
+  --color-surface-container-lowest: var(--fp-surface-container-lowest);
+  --color-surface-container-low: var(--fp-surface-container-low);
+  --color-surface-container: var(--fp-surface-container);
+  --color-surface-container-high: var(--fp-surface-container-high);
+  --color-surface-container-highest: var(--fp-surface-container-highest);
+  --color-primary: var(--fp-primary);
+  --color-primary-container: var(--fp-primary-container);
+  --color-primary-fixed: var(--fp-primary-fixed);
+  --color-primary-fixed-dim: var(--fp-primary-fixed-dim);
+  --color-on-primary: var(--fp-on-primary);
+  --color-on-primary-container: var(--fp-on-primary-container);
+  --color-on-primary-fixed: var(--fp-on-primary-fixed);
+  --color-on-primary-fixed-variant: var(--fp-on-primary-fixed-variant);
+  --color-inverse-primary: var(--fp-inverse-primary);
+  --color-secondary: var(--fp-secondary);
+  --color-secondary-container: var(--fp-secondary-container);
+  --color-secondary-fixed: var(--fp-secondary-fixed);
+  --color-secondary-fixed-dim: var(--fp-secondary-fixed-dim);
+  --color-on-secondary: var(--fp-on-secondary);
+  --color-on-secondary-container: var(--fp-on-secondary-container);
+  --color-on-secondary-fixed: var(--fp-on-secondary-fixed);
+  --color-on-secondary-fixed-variant: var(--fp-on-secondary-fixed-variant);
+  --color-tertiary: var(--fp-tertiary);
+  --color-tertiary-container: var(--fp-tertiary-container);
+  --color-on-tertiary: var(--fp-on-tertiary);
+  --color-error: var(--fp-error);
+  --color-error-container: var(--fp-error-container);
+  --color-on-error: var(--fp-on-error);
+  --color-on-error-container: var(--fp-on-error-container);
+  --color-on-surface: var(--fp-on-surface);
+  --color-on-surface-variant: var(--fp-on-surface-variant);
+  --color-on-background: var(--fp-on-background);
+  --color-inverse-surface: var(--fp-inverse-surface);
+  --color-inverse-on-surface: var(--fp-inverse-on-surface);
+  --color-outline: var(--fp-outline);
+  --color-outline-variant: var(--fp-outline-variant);
+
+  /* ── Fonts ── */
+  --font-headline: 'Manrope', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-label: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+/* ── Body base ── */
+body {
+  background-color: var(--fp-background);
+  color: var(--fp-on-surface);
+}
+
+/* ── Selection ── */
+::selection {
+  background-color: rgb(192 193 255 / 0.3);
+  color: var(--fp-primary);
+}
+
+/* ── Slide-in animation for mobile drawer ── */
+@keyframes slide-in-left {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+.animate-slide-in-left {
+  animation: slide-in-left 0.2s ease-out;
+}
+
+/* ── Slide-in animation for toast notifications ── */
+@keyframes slide-in-right {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+.animate-slide-in-right {
+  animation: slide-in-right 0.3s ease-out;
+}
+
+/* This file is for your main application CSS */
+
+/* Scroll reveal animations */
+.reveal-hidden {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+.reveal-hidden.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal-hidden[data-reveal="left"] {
+  transform: translateX(-20px);
+}
+.reveal-hidden[data-reveal="left"].revealed {
+  transform: translateX(0);
+}
+
+.reveal-hidden[data-reveal="right"] {
+  transform: translateX(20px);
+}
+.reveal-hidden[data-reveal="right"].revealed {
+  transform: translateX(0);
+}
+
+.reveal-hidden[data-reveal="scale"] {
+  transform: scale(0.95);
+}
+.reveal-hidden[data-reveal="scale"].revealed {
+  transform: scale(1);
+}
