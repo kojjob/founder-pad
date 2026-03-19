@@ -25,12 +25,14 @@ import {LiveSocket} from "phoenix_live_view"
 import topbar from "../vendor/topbar"
 import ThemeToggle from "./hooks/theme_toggle"
 import Analytics from "./hooks/analytics"
+import ScrollReveal from "./hooks/scroll_reveal"
+import AutoDismiss from "./hooks/auto_dismiss"
 
 const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 const liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,
   params: {_csrf_token: csrfToken},
-  hooks: {ThemeToggle, Analytics},
+  hooks: {ThemeToggle, Analytics, ScrollReveal, AutoDismiss},
 })
 
 // Show progress bar on live navigation and form submits

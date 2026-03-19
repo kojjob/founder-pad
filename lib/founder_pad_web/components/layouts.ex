@@ -43,7 +43,7 @@ defmodule FounderPadWeb.Layouts do
 
   def flash_group(assigns) do
     ~H"""
-    <div id={@id} aria-live="polite">
+    <div id={@id} aria-live="polite" class="fixed bottom-6 right-6 z-50 flex flex-col-reverse gap-3">
       <.flash kind={:info} flash={@flash} />
       <.flash kind={:error} flash={@flash} />
 
@@ -111,8 +111,27 @@ defmodule FounderPadWeb.Layouts do
     """
   end
 
+  @doc """
+  Extracts user initials from a user struct for avatar fallback.
+  Returns "FP" if no user or no name.
+  """
+  def user_initials(nil), do: "FP"
+  def user_initials(%{name: nil}), do: "FP"
+  def user_initials(%{name: ""}), do: "FP"
+
+  def user_initials(%{name: name}) do
+    name
+    |> String.split(~r/\s+/, trim: true)
+    |> Enum.take(2)
+    |> Enum.map(&String.first/1)
+    |> Enum.join()
+    |> String.upcase()
+  end
+
+  def user_initials(_), do: "FP"
+
   # Embed all files in layouts/* within this module.
-  # The app.html.heex template requires: @flash, @inner_content, @active_nav
+  # The app.html.heex template requires: @flash, @inner_content, @active_nav, @current_user
   # The root.html.heex template provides the HTML skeleton.
   embed_templates "layouts/*"
 end

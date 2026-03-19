@@ -91,7 +91,79 @@ defmodule FounderPadWeb.Auth.RegisterLive do
     """
   end
 
-  def handle_event("register", %{"user" => _params}, socket) do
-    {:noreply, put_flash(socket, :info, "Registration functionality coming soon")}
+  def handle_event("register", %{"user" => params}, socket) do
+    case FounderPad.Accounts.User
+         |> Ash.Changeset.for_create(:register_with_password, %{
+           email: params["email"],
+           password: params["password"],
+           password_confirmation: params["password"]
+         })
+         |> Ash.create() do
+      {:ok, user} ->
+        # Create default organisation and membership
+        org_name = params["name"] || "My Organisation"
+
+        with {:ok, org} <-
+               FounderPad.Accounts.Organisation
+               |> Ash.Changeset.for_create(:create, %{name: org_name})
+               |> Ash.create(),
+             {:ok, _membership} <-
+               FounderPad.Accounts.Membership
+               |> Ash.Changeset.for_create(:create, %{
+                 role: :owner,
+                 user_id: user.id,
+                 organisation_id: org.id
+               })
+               |> Ash.create() do
+          token = AshAuthentication.user_to_subject(user)
+
+          {:noreply,
+           socket
+           |> put_flash(:info, "Account created successfully!")
+           |> redirect(to: "/auth/session?token=#{URI.encode_www_form(token)}&redirect_to=%2Fonboarding")}
+        else
+          {:error, _} ->
+            token = AshAuthentication.user_to_subject(user)
+
+            {:noreply,
+             socket
+             |> put_flash(:info, "Account created successfully!")
+             |> redirect(to: "/auth/session?token=#{URI.encode_www_form(token)}&redirect_to=%2Fonboarding")}
+        end
+
+      {:error, error} ->
+        error_messages = extract_errors(error)
+
+        {:noreply,
+         socket
+         |> put_flash(:error, error_messages)
+         |> assign(
+           form:
+             to_form(
+               %{"email" => params["email"], "password" => "", "name" => params["name"]},
+               as: :user
+             )
+         )}
+    end
   end
+
+  defp extract_errors(%Ash.Error.Invalid{errors: errors}) do
+    errors
+    |> Enum.map(fn
+      %{field: field, message: message} when is_binary(field) ->
+        "#{Phoenix.Naming.humanize(field)} #{message}"
+
+      %{field: field, message: message} when is_atom(field) ->
+        "#{Phoenix.Naming.humanize(Atom.to_string(field))} #{message}"
+
+      %{message: message} ->
+        message
+
+      other ->
+        inspect(other)
+    end)
+    |> Enum.join(". ")
+  end
+
+  defp extract_errors(_), do: "Registration failed. Please try again."
 end
