@@ -92,13 +92,13 @@ defmodule FounderPadWeb.Auth.RegisterLive do
   end
 
   def handle_event("register", %{"user" => params}, socket) do
-    case FounderPad.Accounts.User
-         |> Ash.Changeset.for_create(:register_with_password, %{
-           email: params["email"],
-           password: params["password"],
-           password_confirmation: params["password"]
-         })
-         |> Ash.create() do
+    strategy = AshAuthentication.Info.strategy!(FounderPad.Accounts.User, :password)
+
+    case AshAuthentication.Strategy.action(strategy, :register, %{
+           "email" => params["email"],
+           "password" => params["password"],
+           "password_confirmation" => params["password"]
+         }) do
       {:ok, user} ->
         # Create default organisation and membership
         org_name = params["name"] || "My Organisation"

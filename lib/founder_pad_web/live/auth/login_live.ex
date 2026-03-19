@@ -93,12 +93,12 @@ defmodule FounderPadWeb.Auth.LoginLive do
   end
 
   def handle_event("login", %{"user" => params}, socket) do
-    case FounderPad.Accounts.User
-         |> Ash.Changeset.for_create(:sign_in_with_password, %{
-           email: params["email"],
-           password: params["password"]
-         })
-         |> Ash.create() do
+    strategy = AshAuthentication.Info.strategy!(FounderPad.Accounts.User, :password)
+
+    case AshAuthentication.Strategy.action(strategy, :sign_in, %{
+           "email" => params["email"],
+           "password" => params["password"]
+         }) do
       {:ok, user} ->
         token = AshAuthentication.user_to_subject(user)
 
@@ -107,7 +107,7 @@ defmodule FounderPadWeb.Auth.LoginLive do
          |> put_flash(:info, "Welcome back!")
          |> redirect(to: "/auth/session?token=#{URI.encode_www_form(token)}")}
 
-      {:error, _error} ->
+      {:error, _} ->
         {:noreply,
          socket
          |> put_flash(:error, "Invalid email or password")
