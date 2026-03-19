@@ -1,11 +1,31 @@
 defmodule FounderPad.AI.Agent do
   use Ash.Resource,
     domain: FounderPad.AI,
-    data_layer: AshPostgres.DataLayer
+    data_layer: AshPostgres.DataLayer,
+    extensions: [AshJsonApi.Resource, AshGraphql.Resource]
 
   postgres do
     table "agents"
     repo FounderPad.Repo
+  end
+
+  json_api do
+    type "agent"
+
+    routes do
+      base "/agents"
+      index :read
+      get :read
+    end
+  end
+
+  graphql do
+    type :agent
+
+    queries do
+      list :list_agents, :read
+      get :get_agent, :read
+    end
   end
 
   attributes do
