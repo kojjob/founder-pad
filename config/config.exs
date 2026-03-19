@@ -61,7 +61,7 @@ config :phoenix, :json_library, Jason
 
 # Ash Framework
 config :founder_pad,
-  ash_domains: [FounderPad.Accounts, FounderPad.Billing, FounderPad.AI, FounderPad.Notifications]
+  ash_domains: [FounderPad.Accounts, FounderPad.Billing, FounderPad.AI, FounderPad.Notifications, FounderPad.Audit, FounderPad.FeatureFlags, FounderPad.Webhooks]
 
 # Token signing secret (override in runtime.exs for production)
 config :founder_pad,
@@ -83,6 +83,9 @@ config :founder_pad, Oban,
 # Stripe (keys loaded from runtime.exs)
 config :stripity_stripe,
   api_version: "2024-04-10"
+
+# Demo mode
+config :founder_pad, :demo_mode, System.get_env("DEMO_MODE") == "true"
 
 # Import branding and plans config
 import_config "branding.exs"

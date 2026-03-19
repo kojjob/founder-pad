@@ -12,6 +12,7 @@ defmodule FounderPadWeb.Router do
 
   pipeline :api do
     plug :accepts, ["json"]
+    plug FounderPadWeb.Plugs.RateLimiter, limit: 100, window_ms: 60_000
   end
 
   scope "/", FounderPadWeb do
