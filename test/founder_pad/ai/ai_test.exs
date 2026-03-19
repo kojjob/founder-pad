@@ -102,17 +102,19 @@ defmodule FounderPad.AITest do
   end
 
   describe "Provider behaviour" do
-    test "Anthropic implements the behaviour" do
-      # chat/2 has default arg, so it's exported as both /1 and /2
-      assert function_exported?(FounderPad.AI.Providers.Anthropic, :chat, 1)
-      assert function_exported?(FounderPad.AI.Providers.Anthropic, :stream, 1)
-      assert function_exported?(FounderPad.AI.Providers.Anthropic, :models, 0)
+    test "Anthropic implements the behaviour callbacks" do
+      # The behaviour defines chat/2, stream/2, models/0
+      behaviours = FounderPad.AI.Providers.Anthropic.__info__(:functions)
+      assert {:chat, 2} in behaviours
+      assert {:stream, 2} in behaviours
+      assert {:models, 0} in behaviours
     end
 
-    test "OpenAI implements the behaviour" do
-      assert function_exported?(FounderPad.AI.Providers.OpenAI, :chat, 1)
-      assert function_exported?(FounderPad.AI.Providers.OpenAI, :stream, 1)
-      assert function_exported?(FounderPad.AI.Providers.OpenAI, :models, 0)
+    test "OpenAI implements the behaviour callbacks" do
+      behaviours = FounderPad.AI.Providers.OpenAI.__info__(:functions)
+      assert {:chat, 2} in behaviours
+      assert {:stream, 2} in behaviours
+      assert {:models, 0} in behaviours
     end
 
     test "Anthropic lists models" do
