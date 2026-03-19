@@ -15,10 +15,31 @@ defmodule FounderPadWeb.Router do
     plug FounderPadWeb.Plugs.RateLimiter, limit: 100, window_ms: 60_000
   end
 
+  # Auth routes (no layout - full-page auth screens)
+  scope "/auth", FounderPadWeb.Auth do
+    pipe_through :browser
+    live "/login", LoginLive
+    live "/register", RegisterLive
+  end
+
   scope "/", FounderPadWeb do
     pipe_through :browser
 
     get "/", PageController, :home
+
+    # App routes with sidebar layout
+    live_session :app, on_mount: [{FounderPadWeb.Hooks.AssignDefaults, :default}] do
+      live "/dashboard", DashboardLive
+      live "/activity", ActivityLive
+      live "/workspaces", WorkspacesLive
+      live "/agents", AgentsLive
+      live "/agents/:id", AgentDetailLive
+      live "/billing", BillingLive
+      live "/team", TeamLive
+      live "/settings", SettingsLive
+    end
+
+    live "/onboarding", OnboardingLive
   end
 
   # Webhook routes (no CSRF, raw body needed)
