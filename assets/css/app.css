@@ -104,125 +104,165 @@
 
 /* ============================================================
    Stitch Design System — "Indigo Slate Protocol"
-   Exact M3 color palette from Stitch project
+   CSS variable-based theming for dark/light mode switching.
+   Variables defined in :root (dark default), overridden in html:not(.dark).
+   @theme references vars so Tailwind utilities respond to theme changes.
    ============================================================ */
 
+/* ── Dark theme (default) ── */
+:root {
+  --fp-background: #0b1326;
+  --fp-surface: #0b1326;
+  --fp-surface-dim: #0b1326;
+  --fp-surface-bright: #31394d;
+  --fp-surface-tint: #c0c1ff;
+  --fp-surface-variant: #2d3449;
+  --fp-surface-container-lowest: #060e20;
+  --fp-surface-container-low: #131b2e;
+  --fp-surface-container: #171f33;
+  --fp-surface-container-high: #222a3d;
+  --fp-surface-container-highest: #2d3449;
+  --fp-primary: #c0c1ff;
+  --fp-primary-container: #8083ff;
+  --fp-primary-fixed: #e1e0ff;
+  --fp-primary-fixed-dim: #c0c1ff;
+  --fp-on-primary: #1000a9;
+  --fp-on-primary-container: #0d0096;
+  --fp-on-primary-fixed: #07006c;
+  --fp-on-primary-fixed-variant: #2f2ebe;
+  --fp-inverse-primary: #494bd6;
+  --fp-secondary: #ffb95f;
+  --fp-secondary-container: #ee9800;
+  --fp-secondary-fixed: #ffddb8;
+  --fp-secondary-fixed-dim: #ffb95f;
+  --fp-on-secondary: #472a00;
+  --fp-on-secondary-container: #5b3800;
+  --fp-on-secondary-fixed: #2a1700;
+  --fp-on-secondary-fixed-variant: #653e00;
+  --fp-tertiary: #ffb783;
+  --fp-tertiary-container: #d97721;
+  --fp-on-tertiary: #4f2500;
+  --fp-error: #ffb4ab;
+  --fp-error-container: #93000a;
+  --fp-on-error: #690005;
+  --fp-on-error-container: #ffdad6;
+  --fp-on-surface: #dae2fd;
+  --fp-on-surface-variant: #c7c4d7;
+  --fp-on-background: #dae2fd;
+  --fp-inverse-surface: #dae2fd;
+  --fp-inverse-on-surface: #283044;
+  --fp-outline: #908fa0;
+  --fp-outline-variant: #464554;
+}
+
+/* ── Light theme ── */
+html:not(.dark) {
+  --fp-background: #f5f5fc;
+  --fp-surface: #f5f5fc;
+  --fp-surface-dim: #d8d8e8;
+  --fp-surface-bright: #f5f5fc;
+  --fp-surface-tint: #494bd6;
+  --fp-surface-variant: #e4e1ec;
+  --fp-surface-container-lowest: #ffffff;
+  --fp-surface-container-low: #f0f0fa;
+  --fp-surface-container: #eaeaf4;
+  --fp-surface-container-high: #e4e4ee;
+  --fp-surface-container-highest: #dfe0ea;
+  --fp-primary: #494bd6;
+  --fp-primary-container: #e1e0ff;
+  --fp-primary-fixed: #e1e0ff;
+  --fp-primary-fixed-dim: #c0c1ff;
+  --fp-on-primary: #ffffff;
+  --fp-on-primary-container: #0d0096;
+  --fp-on-primary-fixed: #07006c;
+  --fp-on-primary-fixed-variant: #2f2ebe;
+  --fp-inverse-primary: #c0c1ff;
+  --fp-secondary: #7e5700;
+  --fp-secondary-container: #ffddb8;
+  --fp-secondary-fixed: #ffddb8;
+  --fp-secondary-fixed-dim: #dea24a;
+  --fp-on-secondary: #ffffff;
+  --fp-on-secondary-container: #281800;
+  --fp-on-secondary-fixed: #2a1700;
+  --fp-on-secondary-fixed-variant: #653e00;
+  --fp-tertiary: #885200;
+  --fp-tertiary-container: #ffdcc5;
+  --fp-on-tertiary: #ffffff;
+  --fp-error: #ba1a1a;
+  --fp-error-container: #ffdad6;
+  --fp-on-error: #ffffff;
+  --fp-on-error-container: #410002;
+  --fp-on-surface: #1b1b22;
+  --fp-on-surface-variant: #464554;
+  --fp-on-background: #1b1b22;
+  --fp-inverse-surface: #303038;
+  --fp-inverse-on-surface: #f2f0f9;
+  --fp-outline: #77767f;
+  --fp-outline-variant: #c7c4d7;
+}
+
+/* ── Register vars with @theme so Tailwind generates utilities ── */
 @theme {
-  /* ── Surfaces (dark-first, M3 tonal layering) ── */
-  --color-background: #0b1326;
-  --color-surface: #0b1326;
-  --color-surface-dim: #0b1326;
-  --color-surface-bright: #31394d;
-  --color-surface-tint: #c0c1ff;
-  --color-surface-variant: #2d3449;
-  --color-surface-container-lowest: #060e20;
-  --color-surface-container-low: #131b2e;
-  --color-surface-container: #171f33;
-  --color-surface-container-high: #222a3d;
-  --color-surface-container-highest: #2d3449;
+  --color-background: var(--fp-background);
+  --color-surface: var(--fp-surface);
+  --color-surface-dim: var(--fp-surface-dim);
+  --color-surface-bright: var(--fp-surface-bright);
+  --color-surface-tint: var(--fp-surface-tint);
+  --color-surface-variant: var(--fp-surface-variant);
+  --color-surface-container-lowest: var(--fp-surface-container-lowest);
+  --color-surface-container-low: var(--fp-surface-container-low);
+  --color-surface-container: var(--fp-surface-container);
+  --color-surface-container-high: var(--fp-surface-container-high);
+  --color-surface-container-highest: var(--fp-surface-container-highest);
+  --color-primary: var(--fp-primary);
+  --color-primary-container: var(--fp-primary-container);
+  --color-primary-fixed: var(--fp-primary-fixed);
+  --color-primary-fixed-dim: var(--fp-primary-fixed-dim);
+  --color-on-primary: var(--fp-on-primary);
+  --color-on-primary-container: var(--fp-on-primary-container);
+  --color-on-primary-fixed: var(--fp-on-primary-fixed);
+  --color-on-primary-fixed-variant: var(--fp-on-primary-fixed-variant);
+  --color-inverse-primary: var(--fp-inverse-primary);
+  --color-secondary: var(--fp-secondary);
+  --color-secondary-container: var(--fp-secondary-container);
+  --color-secondary-fixed: var(--fp-secondary-fixed);
+  --color-secondary-fixed-dim: var(--fp-secondary-fixed-dim);
+  --color-on-secondary: var(--fp-on-secondary);
+  --color-on-secondary-container: var(--fp-on-secondary-container);
+  --color-on-secondary-fixed: var(--fp-on-secondary-fixed);
+  --color-on-secondary-fixed-variant: var(--fp-on-secondary-fixed-variant);
+  --color-tertiary: var(--fp-tertiary);
+  --color-tertiary-container: var(--fp-tertiary-container);
+  --color-on-tertiary: var(--fp-on-tertiary);
+  --color-error: var(--fp-error);
+  --color-error-container: var(--fp-error-container);
+  --color-on-error: var(--fp-on-error);
+  --color-on-error-container: var(--fp-on-error-container);
+  --color-on-surface: var(--fp-on-surface);
+  --color-on-surface-variant: var(--fp-on-surface-variant);
+  --color-on-background: var(--fp-on-background);
+  --color-inverse-surface: var(--fp-inverse-surface);
+  --color-inverse-on-surface: var(--fp-inverse-on-surface);
+  --color-outline: var(--fp-outline);
+  --color-outline-variant: var(--fp-outline-variant);
 
-  /* ── Primary (Indigo) ── */
-  --color-primary: #c0c1ff;
-  --color-primary-container: #8083ff;
-  --color-primary-fixed: #e1e0ff;
-  --color-primary-fixed-dim: #c0c1ff;
-  --color-on-primary: #1000a9;
-  --color-on-primary-container: #0d0096;
-  --color-on-primary-fixed: #07006c;
-  --color-on-primary-fixed-variant: #2f2ebe;
-  --color-inverse-primary: #494bd6;
-
-  /* ── Secondary (Amber) ── */
-  --color-secondary: #ffb95f;
-  --color-secondary-container: #ee9800;
-  --color-secondary-fixed: #ffddb8;
-  --color-secondary-fixed-dim: #ffb95f;
-  --color-on-secondary: #472a00;
-  --color-on-secondary-container: #5b3800;
-  --color-on-secondary-fixed: #2a1700;
-  --color-on-secondary-fixed-variant: #653e00;
-
-  /* ── Tertiary (Orange) ── */
-  --color-tertiary: #ffb783;
-  --color-tertiary-container: #d97721;
-  --color-tertiary-fixed: #ffdcc5;
-  --color-tertiary-fixed-dim: #ffb783;
-  --color-on-tertiary: #4f2500;
-  --color-on-tertiary-container: #452000;
-  --color-on-tertiary-fixed: #301400;
-  --color-on-tertiary-fixed-variant: #703700;
-
-  /* ── Semantic ── */
-  --color-error: #ffb4ab;
-  --color-error-container: #93000a;
-  --color-on-error: #690005;
-  --color-on-error-container: #ffdad6;
-
-  /* ── Neutral / Text ── */
-  --color-on-surface: #dae2fd;
-  --color-on-surface-variant: #c7c4d7;
-  --color-on-background: #dae2fd;
-  --color-inverse-surface: #dae2fd;
-  --color-inverse-on-surface: #283044;
-  --color-outline: #908fa0;
-  --color-outline-variant: #464554;
-
-  /* ── Fonts (from Stitch) ── */
+  /* ── Fonts ── */
   --font-headline: 'Manrope', system-ui, sans-serif;
   --font-body: 'Inter', system-ui, sans-serif;
   --font-label: 'Inter', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
-
-  /* ── Border radius (from Stitch) ── */
-  --radius-DEFAULT: 0.125rem;
-  --radius-lg: 0.25rem;
-  --radius-xl: 0.5rem;
-  --radius-full: 0.75rem;
 }
 
-/* ── Light theme overrides ── */
-html:not(.dark) {
-  --color-background: #f5f5fc;
-  --color-surface: #f5f5fc;
-  --color-surface-container-lowest: #ffffff;
-  --color-surface-container-low: #f0f0fa;
-  --color-surface-container: #eaeaf4;
-  --color-surface-container-high: #e4e4ee;
-  --color-surface-container-highest: #dfe0ea;
-  --color-on-surface: #1b1b22;
-  --color-on-surface-variant: #464554;
-  --color-outline: #77767f;
-  --color-outline-variant: #c7c4d7;
-  --color-primary: #494bd6;
-  --color-primary-container: #e1e0ff;
-  --color-on-primary: #ffffff;
-  --color-on-primary-container: #0d0096;
-  --color-secondary: #7e5700;
-  --color-secondary-container: #ffddb8;
-  --color-error: #ba1a1a;
-  --color-error-container: #ffdad6;
-}
-
-/* ── Global body style matching Stitch ── */
+/* ── Body base ── */
 body {
-  background-color: #0b1326;
-  color: #dae2fd;
+  background-color: var(--fp-background);
+  color: var(--fp-on-surface);
 }
 
-html:not(.dark) body {
-  background-color: #f5f5fc;
-  color: #1b1b22;
-}
-
-/* ── Selection style from Stitch ── */
+/* ── Selection ── */
 ::selection {
   background-color: rgb(192 193 255 / 0.3);
-  color: #c0c1ff;
-}
-
-html:not(.dark) ::selection {
-  background-color: rgb(73 75 214 / 0.2);
-  color: #494bd6;
+  color: var(--fp-primary);
 }
 
 /* This file is for your main application CSS */
