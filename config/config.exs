@@ -61,7 +61,11 @@ config :phoenix, :json_library, Jason
 
 # Ash Framework
 config :founder_pad,
-  ash_domains: []  # Will be populated as we add domains
+  ash_domains: [FounderPad.Accounts]
+
+# Token signing secret (override in runtime.exs for production)
+config :founder_pad,
+  token_signing_secret: "super-secret-token-signing-key-at-least-32-bytes-long!!"
 
 # Database
 config :founder_pad, FounderPad.Repo,
