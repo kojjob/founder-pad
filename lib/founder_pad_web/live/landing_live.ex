@@ -54,73 +54,92 @@ defmodule FounderPadWeb.LandingLive do
       <%!-- ═══════════════════════════════════════════════════════
            SECTION 1: HERO — Full viewport, commanding presence
            ═══════════════════════════════════════════════════════ --%>
-      <section class="relative min-h-screen flex flex-col items-center justify-center px-6 pt-24 pb-16 overflow-hidden">
-        <%!-- Subtle radial glow behind hero --%>
-        <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] bg-primary/5 rounded-full blur-[120px] pointer-events-none"></div>
+      <section class="relative min-h-screen flex items-center px-6 pt-24 pb-16 overflow-hidden">
+        <%!-- Background glows --%>
+        <div class="absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[120px] pointer-events-none"></div>
+        <div class="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-secondary/5 rounded-full blur-[100px] pointer-events-none"></div>
 
-        <%!-- Announcement bar --%>
-        <div class="relative inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-surface-container text-xs font-medium text-on-surface-variant mb-8">
-          <span class="text-secondary">&#x1F680;</span>
-          <span>v1.0 — Now with multi-provider AI agents</span>
-          <span class="material-symbols-outlined text-sm text-primary">arrow_forward</span>
-        </div>
+        <div class="relative max-w-[1280px] mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+          <%!-- Left Column: Copy --%>
+          <div class="space-y-8">
+            <%!-- Announcement bar --%>
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-surface-container text-xs font-medium text-on-surface-variant">
+              <span class="text-secondary">&#x1F680;</span>
+              <span>v1.0 — Now with multi-provider AI agents</span>
+              <span class="material-symbols-outlined text-sm text-primary">arrow_forward</span>
+            </div>
 
-        <%!-- Headline --%>
-        <h1 class="relative text-5xl sm:text-6xl md:text-7xl font-extrabold font-headline tracking-tight text-center leading-[1.08] max-w-4xl">
-          Ship Your SaaS
-          <br />
-          <span class="text-primary">In Days, Not Months.</span>
-        </h1>
+            <%!-- Headline --%>
+            <h1 class="text-5xl sm:text-6xl lg:text-7xl font-extrabold font-headline tracking-tight leading-[1.05]">
+              Ship Your SaaS
+              <br />
+              <span class="text-primary">In Days, Not Months.</span>
+            </h1>
 
-        <%!-- Subheadline --%>
-        <p class="relative mt-6 text-lg sm:text-xl text-on-surface-variant max-w-2xl text-center leading-relaxed">
-          The production-ready Phoenix boilerplate with built-in AI agents, Stripe billing, team management, and beautiful dark/light UI.
-        </p>
+            <%!-- Subheadline --%>
+            <p class="text-lg sm:text-xl text-on-surface-variant max-w-xl leading-relaxed">
+              The production-ready Phoenix boilerplate with built-in AI agents, Stripe billing, team management, and beautiful dark/light UI.
+            </p>
 
-        <%!-- CTA Buttons --%>
-        <div class="relative flex flex-col sm:flex-row items-center gap-4 mt-10">
-          <a href="/auth/register" class="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl text-base font-semibold primary-gradient transition-transform hover:scale-[1.02] active:scale-95 editorial-shadow">
-            <span>Get Started Free</span>
-            <span class="material-symbols-outlined text-lg">arrow_forward</span>
-          </a>
-          <a href="https://github.com/founderpad" target="_blank" class="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl text-base font-semibold text-on-surface border border-outline-variant/30 hover:bg-surface-container transition-colors">
-            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12Z"/></svg>
-            <span>View on GitHub</span>
-          </a>
-        </div>
+            <%!-- CTA Buttons --%>
+            <div class="flex flex-col sm:flex-row items-start gap-4">
+              <a href="/auth/register" class="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl text-base font-semibold primary-gradient transition-transform hover:scale-[1.02] active:scale-95 editorial-shadow">
+                <span>Get Started Free</span>
+                <span class="material-symbols-outlined text-lg">arrow_forward</span>
+              </a>
+              <a href="https://github.com/founderpad" target="_blank" class="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl text-base font-semibold text-on-surface bg-surface-container hover:bg-surface-container-high transition-colors">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12Z"/></svg>
+                <span>View on GitHub</span>
+              </a>
+            </div>
 
-        <%!-- Social proof --%>
-        <div class="relative flex flex-col sm:flex-row items-center gap-4 mt-12 text-sm text-on-surface-variant">
-          <div class="flex -space-x-2">
-            <div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center text-[10px] font-bold text-on-primary-container ring-2 ring-background">JD</div>
-            <div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center text-[10px] font-bold text-on-secondary-container ring-2 ring-background">SC</div>
-            <div class="w-8 h-8 rounded-full bg-tertiary-container flex items-center justify-center text-[10px] font-bold text-on-tertiary ring-2 ring-background">AL</div>
-            <div class="w-8 h-8 rounded-full bg-primary-fixed-dim flex items-center justify-center text-[10px] font-bold text-on-primary-fixed ring-2 ring-background">MR</div>
-            <div class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center text-[10px] font-bold text-on-surface ring-2 ring-background">+</div>
-          </div>
-          <span>Trusted by <strong class="text-on-surface">500+</strong> founders</span>
-          <div class="flex items-center gap-0.5 text-secondary">
-            <span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1">star</span>
-            <span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1">star</span>
-            <span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1">star</span>
-            <span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1">star</span>
-            <span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1">star_half</span>
-            <span class="text-on-surface-variant text-xs ml-1">4.8/5</span>
-          </div>
-        </div>
-
-        <%!-- Dashboard mockup placeholder --%>
-        <div class="relative mt-16 w-full max-w-5xl mx-auto">
-          <div class="aspect-[16/9] rounded-2xl bg-surface-container overflow-hidden editorial-shadow ring-1 ring-outline-variant/10">
-            <div class="w-full h-full bg-gradient-to-br from-primary/5 via-surface-container to-secondary/5 flex items-center justify-center">
-              <div class="text-center space-y-3">
-                <span class="material-symbols-outlined text-6xl text-primary/30">dashboard</span>
-                <p class="text-sm text-on-surface-variant/50 font-medium">FounderPad Dashboard Preview</p>
+            <%!-- Social proof --%>
+            <div class="flex flex-col sm:flex-row items-start gap-4 text-sm text-on-surface-variant">
+              <div class="flex -space-x-2">
+                <div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center text-[10px] font-bold text-on-primary-container ring-2 ring-background">JD</div>
+                <div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center text-[10px] font-bold text-on-secondary-container ring-2 ring-background">SC</div>
+                <div class="w-8 h-8 rounded-full bg-tertiary-container flex items-center justify-center text-[10px] font-bold text-on-tertiary ring-2 ring-background">AL</div>
+                <div class="w-8 h-8 rounded-full bg-primary-fixed-dim flex items-center justify-center text-[10px] font-bold text-on-primary-fixed ring-2 ring-background">MR</div>
+                <div class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center text-[10px] font-bold text-on-surface ring-2 ring-background">+</div>
+              </div>
+              <div class="space-y-1">
+                <span>Trusted by <strong class="text-on-surface">500+</strong> founders</span>
+                <div class="flex items-center gap-0.5 text-secondary">
+                  <span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1">star</span>
+                  <span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1">star</span>
+                  <span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1">star</span>
+                  <span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1">star</span>
+                  <span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1">star_half</span>
+                  <span class="text-on-surface-variant text-xs ml-1">4.8/5</span>
+                </div>
               </div>
             </div>
           </div>
-          <%!-- Glow under mockup --%>
-          <div class="absolute -bottom-8 left-1/2 -translate-x-1/2 w-3/4 h-16 bg-primary/10 blur-[60px] rounded-full pointer-events-none"></div>
+
+          <%!-- Right Column: Dashboard Screenshot --%>
+          <div class="relative">
+            <div class="rounded-2xl overflow-hidden editorial-shadow ring-1 ring-outline-variant/10">
+              <img
+                src="/images/dashboard-preview.png"
+                alt="FounderPad Dashboard — AI agent orchestration, billing metrics, and team activity in the Midnight Architect dark theme"
+                class="w-full h-auto"
+                width="1280"
+                height="1024"
+                loading="eager"
+              />
+            </div>
+            <%!-- Glow under image --%>
+            <div class="absolute -bottom-6 left-1/2 -translate-x-1/2 w-3/4 h-12 bg-primary/15 blur-[50px] rounded-full pointer-events-none"></div>
+            <%!-- Floating badges --%>
+            <div class="absolute -bottom-4 -left-4 bg-surface-container-lowest glass-effect rounded-xl px-4 py-2.5 editorial-shadow flex items-center gap-2 z-10">
+              <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span class="text-xs font-mono text-on-surface">123 tests passing</span>
+            </div>
+            <div class="absolute -top-4 -right-4 bg-surface-container-lowest glass-effect rounded-xl px-4 py-2.5 editorial-shadow flex items-center gap-2 z-10">
+              <span class="material-symbols-outlined text-primary text-sm">bolt</span>
+              <span class="text-xs font-mono text-on-surface">8 Ash domains</span>
+            </div>
+          </div>
         </div>
       </section>
 
