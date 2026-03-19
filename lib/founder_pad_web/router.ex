@@ -20,10 +20,11 @@ defmodule FounderPadWeb.Router do
     get "/", PageController, :home
   end
 
-  # Other scopes may use custom stacks.
-  # scope "/api", FounderPadWeb do
-  #   pipe_through :api
-  # end
+  # Webhook routes (no CSRF, raw body needed)
+  scope "/webhooks", FounderPadWeb do
+    pipe_through :api
+    post "/stripe", WebhookController, :stripe
+  end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
   if Application.compile_env(:founder_pad, :dev_routes) do

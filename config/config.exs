@@ -61,7 +61,7 @@ config :phoenix, :json_library, Jason
 
 # Ash Framework
 config :founder_pad,
-  ash_domains: [FounderPad.Accounts]
+  ash_domains: [FounderPad.Accounts, FounderPad.Billing]
 
 # Token signing secret (override in runtime.exs for production)
 config :founder_pad,
@@ -84,8 +84,9 @@ config :founder_pad, Oban,
 config :stripity_stripe,
   api_version: "2024-04-10"
 
-# Import branding config
+# Import branding and plans config
 import_config "branding.exs"
+import_config "plans.exs"
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
