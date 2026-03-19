@@ -47,7 +47,7 @@ defmodule FounderPadWeb.Auth.LoginLive do
 
           <button
             type="submit"
-            class="w-full bg-gradient-to-br from-primary to-primary-container text-on-primary-fixed font-semibold py-3 rounded-lg text-sm transition-all hover:opacity-90 active:scale-[0.98]"
+            class="w-full primary-gradient font-semibold py-3 rounded-lg text-sm transition-all hover:opacity-90 active:scale-[0.98]"
           >
             Sign In
           </button>

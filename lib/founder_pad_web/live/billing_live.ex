@@ -45,7 +45,7 @@ defmodule FounderPadWeb.BillingLive do
               {@current_plan.price} &bull; Renews {@current_plan.renewal}
             </p>
           </div>
-          <button class="bg-gradient-to-br from-primary to-primary-container text-on-primary-fixed font-semibold px-5 py-2.5 rounded-lg text-sm">
+          <button class="primary-gradient font-semibold px-5 py-2.5 rounded-lg text-sm">
             Upgrade Plan
           </button>
         </div>

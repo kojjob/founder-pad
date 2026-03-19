@@ -96,7 +96,7 @@ defmodule FounderPadWeb.OnboardingLive do
           <div :if={@step == 1}></div>
           <button
             phx-click={if @step < @total_steps, do: "next_step", else: "complete"}
-            class="bg-gradient-to-br from-primary to-primary-container text-on-primary-fixed font-semibold px-6 py-2.5 rounded-lg text-sm"
+            class="primary-gradient font-semibold px-6 py-2.5 rounded-lg text-sm"
           >
             {if @step < @total_steps, do: "Continue", else: "Go to Dashboard"}
           </button>

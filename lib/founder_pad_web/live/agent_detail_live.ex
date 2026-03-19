@@ -41,7 +41,7 @@ defmodule FounderPadWeb.AgentDetailLive do
           <button class="px-4 py-2 bg-surface-container-high rounded-lg text-sm font-medium hover:bg-surface-container-highest transition-colors">
             Edit
           </button>
-          <button class="px-4 py-2 bg-gradient-to-br from-primary to-primary-container text-on-primary-fixed rounded-lg text-sm font-semibold">
+          <button class="px-4 py-2 primary-gradient rounded-lg text-sm font-semibold">
             Run Agent
           </button>
         </div>
@@ -102,7 +102,7 @@ defmodule FounderPadWeb.AgentDetailLive do
               placeholder="Send a message..."
               class="flex-1 bg-surface-container-highest border-none rounded-lg px-4 py-2.5 text-sm text-on-surface placeholder:text-on-surface-variant/50 focus:ring-1 focus:ring-primary"
             />
-            <button class="bg-gradient-to-br from-primary to-primary-container text-on-primary-fixed px-4 py-2.5 rounded-lg text-sm font-semibold transition-transform active:scale-95">
+            <button class="primary-gradient px-4 py-2.5 rounded-lg text-sm font-semibold transition-transform active:scale-95">
               <span class="material-symbols-outlined text-lg">send</span>
             </button>
           </div>

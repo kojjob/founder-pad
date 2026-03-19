@@ -56,7 +56,7 @@ defmodule FounderPadWeb.SettingsLive do
               />
             </div>
           </div>
-          <button class="bg-gradient-to-br from-primary to-primary-container text-on-primary-fixed font-semibold px-4 py-2 rounded-lg text-sm">
+          <button class="primary-gradient font-semibold px-4 py-2 rounded-lg text-sm">
             Save Changes
           </button>
         </div>
@@ -100,7 +100,7 @@ defmodule FounderPadWeb.SettingsLive do
       <div :if={@active_tab == :api_keys} class="space-y-6">
         <div class="flex justify-between items-center">
           <p class="text-on-surface-variant">Manage API keys for programmatic access</p>
-          <button class="bg-gradient-to-br from-primary to-primary-container text-on-primary-fixed font-semibold px-4 py-2 rounded-lg text-sm">
+          <button class="primary-gradient font-semibold px-4 py-2 rounded-lg text-sm">
             <span class="flex items-center gap-2">
               <span class="material-symbols-outlined text-lg">add</span> New Key
             </span>

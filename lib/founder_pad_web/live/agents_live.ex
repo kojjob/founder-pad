@@ -19,7 +19,7 @@ defmodule FounderPadWeb.AgentsLive do
           <h1 class="text-4xl font-extrabold font-headline tracking-tight">Agent Directory</h1>
           <p class="text-on-surface-variant mt-1">Manage and monitor your AI agents</p>
         </div>
-        <button class="bg-gradient-to-br from-primary to-primary-container text-on-primary-fixed font-semibold px-4 py-2 rounded-lg text-sm transition-transform active:scale-95">
+        <button class="primary-gradient font-semibold px-4 py-2 rounded-lg text-sm transition-transform active:scale-95">
           <span class="flex items-center gap-2">
             <span class="material-symbols-outlined text-lg">add</span>
             New Agent
