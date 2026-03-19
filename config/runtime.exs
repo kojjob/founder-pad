@@ -45,6 +45,12 @@ if config_env() == :prod do
     api_key: System.get_env("STRIPE_SECRET_KEY"),
     signing_secret: System.get_env("STRIPE_WEBHOOK_SECRET")
 
+  # Google Search Console
+  config :founder_pad, :gsc_credentials, System.get_env("GSC_CREDENTIALS_JSON")
+
+  # Plausible
+  config :founder_pad, :plausible_domain, System.get_env("PLAUSIBLE_DOMAIN")
+
   # AI Providers
   config :founder_pad, :ai,
     anthropic_api_key: System.get_env("ANTHROPIC_API_KEY"),
