@@ -14,6 +14,8 @@ defmodule FounderPad.Application do
       {Phoenix.PubSub, name: FounderPad.PubSub},
       {Finch, name: FounderPad.Finch},
       {Oban, Application.fetch_env!(:founder_pad, Oban)},
+      # Rate limiting (Hammer ETS backend)
+      {FounderPad.RateLimit, clean_period: :timer.minutes(10)},
       # Start to serve requests, typically the last entry
       FounderPadWeb.Endpoint
     ]
