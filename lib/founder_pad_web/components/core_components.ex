@@ -55,24 +55,29 @@ defmodule FounderPadWeb.CoreComponents do
       :if={msg = render_slot(@inner_block) || Phoenix.Flash.get(@flash, @kind)}
       id={@id}
       phx-click={JS.push("lv:clear-flash", value: %{key: @kind}) |> hide("##{@id}")}
+      phx-hook="AutoDismiss"
       role="alert"
-      class="toast toast-top toast-end z-50"
+      class="animate-slide-in-right"
       {@rest}
     >
       <div class={[
-        "alert w-80 sm:w-96 max-w-80 sm:max-w-96 text-wrap",
-        @kind == :info && "alert-info",
-        @kind == :error && "alert-error"
+        "flex items-start gap-3 w-80 sm:w-96 p-4 rounded-xl bg-surface-container-lowest glass-effect editorial-shadow text-on-surface",
+        @kind == :info && "border-l-4 border-primary",
+        @kind == :error && "border-l-4 border-error"
       ]}>
-        <.icon :if={@kind == :info} name="hero-information-circle" class="size-5 shrink-0" />
-        <.icon :if={@kind == :error} name="hero-exclamation-circle" class="size-5 shrink-0" />
-        <div>
-          <p :if={@title} class="font-semibold">{@title}</p>
-          <p>{msg}</p>
+        <span :if={@kind == :info} class="material-symbols-outlined text-primary text-xl shrink-0">info</span>
+        <span :if={@kind == :error} class="material-symbols-outlined text-error text-xl shrink-0">error</span>
+        <div class="flex-1 min-w-0">
+          <p :if={@title} class="text-sm font-semibold text-on-surface">{@title}</p>
+          <p class="text-sm text-on-surface-variant">{msg}</p>
         </div>
-        <div class="flex-1" />
-        <button type="button" class="group self-start cursor-pointer" aria-label={gettext("close")}>
-          <.icon name="hero-x-mark" class="size-5 opacity-40 group-hover:opacity-70" />
+        <button
+          type="button"
+          class="shrink-0 p-1 text-on-surface-variant hover:text-on-surface transition-colors rounded-lg hover:bg-surface-container-high cursor-pointer"
+          aria-label={gettext("close")}
+          phx-click={JS.push("lv:clear-flash", value: %{key: @kind}) |> hide("##{@id}")}
+        >
+          <.icon name="hero-x-mark" class="size-4" />
         </button>
       </div>
     </div>

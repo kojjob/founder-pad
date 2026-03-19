@@ -49,12 +49,85 @@
     </div>
   </aside>
 
+  <%!-- Mobile drawer overlay --%>
+  <div id="mobile-nav" class="fixed inset-0 z-50 hidden md:hidden">
+    <div
+      class="absolute inset-0 bg-background/80 backdrop-blur-sm"
+      phx-click={JS.hide(to: "#mobile-nav")}
+    ></div>
+    <aside class="absolute left-0 top-0 h-full w-[280px] bg-surface-container p-4 space-y-4 animate-slide-in-left overflow-y-auto">
+      <%!-- Logo --%>
+      <div class="flex items-center justify-between mb-6">
+        <div class="flex items-center gap-3 px-2">
+          <div class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
+            <span class="material-symbols-outlined text-on-primary text-xl">architecture</span>
+          </div>
+          <div class="flex flex-col">
+            <span class="text-xl font-bold tracking-tight text-on-surface font-headline">FounderPad</span>
+            <span class="text-[10px] uppercase tracking-widest text-primary font-bold">
+              {Application.get_env(:founder_pad, :branding)[:tagline] || "Ship faster"}
+            </span>
+          </div>
+        </div>
+        <button
+          phx-click={JS.hide(to: "#mobile-nav")}
+          class="p-2 text-on-surface-variant hover:text-on-surface transition-colors rounded-lg hover:bg-surface-container-high"
+          aria-label="Close navigation menu"
+        >
+          <span class="material-symbols-outlined text-xl">close</span>
+        </button>
+      </div>
+
+      <%!-- Navigation --%>
+      <nav class="flex flex-col gap-1">
+        <.nav_link href="/dashboard" icon="dashboard" label="Dashboard" active={@active_nav == :dashboard} />
+        <.nav_link href="/agents" icon="smart_toy" label="Agents" active={@active_nav == :agents} />
+        <.nav_link href="/workspaces" icon="grid_view" label="Workspaces" active={@active_nav == :workspaces} />
+        <.nav_link href="/activity" icon="timeline" label="Activity" active={@active_nav == :activity} />
+
+        <div class="h-px bg-outline-variant/10 my-2"></div>
+
+        <.nav_link href="/billing" icon="payments" label="Billing" active={@active_nav == :billing} />
+        <.nav_link href="/team" icon="group" label="Team" active={@active_nav == :team} />
+        <.nav_link href="/settings" icon="settings" label="Settings" active={@active_nav == :settings} />
+      </nav>
+
+      <%!-- Help + Docs --%>
+      <div class="space-y-1">
+        <a href="https://docs.founderpad.io" target="_blank" class="flex items-center gap-3 px-3 py-2 text-on-surface/40 text-sm hover:text-on-surface hover:bg-surface-container-high rounded-md transition-colors">
+          <span class="material-symbols-outlined text-lg">menu_book</span>
+          <span>Documentation</span>
+        </a>
+        <a href="https://founderpad.io/changelog" target="_blank" class="flex items-center gap-3 px-3 py-2 text-on-surface/40 text-sm hover:text-on-surface hover:bg-surface-container-high rounded-md transition-colors">
+          <span class="material-symbols-outlined text-lg">new_releases</span>
+          <span>Changelog</span>
+        </a>
+      </div>
+
+      <%!-- Workspace Switcher --%>
+      <div class="mt-auto pt-2">
+        <button class="w-full flex items-center justify-between px-3 py-2 rounded-md hover:bg-surface-container-high text-on-surface/70 text-sm font-medium transition-colors">
+          <span>Switch Workspace</span>
+          <span class="material-symbols-outlined text-sm">unfold_more</span>
+        </button>
+      </div>
+    </aside>
+  </div>
+
   <!-- Main Content -->
   <div class="flex-1 flex flex-col min-w-0">
     <!-- TopNavBar -->
     <header class="sticky top-0 z-40 bg-background/60 backdrop-blur-md">
       <div class="flex justify-between items-center w-full px-6 py-3 max-w-[1280px] mx-auto">
         <div class="flex items-center gap-8 flex-1">
+          <%!-- Mobile menu button --%>
+          <button
+            class="md:hidden p-2 text-on-surface-variant hover:text-on-surface transition-colors rounded-lg hover:bg-surface-container-high"
+            phx-click={JS.toggle(to: "#mobile-nav", in: "fade-in", out: "fade-out")}
+            aria-label="Open navigation menu"
+          >
+            <span class="material-symbols-outlined text-xl">menu</span>
+          </button>
           <span class="text-lg font-black font-headline md:hidden text-on-surface">FounderPad</span>
           <div class="relative max-w-md w-full hidden md:block">
             <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">search</span>
@@ -122,13 +195,16 @@
               <!-- Avatar (supports uploaded image or initials fallback) -->
               <div class="relative">
                 <div class="w-8 h-8 rounded-full bg-primary-fixed flex items-center justify-center text-xs font-bold text-primary font-headline overflow-hidden">
-                  <%!-- Replace with <img src={@current_user.avatar_url} /> when wired to real data --%>
-                  FP
+                  <%= if @current_user && @current_user.avatar_url do %>
+                    <img src={@current_user.avatar_url} alt="Avatar" class="w-full h-full object-cover" />
+                  <% else %>
+                    <%= user_initials(@current_user) %>
+                  <% end %>
                 </div>
                 <span class="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-500 ring-2 ring-background"></span>
               </div>
               <div class="hidden md:block text-left">
-                <p class="text-sm font-medium text-on-surface leading-none">User</p>
+                <p class="text-sm font-medium text-on-surface leading-none"><%= if @current_user, do: @current_user.name || "User", else: "User" %></p>
                 <p class="text-[10px] text-on-surface-variant leading-none mt-0.5">Pro Plan</p>
               </div>
               <span class="material-symbols-outlined text-on-surface-variant text-sm hidden md:block">expand_more</span>
@@ -139,7 +215,11 @@
               <div class="px-4 py-3 flex items-center gap-3">
                 <div class="relative group/avatar">
                   <div class="w-12 h-12 rounded-full bg-primary-fixed flex items-center justify-center text-sm font-bold text-primary font-headline overflow-hidden">
-                    FP
+                    <%= if @current_user && @current_user.avatar_url do %>
+                      <img src={@current_user.avatar_url} alt="Avatar" class="w-full h-full object-cover" />
+                    <% else %>
+                      <%= user_initials(@current_user) %>
+                    <% end %>
                   </div>
                   <label class="absolute inset-0 rounded-full bg-on-surface/40 flex items-center justify-center opacity-0 group-hover/avatar:opacity-100 transition-opacity cursor-pointer">
                     <span class="material-symbols-outlined text-white text-sm">photo_camera</span>
@@ -147,8 +227,8 @@
                   </label>
                 </div>
                 <div class="min-w-0">
-                  <p class="text-sm font-semibold text-on-surface truncate">FounderPad User</p>
-                  <p class="text-xs text-on-surface-variant truncate">user@founderpad.io</p>
+                  <p class="text-sm font-semibold text-on-surface truncate"><%= if @current_user, do: @current_user.name || "User", else: "User" %></p>
+                  <p class="text-xs text-on-surface-variant truncate"><%= if @current_user, do: @current_user.email, else: "user@founderpad.io" %></p>
                 </div>
               </div>
               <div class="h-px bg-outline-variant/10 mx-3 my-1"></div>
@@ -178,10 +258,10 @@
                 Help &amp; Support
               </a>
               <div class="h-px bg-outline-variant/10 mx-3 my-1"></div>
-              <a href="/auth/login" class="flex items-center gap-3 px-4 py-2.5 text-sm text-error/80 hover:text-error hover:bg-error/5 transition-colors">
+              <.link href="/auth/session" method="delete" class="flex items-center gap-3 px-4 py-2.5 text-sm text-error/80 hover:text-error hover:bg-error/5 transition-colors">
                 <span class="material-symbols-outlined text-lg">logout</span>
                 Sign Out
-              </a>
+              </.link>
             </div>
           </div>
 

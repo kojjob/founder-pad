@@ -1,0 +1,28 @@
+defmodule FounderPadWeb.AuthSessionController do
+  @moduledoc """
+  Handles session creation and destruction for authentication.
+  LiveView cannot set session directly, so auth forms redirect here
+  to persist the user token in the session.
+  """
+  use FounderPadWeb, :controller
+
+  def create(conn, %{"token" => token, "redirect_to" => redirect_to}) do
+    conn
+    |> put_session(:user_token, token)
+    |> configure_session(renew: true)
+    |> redirect(to: redirect_to)
+  end
+
+  def create(conn, %{"token" => token}) do
+    conn
+    |> put_session(:user_token, token)
+    |> configure_session(renew: true)
+    |> redirect(to: "/dashboard")
+  end
+
+  def delete(conn, _params) do
+    conn
+    |> configure_session(drop: true)
+    |> redirect(to: "/auth/login")
+  end
+end

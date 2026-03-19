@@ -15,6 +15,13 @@ defmodule FounderPadWeb.Router do
     plug FounderPadWeb.Plugs.RateLimiter, limit: 100, window_ms: 60_000
   end
 
+  # Auth session controller (sets/clears session cookie)
+  scope "/auth", FounderPadWeb do
+    pipe_through :browser
+    get "/session", AuthSessionController, :create
+    delete "/session", AuthSessionController, :delete
+  end
+
   # Auth routes (no layout - full-page auth screens)
   scope "/auth", FounderPadWeb.Auth do
     pipe_through :browser
@@ -31,7 +38,10 @@ defmodule FounderPadWeb.Router do
     # App routes with sidebar layout
     live_session :app,
       layout: {FounderPadWeb.Layouts, :app},
-      on_mount: [{FounderPadWeb.Hooks.AssignDefaults, :default}] do
+      on_mount: [
+        {FounderPadWeb.Hooks.AssignDefaults, :default},
+        {FounderPadWeb.Hooks.RequireAuth, :default}
+      ] do
       live "/dashboard", DashboardLive
       live "/activity", ActivityLive
       live "/workspaces", WorkspacesLive

@@ -92,8 +92,26 @@ defmodule FounderPadWeb.Auth.LoginLive do
     """
   end
 
-  def handle_event("login", %{"user" => _params}, socket) do
-    # TODO: Wire to AshAuthentication in Phase 7 integration
-    {:noreply, put_flash(socket, :info, "Login functionality coming soon")}
+  def handle_event("login", %{"user" => params}, socket) do
+    case FounderPad.Accounts.User
+         |> Ash.Changeset.for_create(:sign_in_with_password, %{
+           email: params["email"],
+           password: params["password"]
+         })
+         |> Ash.create() do
+      {:ok, user} ->
+        token = AshAuthentication.user_to_subject(user)
+
+        {:noreply,
+         socket
+         |> put_flash(:info, "Welcome back!")
+         |> redirect(to: "/auth/session?token=#{URI.encode_www_form(token)}")}
+
+      {:error, _error} ->
+        {:noreply,
+         socket
+         |> put_flash(:error, "Invalid email or password")
+         |> assign(form: to_form(%{"email" => params["email"], "password" => ""}, as: :user))}
+    end
   end
 end

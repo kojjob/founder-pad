@@ -17,7 +17,7 @@ defmodule FounderPadWeb.LandingLive do
 
   def render(assigns) do
     ~H"""
-    <div class="min-h-screen bg-background text-on-surface font-body selection:bg-primary/30 selection:text-primary">
+    <div id="landing-scroll" phx-hook="ScrollReveal" class="min-h-screen bg-background text-on-surface font-body selection:bg-primary/30 selection:text-primary">
       <%!-- ═══════════════════════════════════════════════════════
            NAVIGATION — Sticky glass nav bar
            ═══════════════════════════════════════════════════════ --%>
@@ -61,7 +61,7 @@ defmodule FounderPadWeb.LandingLive do
 
         <div class="relative w-full grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-0 items-center">
           <%!-- Left Column: Copy --%>
-          <div class="space-y-8 pl-6 md:pl-12 lg:pl-[max(2rem,calc((100vw-1280px)/2+2rem))]">
+          <div data-reveal="left" class="space-y-8 pl-6 md:pl-12 lg:pl-[max(2rem,calc((100vw-1280px)/2+2rem))]">
             <%!-- Announcement bar --%>
             <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-surface-container text-xs font-medium text-on-surface-variant">
               <span class="text-secondary">&#x1F680;</span>
@@ -117,7 +117,7 @@ defmodule FounderPadWeb.LandingLive do
           </div>
 
           <%!-- Right Column: Dashboard Screenshot — bleeds to right edge --%>
-          <div class="relative lg:pl-8">
+          <div data-reveal="right" class="relative lg:pl-8">
             <div class="rounded-l-2xl lg:rounded-r-none overflow-hidden editorial-shadow ring-1 ring-outline-variant/10 ring-r-0">
               <img
                 src="/images/dashboard-preview.png"
@@ -168,7 +168,7 @@ defmodule FounderPadWeb.LandingLive do
            ═══════════════════════════════════════════════════════ --%>
       <section id="features" class="py-24 px-6">
         <div class="max-w-7xl mx-auto">
-          <div class="text-center mb-16">
+          <div data-reveal class="text-center mb-16">
             <p class="text-xs uppercase tracking-[0.2em] text-primary font-semibold mb-3">Features</p>
             <h2 class="text-4xl md:text-5xl font-extrabold font-headline tracking-tight">Everything you need to ship</h2>
             <p class="mt-4 text-lg text-on-surface-variant max-w-2xl mx-auto">
@@ -178,7 +178,7 @@ defmodule FounderPadWeb.LandingLive do
 
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             <%!-- Feature 1: AI Agents — Large card --%>
-            <div class="lg:col-span-2 bg-surface-container rounded-xl p-8 transition-transform hover:scale-[1.01] group">
+            <div data-reveal class="lg:col-span-2 bg-surface-container rounded-xl p-8 transition-transform hover:scale-[1.01] group">
               <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-5">
                 <span class="material-symbols-outlined text-primary text-2xl">smart_toy</span>
               </div>
@@ -195,7 +195,7 @@ defmodule FounderPadWeb.LandingLive do
             </div>
 
             <%!-- Feature 2: Stripe Billing --%>
-            <div class="bg-surface-container rounded-xl p-8 transition-transform hover:scale-[1.01]">
+            <div data-reveal class="bg-surface-container rounded-xl p-8 transition-transform hover:scale-[1.01]">
               <div class="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center mb-5">
                 <span class="material-symbols-outlined text-secondary text-2xl">payments</span>
               </div>
@@ -206,7 +206,7 @@ defmodule FounderPadWeb.LandingLive do
             </div>
 
             <%!-- Feature 3: Team Management --%>
-            <div class="bg-surface-container rounded-xl p-8 transition-transform hover:scale-[1.01]">
+            <div data-reveal class="bg-surface-container rounded-xl p-8 transition-transform hover:scale-[1.01]">
               <div class="w-12 h-12 rounded-xl bg-tertiary/10 flex items-center justify-center mb-5">
                 <span class="material-symbols-outlined text-tertiary text-2xl">group</span>
               </div>
@@ -217,7 +217,7 @@ defmodule FounderPadWeb.LandingLive do
             </div>
 
             <%!-- Feature 4: Dark & Light Mode — Large card --%>
-            <div class="lg:col-span-2 bg-surface-container rounded-xl p-8 transition-transform hover:scale-[1.01]">
+            <div data-reveal class="lg:col-span-2 bg-surface-container rounded-xl p-8 transition-transform hover:scale-[1.01]">
               <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-5">
                 <span class="material-symbols-outlined text-primary text-2xl">dark_mode</span>
               </div>
@@ -233,7 +233,7 @@ defmodule FounderPadWeb.LandingLive do
             </div>
 
             <%!-- Feature 5: API Layer --%>
-            <div class="bg-surface-container rounded-xl p-8 transition-transform hover:scale-[1.01]">
+            <div data-reveal class="bg-surface-container rounded-xl p-8 transition-transform hover:scale-[1.01]">
               <div class="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center mb-5">
                 <span class="material-symbols-outlined text-secondary text-2xl">api</span>
               </div>
@@ -244,7 +244,7 @@ defmodule FounderPadWeb.LandingLive do
             </div>
 
             <%!-- Feature 6: Production Ready --%>
-            <div class="bg-surface-container rounded-xl p-8 transition-transform hover:scale-[1.01]">
+            <div data-reveal class="bg-surface-container rounded-xl p-8 transition-transform hover:scale-[1.01]">
               <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-5">
                 <span class="material-symbols-outlined text-primary text-2xl">rocket_launch</span>
               </div>
@@ -262,7 +262,7 @@ defmodule FounderPadWeb.LandingLive do
            ═══════════════════════════════════════════════════════ --%>
       <section class="py-24 px-6">
         <div class="max-w-5xl mx-auto">
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+          <div data-reveal class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             <div class="space-y-2">
               <p class="text-5xl font-mono font-bold text-on-surface">8</p>
               <p class="text-sm text-on-surface-variant font-medium">Ash Domains</p>
@@ -288,12 +288,12 @@ defmodule FounderPadWeb.LandingLive do
            ═══════════════════════════════════════════════════════ --%>
       <section class="py-24 px-6">
         <div class="max-w-3xl mx-auto">
-          <div class="text-center mb-12">
+          <div data-reveal class="text-center mb-12">
             <p class="text-xs uppercase tracking-[0.2em] text-primary font-semibold mb-3">Developer Experience</p>
             <h2 class="text-4xl md:text-5xl font-extrabold font-headline tracking-tight">Three commands. Ship it.</h2>
           </div>
 
-          <div class="bg-surface-container rounded-xl p-6 sm:p-8 editorial-shadow ring-1 ring-outline-variant/10">
+          <div data-reveal="scale" class="bg-surface-container rounded-xl p-6 sm:p-8 editorial-shadow ring-1 ring-outline-variant/10">
             <div class="flex items-center gap-2 mb-5">
               <div class="w-3 h-3 rounded-full bg-error/60"></div>
               <div class="w-3 h-3 rounded-full bg-secondary/60"></div>
@@ -312,7 +312,7 @@ defmodule FounderPadWeb.LandingLive do
            ═══════════════════════════════════════════════════════ --%>
       <section id="pricing" class="py-24 px-6">
         <div class="max-w-7xl mx-auto">
-          <div class="text-center mb-16">
+          <div data-reveal class="text-center mb-16">
             <p class="text-xs uppercase tracking-[0.2em] text-primary font-semibold mb-3">Pricing</p>
             <h2 class="text-4xl md:text-5xl font-extrabold font-headline tracking-tight">Simple, transparent pricing</h2>
             <p class="mt-4 text-lg text-on-surface-variant max-w-2xl mx-auto">
@@ -322,7 +322,7 @@ defmodule FounderPadWeb.LandingLive do
 
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
             <%!-- Free tier --%>
-            <div class="bg-surface-container rounded-xl p-8 flex flex-col transition-transform hover:scale-[1.01]">
+            <div data-reveal="scale" class="bg-surface-container rounded-xl p-8 flex flex-col transition-transform hover:scale-[1.01]">
               <h3 class="text-lg font-bold font-headline">Free</h3>
               <div class="mt-4 mb-6">
                 <span class="text-4xl font-mono font-bold text-on-surface">$0</span>
@@ -340,7 +340,7 @@ defmodule FounderPadWeb.LandingLive do
             </div>
 
             <%!-- Starter tier --%>
-            <div class="bg-surface-container rounded-xl p-8 flex flex-col transition-transform hover:scale-[1.01]">
+            <div data-reveal="scale" class="bg-surface-container rounded-xl p-8 flex flex-col transition-transform hover:scale-[1.01]">
               <h3 class="text-lg font-bold font-headline">Starter</h3>
               <div class="mt-4 mb-6">
                 <span class="text-4xl font-mono font-bold text-on-surface">$29</span>
@@ -359,7 +359,7 @@ defmodule FounderPadWeb.LandingLive do
             </div>
 
             <%!-- Pro tier — Highlighted --%>
-            <div class="relative bg-surface-container rounded-xl p-8 flex flex-col ring-2 ring-primary transition-transform hover:scale-[1.01]">
+            <div data-reveal="scale" class="relative bg-surface-container rounded-xl p-8 flex flex-col ring-2 ring-primary transition-transform hover:scale-[1.01]">
               <div class="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full primary-gradient text-xs font-bold">
                 Most Popular
               </div>
@@ -382,7 +382,7 @@ defmodule FounderPadWeb.LandingLive do
             </div>
 
             <%!-- Enterprise tier --%>
-            <div class="bg-surface-container rounded-xl p-8 flex flex-col transition-transform hover:scale-[1.01]">
+            <div data-reveal="scale" class="bg-surface-container rounded-xl p-8 flex flex-col transition-transform hover:scale-[1.01]">
               <h3 class="text-lg font-bold font-headline">Enterprise</h3>
               <div class="mt-4 mb-6">
                 <span class="text-4xl font-mono font-bold text-on-surface">$199</span>
@@ -409,13 +409,13 @@ defmodule FounderPadWeb.LandingLive do
            ═══════════════════════════════════════════════════════ --%>
       <section class="py-24 px-6">
         <div class="max-w-7xl mx-auto">
-          <div class="text-center mb-16">
+          <div data-reveal class="text-center mb-16">
             <p class="text-xs uppercase tracking-[0.2em] text-primary font-semibold mb-3">Testimonials</p>
             <h2 class="text-4xl md:text-5xl font-extrabold font-headline tracking-tight">Loved by founders</h2>
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-            <div class="bg-surface-container rounded-xl p-8 editorial-shadow">
+            <div data-reveal class="bg-surface-container rounded-xl p-8 editorial-shadow">
               <div class="flex items-center gap-1 mb-5 text-secondary">
                 <span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1">star</span>
                 <span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1">star</span>
@@ -435,7 +435,7 @@ defmodule FounderPadWeb.LandingLive do
               </div>
             </div>
 
-            <div class="bg-surface-container rounded-xl p-8 editorial-shadow">
+            <div data-reveal class="bg-surface-container rounded-xl p-8 editorial-shadow">
               <div class="flex items-center gap-1 mb-5 text-secondary">
                 <span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1">star</span>
                 <span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1">star</span>
@@ -455,7 +455,7 @@ defmodule FounderPadWeb.LandingLive do
               </div>
             </div>
 
-            <div class="bg-surface-container rounded-xl p-8 editorial-shadow">
+            <div data-reveal class="bg-surface-container rounded-xl p-8 editorial-shadow">
               <div class="flex items-center gap-1 mb-5 text-secondary">
                 <span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1">star</span>
                 <span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1">star</span>
@@ -483,7 +483,7 @@ defmodule FounderPadWeb.LandingLive do
            ═══════════════════════════════════════════════════════ --%>
       <section class="py-24 px-6">
         <div class="max-w-4xl mx-auto text-center">
-          <div class="bg-surface-container rounded-2xl p-12 sm:p-16 relative overflow-hidden">
+          <div data-reveal="scale" class="bg-surface-container rounded-2xl p-12 sm:p-16 relative overflow-hidden">
             <%!-- Background glow --%>
             <div class="absolute top-0 right-0 w-80 h-80 bg-primary/5 rounded-full blur-[100px] pointer-events-none"></div>
             <div class="absolute bottom-0 left-0 w-60 h-60 bg-secondary/5 rounded-full blur-[80px] pointer-events-none"></div>

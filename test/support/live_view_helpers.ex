@@ -23,11 +23,12 @@ defmodule FounderPad.LiveViewHelpers do
     org = Factory.create_organisation!()
     Factory.create_membership!(user, org, :owner)
 
+    token = AshAuthentication.user_to_subject(user)
+
     conn =
       conn
       |> Phoenix.ConnTest.init_test_session(%{})
-      |> Plug.Conn.put_session(:current_user_id, user.id)
-      |> Plug.Conn.put_session(:current_org_id, org.id)
+      |> Plug.Conn.put_session(:user_token, token)
 
     {conn, user, org}
   end
