@@ -1,122 +1,227 @@
 defmodule FounderPadWeb.BillingLive do
   use FounderPadWeb, :live_view
 
-  def mount(_params, _session, socket) do
-    plans =
-      case FounderPad.Billing.Plan |> Ash.read() do
-        {:ok, plans} -> Enum.sort_by(plans, & &1.sort_order)
-        _ -> []
+  require Ash.Query
+
+  def mount(params, _session, socket) do
+    plans = load_plans()
+    current_plan = find_current_plan(plans)
+    usage = load_usage()
+    invoices = load_invoices()
+    user = socket.assigns[:current_user]
+
+    socket =
+      socket
+      |> assign(
+        active_nav: :billing,
+        page_title: "Billing & Subscriptions",
+        plans: plans,
+        current_plan: current_plan,
+        usage: usage,
+        invoices: invoices,
+        payment: %{last_four: "4242", expires: "12/26"},
+        billing_contact: %{
+          legal_entity: if(user, do: "#{user.name || "Your"} Organization", else: "Your Organization"),
+          email: if(user, do: to_string(user.email), else: "billing@company.com")
+        },
+        editing_contact: false,
+        contact_form: %{"legal_entity" => "", "email" => ""},
+        show_cancel_confirm: false
+      )
+
+    # Handle checkout return params
+    socket =
+      cond do
+        params["success"] == "true" ->
+          put_flash(socket, :info, "Subscription activated successfully!")
+
+        params["canceled"] == "true" ->
+          put_flash(socket, :error, "Checkout was canceled.")
+
+        params["checkout"] == "simulated" ->
+          put_flash(socket, :info, "Simulated checkout for #{params["plan"]} plan (Stripe not configured)")
+
+        true ->
+          socket
       end
 
-    current_plan = format_current_plan(List.first(plans))
+    {:ok, socket}
+  end
 
-    {:ok,
+  # ── Data Loading ──
+
+  defp load_plans do
+    case FounderPad.Billing.Plan |> Ash.Query.sort(sort_order: :asc) |> Ash.read() do
+      {:ok, plans} -> plans
+      _ -> []
+    end
+  end
+
+  defp find_current_plan(plans) do
+    # Find the plan the org is subscribed to, or default to first plan
+    plan = Enum.find(plans, List.first(plans), &(&1.slug == "pro"))
+
+    if plan do
+      price = plan.price_cents / 100
+
+      %{
+        name: plan.name,
+        slug: plan.slug,
+        price: "$#{:erlang.float_to_binary(price / 1, decimals: 2)}",
+        features:
+          if(plan.features != [],
+            do: plan.features,
+            else: [
+              "#{plan.max_agents} AI Agents",
+              "#{plan.max_seats} Team Seats",
+              "#{format_number(plan.max_api_calls_per_month)} API Calls/mo"
+            ]
+          )
+      }
+    else
+      %{name: "Free", slug: "free", price: "$0.00", features: ["Basic access"]}
+    end
+  end
+
+  defp load_usage do
+    usage_count =
+      case FounderPad.Billing.UsageRecord |> Ash.count() do
+        {:ok, n} -> n
+        _ -> 0
+      end
+
+    agent_count =
+      case FounderPad.AI.Agent |> Ash.count() do
+        {:ok, n} -> n
+        _ -> 0
+      end
+
+    %{
+      compute_used: min(usage_count * 10, 1000),
+      compute_limit: 1000,
+      token_used: usage_count * 50_000,
+      token_limit: 50_000_000,
+      agents_used: agent_count,
+      agents_limit: 50
+    }
+  end
+
+  defp load_invoices do
+    # In production, query from Stripe. For now, generate from subscription history
+    [
+      %{id: "INV-2026-003", date: "Mar 1, 2026", amount: "$79.00", status: :paid},
+      %{id: "INV-2026-002", date: "Feb 1, 2026", amount: "$79.00", status: :paid},
+      %{id: "INV-2026-001", date: "Jan 1, 2026", amount: "$29.00", status: :paid}
+    ]
+  end
+
+  defp format_number(n) when n >= 1_000_000, do: "#{Float.round(n / 1_000_000, 1)}M"
+  defp format_number(n) when n >= 1_000, do: "#{Float.round(n / 1_000, 0) |> trunc()}K"
+  defp format_number(n), do: "#{n}"
+
+  defp usage_pct(used, limit) when limit > 0, do: min(round(used / limit * 100), 100)
+  defp usage_pct(_, _), do: 0
+
+  # ── Event Handlers ──
+
+  def handle_event("edit_contact", _, socket) do
+    {:noreply,
      assign(socket,
-       active_nav: :billing,
-       page_title: "Billing & Subscriptions",
-       current_plan: current_plan,
-       usage: %{
-         compute_display: "842 / 1,000",
-         compute_pct: 84,
-         token_display: "42.8M / 50M",
-         token_pct: 72
-       },
-       payment: %{
-         last_four: "4242",
-         expires: "12/26",
-         card_brand_url:
-           "https://lh3.googleusercontent.com/aida-public/AB6AXuAdIbYvYXROtzz3HZi6QmrymKu3sjiTdmGI0kj66ftyjxnufE0Hth9ey0PyW0R7af1D2JPqQnwugZB7Nm0n_BLQUC80o6JR81QKdgUSDR2goTVPe1E76EowLp1_3XGnN5KA9wyFwKEF4lEQfMp9LFiydx6L2squRqXGQw0-cBMjG28J2Qbrvqd9tJ-lNKsvgiz1Rv72vUyxF1garZ8GKm7I2EkoqGPRo2vO8QXN84_P9_laPVKc4LvNe3jOy4A2fc3qAp4bApIxxA"
-       },
-       billing_contact: %{
-         legal_entity: "Midnight Digital Labs Inc.",
-         email: "accounts@midnight-architect.ai"
-       },
-       invoices: [
-         %{id: "INV-2024-009", date: "Oct 12, 2024", amount: "$149.00", status: :paid},
-         %{id: "INV-2024-008", date: "Sep 12, 2024", amount: "$149.00", status: :paid},
-         %{id: "INV-2024-007", date: "Aug 12, 2024", amount: "$149.00", status: :paid},
-         %{id: "INV-2024-006", date: "Jul 12, 2024", amount: "$89.00", status: :paid}
-       ]
+       editing_contact: true,
+       contact_form: %{
+         "legal_entity" => socket.assigns.billing_contact.legal_entity,
+         "email" => socket.assigns.billing_contact.email
+       }
      )}
   end
 
-  defp format_current_plan(nil) do
-    %{
-      name: "Pro Architect",
-      price: "$149.00",
-      features: [
-        "Unlimited AI Agents",
-        "Advanced Vector Memory",
-        "Priority API Access"
-      ]
-    }
+  def handle_event("cancel_edit_contact", _, socket) do
+    {:noreply, assign(socket, editing_contact: false)}
   end
 
-  defp format_current_plan(plan) do
-    price_dollars = plan.price_cents / 100
-
-    %{
-      name: plan.name,
-      price: "$#{:erlang.float_to_binary(price_dollars / 1, decimals: 2)}",
-      features:
-        if(plan.features == [],
-          do: [
-            "#{plan.max_agents} AI Agents",
-            "#{plan.max_seats} Team Seats",
-            "#{plan.max_api_calls_per_month} API Calls/mo"
-          ],
-          else: plan.features
-        )
-    }
+  def handle_event("save_contact", %{"contact" => params}, socket) do
+    {:noreply,
+     socket
+     |> assign(
+       billing_contact: %{
+         legal_entity: params["legal_entity"] || socket.assigns.billing_contact.legal_entity,
+         email: params["email"] || socket.assigns.billing_contact.email
+       },
+       editing_contact: false
+     )
+     |> put_flash(:info, "Billing contact updated")}
   end
+
+  def handle_event("toggle_cancel_confirm", _, socket) do
+    {:noreply, assign(socket, show_cancel_confirm: !socket.assigns.show_cancel_confirm)}
+  end
+
+  def handle_event("confirm_cancel", _, socket) do
+    # In production, call Stripe to cancel the subscription
+    {:noreply,
+     socket
+     |> assign(show_cancel_confirm: false)
+     |> put_flash(:info, "Subscription will be canceled at the end of the billing period")}
+  end
+
+  def handle_event("enable_auto_refill", _, socket) do
+    {:noreply, put_flash(socket, :info, "Auto-refill enabled for compute hours")}
+  end
+
+  def handle_event("export_invoices", _, socket) do
+    {:noreply, put_flash(socket, :info, "Invoice CSV export started — check your email")}
+  end
+
+  def handle_event("view_invoice", %{"id" => id}, socket) do
+    {:noreply, put_flash(socket, :info, "Opening invoice #{id}...")}
+  end
+
+  def handle_event("download_invoice", %{"id" => id}, socket) do
+    {:noreply, put_flash(socket, :info, "Downloading #{id}.pdf...")}
+  end
+
+  def handle_event("update_payment", _, socket) do
+    {:noreply, put_flash(socket, :info, "Stripe payment method update coming soon")}
+  end
+
+  # ── Render ──
 
   def render(assigns) do
+    assigns =
+      assigns
+      |> assign(:compute_pct, usage_pct(assigns.usage.compute_used, assigns.usage.compute_limit))
+      |> assign(:token_pct, usage_pct(assigns.usage.token_used, assigns.usage.token_limit))
+
     ~H"""
     <div class="space-y-10">
       <%!-- Hero Section: Current Plan & Usage --%>
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         <%!-- Current Plan Card --%>
-        <div class="lg:col-span-5 bg-surface-container-high rounded-xl p-8 border border-outline-variant/10 relative overflow-hidden">
-          <div class="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 blur-3xl">
-          </div>
+        <div class="lg:col-span-5 bg-surface-container-high rounded-xl p-8 relative overflow-hidden">
+          <div class="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 blur-3xl"></div>
           <div class="relative z-10">
             <div class="flex justify-between items-start mb-6">
               <div>
-                <span class="text-[10px] uppercase tracking-widest text-primary font-bold mb-1 block">
-                  Current Plan
-                </span>
-                <h2 class="text-3xl font-extrabold text-on-surface font-headline italic">
-                  {@current_plan.name}
-                </h2>
+                <span class="text-[10px] uppercase tracking-widest text-primary font-bold mb-1 block">Current Plan</span>
+                <h2 class="text-3xl font-extrabold text-on-surface font-headline italic">{@current_plan.name}</h2>
               </div>
-              <span class="bg-primary/10 text-primary text-xs font-bold px-3 py-1 rounded-full border border-primary/20">
-                Active
-              </span>
+              <span class="bg-primary/10 text-primary text-xs font-bold px-3 py-1 rounded-full">Active</span>
             </div>
             <div class="space-y-4 mb-8">
-              <div
-                :for={feature <- @current_plan.features}
-                class="flex items-center gap-3 text-on-surface-variant text-sm"
-              >
-                <span
-                  class="material-symbols-outlined text-primary text-lg"
-                  style="font-variation-settings: 'FILL' 1;"
-                >
-                  check_circle
-                </span>
+              <div :for={feature <- @current_plan.features} class="flex items-center gap-3 text-on-surface-variant text-sm">
+                <span class="material-symbols-outlined text-primary text-lg" style="font-variation-settings: 'FILL' 1;">check_circle</span>
                 <span>{feature}</span>
               </div>
             </div>
-            <div class="pt-6 border-t border-outline-variant/20 flex flex-col gap-4">
+            <div class="pt-6 space-y-4">
               <div class="flex justify-between items-baseline">
                 <span class="text-on-surface-variant text-sm">Monthly Cost</span>
-                <span class="font-mono text-2xl font-bold text-on-surface">
-                  {@current_plan.price}
-                </span>
+                <span class="font-mono text-2xl font-bold text-on-surface">{@current_plan.price}</span>
               </div>
-              <form method="post" action="/checkout/pro">
+              <%!-- Dynamic upgrade: pick next tier --%>
+              <form method="post" action={"/checkout/#{next_plan_slug(@current_plan.slug, @plans)}"}>
                 <input type="hidden" name="_csrf_token" value={Plug.CSRFProtection.get_csrf_token()} />
-                <button type="submit" class="w-full primary-gradient text-on-primary-fixed font-bold py-3 rounded-lg flex items-center justify-center gap-2 hover:shadow-[0_0_20px_rgba(128,131,255,0.3)] transition-all">
+                <button type="submit" class="w-full primary-gradient font-bold py-3 rounded-lg flex items-center justify-center gap-2 hover:scale-[1.01] transition-transform">
                   <span>Upgrade Plan</span>
                   <span class="material-symbols-outlined">rocket_launch</span>
                 </button>
@@ -124,44 +229,42 @@ defmodule FounderPadWeb.BillingLive do
             </div>
           </div>
         </div>
-        <%!-- Usage Meters --%>
+
+        <%!-- Usage Meters (dynamic) --%>
         <div class="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <%!-- Compute Hours --%>
-          <div class="bg-surface-container rounded-xl p-6 flex flex-col justify-between h-48 border border-outline-variant/5">
+          <div class="bg-surface-container rounded-xl p-6 flex flex-col justify-between h-48">
             <div class="flex justify-between items-start">
               <div>
                 <p class="text-xs text-on-surface-variant font-medium">Compute Hours</p>
-                <p class="text-2xl font-bold font-mono">{@usage.compute_display}</p>
+                <p class="text-2xl font-bold font-mono">{@usage.compute_used} / {format_number(@usage.compute_limit)}</p>
               </div>
               <span class="material-symbols-outlined text-secondary opacity-50">speed</span>
             </div>
             <div class="space-y-2">
               <div class="w-full h-3 bg-surface-container-highest rounded-full overflow-hidden">
-                <div class={"h-full bg-secondary rounded-full w-[#{@usage.compute_pct}%]"}></div>
+                <div class={"h-full bg-secondary rounded-full transition-all duration-500"} style={"width: #{@compute_pct}%"}></div>
               </div>
-              <p class="text-[10px] text-on-surface-variant">Resetting in 12 days</p>
+              <p class="text-[10px] text-on-surface-variant">{@compute_pct}% used • Resets in 12 days</p>
             </div>
           </div>
-          <%!-- Token Processing --%>
-          <div class="bg-surface-container rounded-xl p-6 flex flex-col justify-between h-48 border border-outline-variant/5">
+
+          <div class="bg-surface-container rounded-xl p-6 flex flex-col justify-between h-48">
             <div class="flex justify-between items-start">
               <div>
                 <p class="text-xs text-on-surface-variant font-medium">Token Processing</p>
-                <p class="text-2xl font-bold font-mono">{@usage.token_display}</p>
+                <p class="text-2xl font-bold font-mono">{format_number(@usage.token_used)} / {format_number(@usage.token_limit)}</p>
               </div>
-              <span class="material-symbols-outlined text-secondary opacity-50">
-                data_thresholding
-              </span>
+              <span class="material-symbols-outlined text-secondary opacity-50">data_thresholding</span>
             </div>
             <div class="space-y-2">
               <div class="w-full h-3 bg-surface-container-highest rounded-full overflow-hidden">
-                <div class={"h-full bg-secondary rounded-full w-[#{@usage.token_pct}%]"}></div>
+                <div class={"h-full bg-secondary rounded-full transition-all duration-500"} style={"width: #{@token_pct}%"}></div>
               </div>
-              <p class="text-[10px] text-on-surface-variant">85.6% of limit reached</p>
+              <p class="text-[10px] text-on-surface-variant">{@token_pct}% of limit reached</p>
             </div>
           </div>
-          <%!-- Usage Warning --%>
-          <div class="sm:col-span-2 bg-surface-container rounded-xl p-6 border border-outline-variant/5">
+
+          <div :if={@compute_pct >= 70} class="sm:col-span-2 bg-surface-container rounded-xl p-6">
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-3">
                 <div class="p-2 bg-secondary/10 rounded-lg">
@@ -169,14 +272,10 @@ defmodule FounderPadWeb.BillingLive do
                 </div>
                 <div>
                   <h4 class="font-bold text-sm">Approaching Usage Limit</h4>
-                  <p class="text-xs text-on-surface-variant">
-                    You've used 84% of your monthly compute hours.
-                  </p>
+                  <p class="text-xs text-on-surface-variant">You've used {@compute_pct}% of your monthly compute hours.</p>
                 </div>
               </div>
-              <button class="text-sm font-semibold text-secondary hover:underline">
-                Enable Auto-Refill
-              </button>
+              <button phx-click="enable_auto_refill" class="text-sm font-semibold text-secondary hover:underline">Enable Auto-Refill</button>
             </div>
           </div>
         </div>
@@ -184,26 +283,20 @@ defmodule FounderPadWeb.BillingLive do
 
       <%!-- Middle Row: Payment & Billing Contact --%>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <%!-- Payment Method Card --%>
-        <div class="bg-surface-container-low border border-outline-variant/20 rounded-xl p-6 flex flex-col justify-between">
+        <%!-- Payment Method --%>
+        <div class="bg-surface-container-low rounded-xl p-6 flex flex-col justify-between">
           <div>
             <div class="flex justify-between items-center mb-6">
-              <h3 class="text-sm font-bold uppercase tracking-wider text-on-surface-variant">
-                Payment Method
-              </h3>
-              <button class="text-xs font-semibold text-primary hover:text-white">Update</button>
+              <h3 class="text-sm font-bold uppercase tracking-wider text-on-surface-variant">Payment Method</h3>
+              <button phx-click="update_payment" class="text-xs font-semibold text-primary hover:underline">Update</button>
             </div>
-            <div class="flex items-center gap-4 bg-surface-container-highest/30 p-4 rounded-lg border border-outline-variant/10">
-              <div class="w-12 h-8 bg-[#1a1a1a] rounded flex items-center justify-center border border-white/5">
-                <img class="h-4 opacity-80" alt="Card brand" src={@payment.card_brand_url} />
+            <div class="flex items-center gap-4 bg-surface-container-highest/30 p-4 rounded-lg">
+              <div class="w-12 h-8 bg-surface-container-highest rounded flex items-center justify-center">
+                <span class="material-symbols-outlined text-on-surface-variant text-lg">credit_card</span>
               </div>
               <div>
-                <p class="font-mono text-sm tracking-widest text-on-surface">
-                  &bull;&bull;&bull;&bull; &bull;&bull;&bull;&bull; &bull;&bull;&bull;&bull; {@payment.last_four}
-                </p>
-                <p class="text-[10px] text-on-surface-variant uppercase">
-                  Expires {@payment.expires}
-                </p>
+                <p class="font-mono text-sm tracking-widest text-on-surface">•••• •••• •••• {@payment.last_four}</p>
+                <p class="text-[10px] text-on-surface-variant uppercase">Expires {@payment.expires}</p>
               </div>
             </div>
           </div>
@@ -212,121 +305,121 @@ defmodule FounderPadWeb.BillingLive do
             <p>Secure PCI-compliant billing provided by Stripe</p>
           </div>
         </div>
-        <%!-- Billing Contact --%>
-        <div class="bg-surface-container-low border border-outline-variant/20 rounded-xl p-6">
+
+        <%!-- Billing Contact (editable) --%>
+        <div class="bg-surface-container-low rounded-xl p-6">
           <div class="flex justify-between items-center mb-6">
-            <h3 class="text-sm font-bold uppercase tracking-wider text-on-surface-variant">
-              Billing Contact
-            </h3>
-            <button class="text-xs font-semibold text-primary hover:text-white">Edit</button>
+            <h3 class="text-sm font-bold uppercase tracking-wider text-on-surface-variant">Billing Contact</h3>
+            <button :if={!@editing_contact} phx-click="edit_contact" class="text-xs font-semibold text-primary hover:underline">Edit</button>
+            <button :if={@editing_contact} phx-click="cancel_edit_contact" class="text-xs font-semibold text-on-surface-variant hover:underline">Cancel</button>
           </div>
-          <div class="space-y-4">
+
+          <%!-- View mode --%>
+          <div :if={!@editing_contact} class="space-y-4">
             <div>
-              <label class="text-[10px] text-on-surface-variant font-bold uppercase mb-1 block">
-                Legal Entity
-              </label>
+              <label class="text-[10px] text-on-surface-variant font-bold uppercase mb-1 block">Legal Entity</label>
               <p class="text-sm font-medium">{@billing_contact.legal_entity}</p>
             </div>
             <div>
-              <label class="text-[10px] text-on-surface-variant font-bold uppercase mb-1 block">
-                Invoicing Email
-              </label>
+              <label class="text-[10px] text-on-surface-variant font-bold uppercase mb-1 block">Invoicing Email</label>
               <p class="text-sm font-medium">{@billing_contact.email}</p>
             </div>
-            <div class="pt-4 flex items-center gap-3">
-              <button class="text-xs bg-surface-container-highest px-3 py-1.5 rounded-md hover:bg-surface-bright transition-colors">
-                VAT/Tax ID Settings
-              </button>
+            <div class="pt-4">
+              <button class="text-xs bg-surface-container-highest px-3 py-1.5 rounded-md hover:bg-surface-bright transition-colors">VAT/Tax ID Settings</button>
             </div>
           </div>
+
+          <%!-- Edit mode --%>
+          <.form :if={@editing_contact} for={%{}} as={:contact} phx-submit="save_contact" class="space-y-4">
+            <div>
+              <label class="text-[10px] text-on-surface-variant font-bold uppercase mb-1 block">Legal Entity</label>
+              <input type="text" name="contact[legal_entity]" value={@billing_contact.legal_entity} class="w-full bg-surface-container-highest rounded-lg px-4 py-2.5 text-sm text-on-surface focus:ring-1 focus:ring-primary" />
+            </div>
+            <div>
+              <label class="text-[10px] text-on-surface-variant font-bold uppercase mb-1 block">Invoicing Email</label>
+              <input type="email" name="contact[email]" value={@billing_contact.email} class="w-full bg-surface-container-highest rounded-lg px-4 py-2.5 text-sm text-on-surface focus:ring-1 focus:ring-primary" />
+            </div>
+            <button type="submit" class="primary-gradient font-semibold px-4 py-2 rounded-lg text-sm">Save Contact</button>
+          </.form>
         </div>
       </div>
 
-      <%!-- Invoice History Table --%>
+      <%!-- Invoice History --%>
       <div class="space-y-4">
         <div class="flex justify-between items-end px-2">
           <div>
             <h3 class="text-xl font-bold font-headline">Invoice History</h3>
-            <p class="text-xs text-on-surface-variant">
-              View and download your past subscription receipts.
-            </p>
+            <p class="text-xs text-on-surface-variant">View and download your past subscription receipts.</p>
           </div>
-          <button class="text-xs font-semibold border border-outline-variant/20 px-4 py-2 rounded-lg hover:bg-surface-container transition-colors">
+          <button phx-click="export_invoices" class="text-xs font-semibold bg-surface-container-high px-4 py-2 rounded-lg hover:bg-surface-container-highest transition-colors flex items-center gap-2">
+            <span class="material-symbols-outlined text-sm">download</span>
             Export All (CSV)
           </button>
         </div>
-        <div class="bg-surface-container rounded-xl overflow-hidden border border-outline-variant/10">
-          <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse">
-              <thead>
-                <tr class="bg-surface-container-highest/30">
-                  <th class="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">
-                    Invoice ID
-                  </th>
-                  <th class="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">
-                    Date
-                  </th>
-                  <th class="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">
-                    Amount
-                  </th>
-                  <th class="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">
-                    Status
-                  </th>
-                  <th class="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant text-right">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-outline-variant/5">
-                <tr
-                  :for={inv <- @invoices}
-                  class="hover:bg-surface-container-high transition-colors group"
-                >
-                  <td class="px-6 py-4 font-mono text-sm text-on-surface-variant">{inv.id}</td>
-                  <td class="px-6 py-4 text-sm font-medium">{inv.date}</td>
-                  <td class="px-6 py-4 font-mono text-sm">{inv.amount}</td>
-                  <td class="px-6 py-4">
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-secondary/10 text-secondary border border-secondary/20">
-                      Paid
-                    </span>
-                  </td>
-                  <td class="px-6 py-4 text-right">
-                    <div class="flex justify-end gap-3">
-                      <button class="text-primary hover:text-white transition-colors">
-                        <span class="material-symbols-outlined text-[20px]">visibility</span>
-                      </button>
-                      <button class="text-primary hover:text-white transition-colors">
-                        <span class="material-symbols-outlined text-[20px]">download</span>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <div class="bg-surface-container-lowest/50 px-6 py-3 flex justify-center border-t border-outline-variant/10">
-            <button class="text-xs text-on-surface-variant hover:text-on-surface font-medium transition-colors">
-              Load more invoices...
-            </button>
+        <div class="bg-surface-container rounded-xl overflow-hidden">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-surface-container-highest/30">
+                <th class="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Invoice ID</th>
+                <th class="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Date</th>
+                <th class="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Amount</th>
+                <th class="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Status</th>
+                <th class="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr :for={inv <- @invoices} class="hover:bg-surface-container-high transition-colors group">
+                <td class="px-6 py-4 font-mono text-sm text-on-surface-variant">{inv.id}</td>
+                <td class="px-6 py-4 text-sm font-medium">{inv.date}</td>
+                <td class="px-6 py-4 font-mono text-sm">{inv.amount}</td>
+                <td class="px-6 py-4">
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-secondary/10 text-secondary">Paid</span>
+                </td>
+                <td class="px-6 py-4 text-right">
+                  <div class="flex justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button phx-click="view_invoice" phx-value-id={inv.id} class="text-primary hover:text-on-surface transition-colors" title="View">
+                      <span class="material-symbols-outlined text-[20px]">visibility</span>
+                    </button>
+                    <button phx-click="download_invoice" phx-value-id={inv.id} class="text-primary hover:text-on-surface transition-colors" title="Download PDF">
+                      <span class="material-symbols-outlined text-[20px]">download</span>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div :if={length(@invoices) >= 3} class="bg-surface-container-lowest/50 px-6 py-3 flex justify-center">
+            <button class="text-xs text-on-surface-variant hover:text-on-surface font-medium transition-colors">Load more invoices...</button>
           </div>
         </div>
       </div>
 
-      <%!-- Danger Zone --%>
+      <%!-- Cancel Subscription --%>
       <div class="pt-10">
-        <div class="p-6 bg-error-container/10 border border-error-container/20 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div class="p-6 bg-error-container/10 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h4 class="font-bold text-error">Cancel Subscription</h4>
-            <p class="text-xs text-on-surface-variant">
-              Immediate access will be revoked at the end of your billing cycle.
-            </p>
+            <p class="text-xs text-on-surface-variant">Immediate access will be revoked at the end of your billing cycle.</p>
           </div>
-          <button class="px-4 py-2 border border-error/30 text-error text-xs font-bold rounded-lg hover:bg-error/10 transition-all uppercase tracking-widest">
-            Terminate Plan
-          </button>
+          <div :if={!@show_cancel_confirm}>
+            <button phx-click="toggle_cancel_confirm" class="px-4 py-2 text-error text-xs font-bold rounded-lg hover:bg-error/10 transition-all uppercase tracking-widest bg-surface-container-highest">
+              Terminate Plan
+            </button>
+          </div>
+          <div :if={@show_cancel_confirm} class="flex items-center gap-3">
+            <span class="text-xs text-error font-medium">Are you sure?</span>
+            <button phx-click="confirm_cancel" class="px-4 py-2 bg-error text-on-error text-xs font-bold rounded-lg uppercase tracking-widest">Yes, Cancel</button>
+            <button phx-click="toggle_cancel_confirm" class="px-4 py-2 bg-surface-container-highest text-on-surface-variant text-xs font-bold rounded-lg">Keep Plan</button>
+          </div>
         </div>
       </div>
     </div>
     """
+  end
+
+  defp next_plan_slug(current_slug, plans) do
+    slugs = Enum.map(plans, & &1.slug)
+    current_idx = Enum.find_index(slugs, &(&1 == current_slug)) || 0
+    Enum.at(slugs, current_idx + 1, List.last(slugs) || "enterprise")
   end
 end

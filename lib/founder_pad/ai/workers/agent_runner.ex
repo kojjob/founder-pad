@@ -9,19 +9,20 @@ defmodule FounderPad.AI.Workers.AgentRunner do
   require Ash.Query
 
   alias FounderPad.AI
+  alias FounderPad.Notifications
 
   @impl Oban.Worker
   def perform(%Oban.Job{
         args: %{
           "conversation_id" => conversation_id,
-          "message_content" => message_content,
+          "message_content" => _message_content,
           "organisation_id" => organisation_id
         }
       }) do
+    # Note: user message is already saved by the LiveView before enqueuing this job
     with {:ok, conversation} <- Ash.get(AI.Conversation, conversation_id, load: [:agent]),
-         {:ok, _user_msg} <- create_message(conversation_id, :user, message_content),
          provider <- get_provider(conversation.agent.provider),
-         messages <- build_messages(conversation_id, message_content),
+         messages <- build_messages(conversation_id, nil),
          {:ok, response} <- provider.chat(messages, agent_opts(conversation.agent)) do
       # Save assistant message
       {:ok, _assistant_msg} = create_message(conversation_id, :assistant, response)
@@ -32,13 +33,66 @@ defmodule FounderPad.AI.Workers.AgentRunner do
       # Broadcast completion
       broadcast(conversation_id, {:message_complete, response})
 
+      # Notify user of completion
+      notify_agent_completed(conversation, conversation.agent)
+
       :ok
     else
       {:error, reason} ->
         Logger.error("Agent run failed: #{inspect(reason)}")
         broadcast(conversation_id, {:error, reason})
+
+        # Notify user of failure
+        case Ash.get(AI.Conversation, conversation_id, load: [:agent]) do
+          {:ok, conv} -> notify_agent_failed(conv, inspect(reason))
+          _ -> :ok
+        end
+
         {:error, reason}
     end
+  end
+
+  @doc "Creates an agent_completed notification and broadcasts it to the user."
+  def notify_agent_completed(conversation, agent) do
+    user_id = conversation.user_id
+
+    if user_id do
+      {:ok, notif} =
+        Notifications.Notification
+        |> Ash.Changeset.for_create(:create, %{
+          type: :agent_completed,
+          title: "#{agent.name} completed a run",
+          body: "Agent run completed successfully",
+          action_url: "/agents/#{agent.id}",
+          user_id: user_id
+        })
+        |> Ash.create()
+
+      Notifications.broadcast_to_user(user_id, notif)
+    end
+
+    :ok
+  end
+
+  @doc "Creates an agent_failed notification and broadcasts it to the user."
+  def notify_agent_failed(conversation, reason) do
+    user_id = conversation.user_id
+
+    if user_id do
+      {:ok, notif} =
+        Notifications.Notification
+        |> Ash.Changeset.for_create(:create, %{
+          type: :agent_failed,
+          title: "Agent run failed",
+          body: "Agent run failed: #{reason}",
+          user_id: user_id
+        })
+        |> Ash.create()
+
+      Notifications.broadcast_to_user(user_id, notif)
+    end
+
+    :ok
   end
 
   defp get_provider(:anthropic), do: FounderPad.AI.Providers.Anthropic
@@ -54,16 +108,13 @@ defmodule FounderPad.AI.Workers.AgentRunner do
     ]
   end
 
-  defp build_messages(conversation_id, new_content) do
-    # Fetch existing messages for context
-    existing =
-      AI.Message
-      |> Ash.Query.filter(conversation_id: conversation_id)
-      |> Ash.Query.sort(inserted_at: :asc)
-      |> Ash.read!()
-      |> Enum.map(fn msg -> %{role: msg.role, content: msg.content} end)
-
-    existing ++ [%{role: :user, content: new_content}]
+  defp build_messages(conversation_id, _new_content) do
+    # Fetch all messages (user message already saved by LiveView)
+    AI.Message
+    |> Ash.Query.filter(conversation_id: conversation_id)
+    |> Ash.Query.sort(inserted_at: :asc)
+    |> Ash.read!()
+    |> Enum.map(fn msg -> %{role: msg.role, content: msg.content} end)
   end
 
   defp create_message(conversation_id, role, content) do

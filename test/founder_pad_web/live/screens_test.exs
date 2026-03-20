@@ -165,7 +165,7 @@ defmodule FounderPadWeb.ScreensTest do
       refute html =~ "prev_step"
     end
 
-    test "complete event triggers navigation to dashboard", %{conn: conn} do
+    test "complete event shows error when not authenticated", %{conn: conn} do
       {:ok, view, _html} = live(conn, "/onboarding")
 
       # Navigate to step 4
@@ -173,9 +173,9 @@ defmodule FounderPadWeb.ScreensTest do
       render_click(view, "next_step")
       render_click(view, "next_step")
 
-      # The "complete" event calls push_navigate to /dashboard
-      render_click(view, "complete")
-      assert_redirect(view, "/dashboard")
+      # The "complete" event shows an error when not logged in
+      html = render_click(view, "complete")
+      assert html =~ "logged in"
     end
 
     test "cannot go past step 4 with next_step", %{conn: conn} do
