@@ -398,7 +398,7 @@
               </div>
               <div class="hidden md:block text-left">
                 <p class="text-sm font-semibold text-on-surface leading-none">
-                  {if @current_user, do: @current_user.name || String.split(to_string(@current_user.email), "@") |> List.first(), else: "User"}
+                  {if @current_user && @current_user.name, do: @current_user.name |> String.split() |> List.first(), else: "User"}
                 </p>
                 <p class="text-[10px] text-on-surface-variant/60 leading-none mt-1 font-medium">
                   Pro Plan
@@ -434,7 +434,7 @@
                   </div>
                   <div class="min-w-0 flex-1">
                     <p class="text-sm font-bold text-on-surface truncate font-headline">
-                      {if @current_user, do: @current_user.name || String.split(to_string(@current_user.email), "@") |> List.first(), else: "User"}
+                      {if @current_user && @current_user.name, do: @current_user.name, else: "User"}
                     </p>
                     <p class="text-xs text-on-surface-variant/60 truncate">
                       {if @current_user, do: @current_user.email, else: "user@founderpad.io"}
