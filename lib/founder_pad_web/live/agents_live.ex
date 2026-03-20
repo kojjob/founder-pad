@@ -80,10 +80,14 @@ defmodule FounderPadWeb.AgentsLive do
         </div>
 
         <%!-- Plan & Usage Card --%>
-        <div class="bg-gradient-to-br from-primary via-primary/80 to-secondary rounded-2xl p-8 relative overflow-hidden text-white flex flex-col justify-between">
+        <div class="bg-gradient-to-br from-[#4648d4] via-[#5558e0] to-[#6063ee] rounded-2xl p-8 relative overflow-hidden text-white flex flex-col justify-between">
+          <%!-- Decorative pattern --%>
+          <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-20 -mt-20 pointer-events-none"></div>
+          <div class="absolute bottom-0 left-0 w-32 h-32 bg-white/5 rounded-full -ml-10 -mb-10 pointer-events-none"></div>
+
           <div class="flex justify-between items-start mb-10 relative z-10">
-             <div class="bg-white/20 w-12 h-12 rounded-xl flex items-center justify-center backdrop-blur-md">
-               <span class="material-symbols-outlined text-white text-2xl">bolt</span>
+             <div class="bg-white/15 w-12 h-12 rounded-xl flex items-center justify-center backdrop-blur-md">
+               <span class="material-symbols-outlined text-white text-2xl">deployed_code</span>
              </div>
              <a href="/billing" class="text-white/70 hover:text-white transition-colors text-xs font-semibold uppercase tracking-wider">
                Manage Plan →
