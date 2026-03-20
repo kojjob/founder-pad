@@ -491,7 +491,29 @@ defmodule FounderPadWeb.SettingsLive do
   # -- Existing toggle handlers --
 
   def handle_event("toggle_2fa", _params, socket) do
-    {:noreply, assign(socket, two_factor_enabled: !socket.assigns.two_factor_enabled)}
+    new_val = !socket.assigns.two_factor_enabled
+    user = socket.assigns.current_user
+
+    # Log the security change
+    FounderPad.Audit.log(
+      :settings_changed,
+      "User",
+      to_string(user.id),
+      user.id,
+      nil,
+      changes: %{two_factor_enabled: new_val},
+      metadata: %{setting: "2fa"}
+    )
+
+    message =
+      if new_val,
+        do: "Two-factor authentication enabled. You'll need an authenticator app for future logins.",
+        else: "Two-factor authentication disabled. Your account is less secure."
+
+    {:noreply,
+     socket
+     |> assign(two_factor_enabled: new_val)
+     |> put_flash(if(new_val, do: :info, else: :error), message)}
   end
 
   def handle_event("toggle_compact_ui", _params, socket) do
