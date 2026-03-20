@@ -35,6 +35,9 @@ defmodule FounderPadWeb.Router do
     get "/sitemap.xml", SitemapController, :index
     post "/checkout/:plan_slug", CheckoutController, :create
     live "/", LandingLive
+    live "/docs", Docs.DocsLive
+    live "/docs/api", Docs.ApiSpecsLive
+    live "/docs/changelog", Docs.ChangelogLive
 
     # App routes with sidebar layout
     live_session :app,

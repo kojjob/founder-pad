@@ -551,7 +551,7 @@ defmodule FounderPadWeb.CoreComponents do
                 </a>
               </li>
               <li>
-                <a href="/api/v1/open_api" class="hover:text-on-surface transition-colors">
+                <a href="/docs/api" class="hover:text-on-surface transition-colors">
                   API Reference
                 </a>
               </li>
