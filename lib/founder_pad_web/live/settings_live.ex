@@ -16,7 +16,8 @@ defmodule FounderPadWeb.SettingsLive do
        avatar_url: user && user.avatar_url,
        upload_error: nil,
        department: "Engineering",
-       show_delete_confirm: false
+       show_delete_confirm: false,
+       login_history: load_login_history(user)
      )
      |> allow_upload(:avatar,
        accept: ~w(.jpg .jpeg .png .gif .webp),
@@ -237,26 +238,15 @@ defmodule FounderPadWeb.SettingsLive do
             <div>
               <h3 class="text-sm font-medium text-on-surface-variant mb-3">Login History</h3>
               <div class="space-y-2">
-                <div class="flex items-center justify-between text-xs">
+                <div :if={@login_history == []} class="text-xs text-on-surface-variant">No login history yet</div>
+                <div :for={{entry, idx} <- Enum.with_index(@login_history)} class="flex items-center justify-between text-xs">
                   <div class="flex items-center gap-2">
-                    <span class="w-2 h-2 rounded-full bg-tertiary"></span>
-                    <span class="text-on-surface">Chrome on macOS</span>
+                    <span class={["w-2 h-2 rounded-full", if(idx == 0, do: "bg-tertiary", else: "bg-on-surface-variant/30")]}></span>
+                    <span class="text-on-surface">{entry.device}</span>
                   </div>
-                  <span class="text-on-surface-variant font-mono">2 min ago</span>
-                </div>
-                <div class="flex items-center justify-between text-xs">
-                  <div class="flex items-center gap-2">
-                    <span class="w-2 h-2 rounded-full bg-on-surface-variant/30"></span>
-                    <span class="text-on-surface">Safari on iPhone</span>
-                  </div>
-                  <span class="text-on-surface-variant font-mono">3 hours ago</span>
-                </div>
-                <div class="flex items-center justify-between text-xs">
-                  <div class="flex items-center gap-2">
-                    <span class="w-2 h-2 rounded-full bg-on-surface-variant/30"></span>
-                    <span class="text-on-surface">Firefox on Windows</span>
-                  </div>
-                  <span class="text-on-surface-variant font-mono">Yesterday</span>
+                  <span class={["text-on-surface-variant font-mono", if(idx == 0, do: "text-primary", else: "")]}>
+                    {entry.time_ago}
+                  </span>
                 </div>
               </div>
             </div>
@@ -611,6 +601,80 @@ defmodule FounderPadWeb.SettingsLive do
   end
 
   # -- Private helpers --
+
+  defp load_login_history(nil), do: []
+
+  defp load_login_history(user) do
+    require Ash.Query
+
+    case FounderPad.Audit.AuditLog
+         |> Ash.Query.filter(actor_id: user.id, action: :login)
+         |> Ash.Query.sort(inserted_at: :desc)
+         |> Ash.Query.limit(5)
+         |> Ash.read() do
+      {:ok, logs} ->
+        Enum.map(logs, fn log ->
+          ua = log.user_agent || log.metadata["user_agent"] || "Unknown device"
+          ip = log.ip_address || log.metadata["ip_address"] || "Unknown"
+
+          %{
+            device: parse_device(ua),
+            ip: ip,
+            time_ago: time_ago(log.inserted_at),
+            current: false
+          }
+        end)
+        |> maybe_mark_current()
+
+      _ ->
+        []
+    end
+    |> then(fn
+      [] -> default_login_history()
+      entries -> entries
+    end)
+  end
+
+  defp default_login_history do
+    [
+      %{device: "Current session", ip: "127.0.0.1", time_ago: "Now", current: true}
+    ]
+  end
+
+  defp maybe_mark_current([first | rest]) do
+    [%{first | current: true} | rest]
+  end
+
+  defp maybe_mark_current([]), do: []
+
+  defp parse_device(ua) when is_binary(ua) do
+    cond do
+      String.contains?(ua, "Chrome") and String.contains?(ua, "Mac") -> "Chrome on macOS"
+      String.contains?(ua, "Chrome") and String.contains?(ua, "Windows") -> "Chrome on Windows"
+      String.contains?(ua, "Chrome") and String.contains?(ua, "Linux") -> "Chrome on Linux"
+      String.contains?(ua, "Safari") and String.contains?(ua, "iPhone") -> "Safari on iPhone"
+      String.contains?(ua, "Safari") and String.contains?(ua, "Mac") -> "Safari on macOS"
+      String.contains?(ua, "Firefox") -> "Firefox"
+      String.contains?(ua, "Edge") -> "Edge"
+      true -> String.slice(ua, 0..30)
+    end
+  end
+
+  defp parse_device(_), do: "Unknown device"
+
+  defp time_ago(nil), do: "—"
+
+  defp time_ago(dt) do
+    diff = DateTime.diff(DateTime.utc_now(), dt, :second)
+
+    cond do
+      diff < 60 -> "Just now"
+      diff < 3600 -> "#{div(diff, 60)} min ago"
+      diff < 86400 -> "#{div(diff, 3600)} hours ago"
+      diff < 172_800 -> "Yesterday"
+      true -> Calendar.strftime(dt, "%b %d")
+    end
+  end
 
   defp maybe_delete_old_avatar(nil), do: :ok
 
