@@ -39,7 +39,12 @@ defmodule Mix.Tasks.FounderPad.Seed do
       })
       |> Ash.create()
 
-    Mix.shell().info("  Created demo user: demo@founderpad.io")
+    # Set the user's full name
+    user
+    |> Ash.Changeset.for_update(:update_profile, %{name: "Demo User"})
+    |> Ash.update!()
+
+    Mix.shell().info("  Created demo user: Demo User (demo@founderpad.io)")
 
     # Create demo org
     {:ok, org} =
@@ -65,7 +70,8 @@ defmodule Mix.Tasks.FounderPad.Seed do
     |> Ash.Changeset.for_create(:create, %{
       name: "Research Assistant",
       description: "A helpful research assistant powered by Claude.",
-      system_prompt: "You are a knowledgeable research assistant. Help users find information, summarize documents, and answer questions accurately.",
+      system_prompt:
+        "You are a knowledgeable research assistant. Help users find information, summarize documents, and answer questions accurately.",
       model: "claude-sonnet-4-20250514",
       provider: :anthropic,
       organisation_id: org.id
@@ -88,7 +94,12 @@ defmodule Mix.Tasks.FounderPad.Seed do
       %{key: "api_access", name: "API Access", enabled: true, required_plan: "starter"},
       %{key: "webhooks", name: "Outbound Webhooks", enabled: true, required_plan: "pro"},
       %{key: "audit_log", name: "Audit Log", enabled: true, required_plan: "pro"},
-      %{key: "priority_support", name: "Priority Support", enabled: true, required_plan: "starter"}
+      %{
+        key: "priority_support",
+        name: "Priority Support",
+        enabled: true,
+        required_plan: "starter"
+      }
     ]
 
     require Ash.Query
