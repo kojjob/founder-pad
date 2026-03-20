@@ -61,12 +61,24 @@ defmodule FounderPadWeb.AgentDetailLive do
   def handle_event("send_message", %{"message" => content}, socket) when byte_size(content) > 0 do
     conversation = socket.assigns.conversation
     agent = socket.assigns.agent
+    trimmed = String.trim(content)
 
-    %{conversation_id: conversation.id, message_content: String.trim(content), organisation_id: agent.organisation_id}
+    # Save user message to DB here (not in the worker) to prevent duplicates
+    {:ok, _saved_msg} =
+      FounderPad.AI.Message
+      |> Ash.Changeset.for_create(:create, %{
+        role: :user,
+        content: trimmed,
+        conversation_id: conversation.id
+      })
+      |> Ash.create()
+
+    # Enqueue agent runner — it will NOT create the user message again
+    %{conversation_id: conversation.id, message_content: trimmed, organisation_id: agent.organisation_id}
     |> FounderPad.AI.Workers.AgentRunner.new()
     |> Oban.insert()
 
-    msg = %{role: :user, content: String.trim(content), time: format_time(DateTime.utc_now())}
+    msg = %{role: :user, content: trimmed, time: format_time(DateTime.utc_now())}
 
     {:noreply,
      socket

@@ -18,10 +18,10 @@ defmodule FounderPad.AI.Workers.AgentRunner do
           "organisation_id" => organisation_id
         }
       }) do
+    # Note: user message is already saved by the LiveView before enqueuing this job
     with {:ok, conversation} <- Ash.get(AI.Conversation, conversation_id, load: [:agent]),
-         {:ok, _user_msg} <- create_message(conversation_id, :user, message_content),
          provider <- get_provider(conversation.agent.provider),
-         messages <- build_messages(conversation_id, message_content),
+         messages <- build_messages(conversation_id, nil),
          {:ok, response} <- provider.chat(messages, agent_opts(conversation.agent)) do
       # Save assistant message
       {:ok, _assistant_msg} = create_message(conversation_id, :assistant, response)
@@ -54,16 +54,13 @@ defmodule FounderPad.AI.Workers.AgentRunner do
     ]
   end
 
-  defp build_messages(conversation_id, new_content) do
-    # Fetch existing messages for context
-    existing =
-      AI.Message
-      |> Ash.Query.filter(conversation_id: conversation_id)
-      |> Ash.Query.sort(inserted_at: :asc)
-      |> Ash.read!()
-      |> Enum.map(fn msg -> %{role: msg.role, content: msg.content} end)
-
-    existing ++ [%{role: :user, content: new_content}]
+  defp build_messages(conversation_id, _new_content) do
+    # Fetch all messages (user message already saved by LiveView)
+    AI.Message
+    |> Ash.Query.filter(conversation_id: conversation_id)
+    |> Ash.Query.sort(inserted_at: :asc)
+    |> Ash.read!()
+    |> Enum.map(fn msg -> %{role: msg.role, content: msg.content} end)
   end
 
   defp create_message(conversation_id, role, content) do
