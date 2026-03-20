@@ -123,15 +123,16 @@ defmodule FounderPadWeb.Auth.LoginLive do
       {:ok, user} ->
         token = AshAuthentication.user_to_subject(user)
 
-        # Log the login to audit trail
-        ua = Phoenix.LiveView.get_connect_info(socket, :user_agent) || "LiveView"
-        peer = Phoenix.LiveView.get_connect_info(socket, :peer_data)
-        ip = if peer, do: peer.address |> :inet.ntoa() |> to_string(), else: "unknown"
-
-        FounderPad.Audit.log(:login, "User", to_string(user.id), user.id, nil,
-          user_agent: ua,
-          ip_address: ip
-        )
+        # Log the login to audit trail (safely — connect_info may not be available)
+        try do
+          ua = Phoenix.LiveView.get_connect_info(socket, :user_agent) || "LiveView"
+          FounderPad.Audit.log(:login, "User", to_string(user.id), user.id, nil,
+            user_agent: ua,
+            ip_address: "unknown"
+          )
+        rescue
+          _ -> :ok
+        end
 
         {:noreply,
          socket
