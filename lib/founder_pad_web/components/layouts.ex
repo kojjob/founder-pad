@@ -141,6 +141,74 @@ defmodule FounderPadWeb.Layouts do
 
   def user_initials(_), do: "FP"
 
+  # --- Notification helpers used by the app layout template ---
+
+  @doc "Returns the border color class for a notification type."
+  def notification_border_class(:agent_completed), do: "border-primary bg-primary/[0.03]"
+  def notification_border_class(:agent_failed), do: "border-error bg-error/[0.03]"
+  def notification_border_class(:billing_warning), do: "border-error bg-error/[0.03]"
+  def notification_border_class(:billing_updated), do: "border-secondary bg-secondary/[0.03]"
+  def notification_border_class(:team_invite), do: "border-secondary bg-secondary/[0.03]"
+  def notification_border_class(:team_removed), do: "border-error bg-error/[0.03]"
+  def notification_border_class(:system_announcement), do: "border-primary bg-primary/[0.03]"
+  def notification_border_class(_), do: "border-primary bg-primary/[0.03]"
+
+  @doc "Returns the unread dot color class for a notification type."
+  def notification_dot_class(:agent_completed), do: "bg-primary"
+  def notification_dot_class(:agent_failed), do: "bg-error"
+  def notification_dot_class(:billing_warning), do: "bg-error"
+  def notification_dot_class(:billing_updated), do: "bg-secondary"
+  def notification_dot_class(:team_invite), do: "bg-secondary"
+  def notification_dot_class(:team_removed), do: "bg-error"
+  def notification_dot_class(:system_announcement), do: "bg-primary"
+  def notification_dot_class(_), do: "bg-primary"
+
+  @doc "Returns the icon background gradient class for a notification type."
+  def notification_icon_bg_class(:agent_completed), do: "from-emerald-500/20 to-emerald-500/5"
+  def notification_icon_bg_class(:agent_failed), do: "from-error/20 to-error/5"
+  def notification_icon_bg_class(:billing_warning), do: "from-error/20 to-error/5"
+  def notification_icon_bg_class(:billing_updated), do: "from-secondary/20 to-secondary/5"
+  def notification_icon_bg_class(:team_invite), do: "from-secondary/20 to-secondary/5"
+  def notification_icon_bg_class(:team_removed), do: "from-error/20 to-error/5"
+  def notification_icon_bg_class(:system_announcement), do: "from-primary/20 to-primary/5"
+  def notification_icon_bg_class(_), do: "from-primary/20 to-primary/5"
+
+  @doc "Returns the icon color class for a notification type."
+  def notification_icon_color_class(:agent_completed), do: "text-emerald-500"
+  def notification_icon_color_class(:agent_failed), do: "text-error"
+  def notification_icon_color_class(:billing_warning), do: "text-error"
+  def notification_icon_color_class(:billing_updated), do: "text-secondary"
+  def notification_icon_color_class(:team_invite), do: "text-secondary"
+  def notification_icon_color_class(:team_removed), do: "text-error"
+  def notification_icon_color_class(:system_announcement), do: "text-primary"
+  def notification_icon_color_class(_), do: "text-primary"
+
+  @doc "Returns the Material Symbol icon name for a notification type."
+  def notification_icon(:agent_completed), do: "check_circle"
+  def notification_icon(:agent_failed), do: "error"
+  def notification_icon(:billing_warning), do: "warning"
+  def notification_icon(:billing_updated), do: "receipt_long"
+  def notification_icon(:team_invite), do: "person_add"
+  def notification_icon(:team_removed), do: "person_remove"
+  def notification_icon(:system_announcement), do: "campaign"
+  def notification_icon(_), do: "notifications"
+
+  @doc "Formats a datetime as relative time (e.g., '2m', '1h', '3d')."
+  def relative_time(nil), do: ""
+
+  def relative_time(datetime) do
+    now = DateTime.utc_now()
+    diff_seconds = DateTime.diff(now, datetime, :second)
+
+    cond do
+      diff_seconds < 60 -> "#{diff_seconds}s"
+      diff_seconds < 3_600 -> "#{div(diff_seconds, 60)}m"
+      diff_seconds < 86_400 -> "#{div(diff_seconds, 3_600)}h"
+      diff_seconds < 604_800 -> "#{div(diff_seconds, 86_400)}d"
+      true -> "#{div(diff_seconds, 604_800)}w"
+    end
+  end
+
   # Embed all files in layouts/* within this module.
   # The app.html.heex template requires: @flash, @inner_content, @active_nav, @current_user
   # The root.html.heex template provides the HTML skeleton.

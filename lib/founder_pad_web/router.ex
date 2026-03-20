@@ -44,7 +44,8 @@ defmodule FounderPadWeb.Router do
       layout: {FounderPadWeb.Layouts, :app},
       on_mount: [
         {FounderPadWeb.Hooks.AssignDefaults, :default},
-        {FounderPadWeb.Hooks.RequireAuth, :default}
+        {FounderPadWeb.Hooks.RequireAuth, :default},
+        {FounderPadWeb.Hooks.NotificationHandler, :default}
       ] do
       live "/dashboard", DashboardLive
       live "/activity", ActivityLive

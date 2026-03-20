@@ -9,12 +9,13 @@ defmodule FounderPad.AI.Workers.AgentRunner do
   require Ash.Query
 
   alias FounderPad.AI
+  alias FounderPad.Notifications
 
   @impl Oban.Worker
   def perform(%Oban.Job{
         args: %{
           "conversation_id" => conversation_id,
-          "message_content" => message_content,
+          "message_content" => _message_content,
           "organisation_id" => organisation_id
         }
       }) do
@@ -32,13 +33,66 @@ defmodule FounderPad.AI.Workers.AgentRunner do
       # Broadcast completion
       broadcast(conversation_id, {:message_complete, response})
 
+      # Notify user of completion
+      notify_agent_completed(conversation, conversation.agent)
+
       :ok
     else
       {:error, reason} ->
         Logger.error("Agent run failed: #{inspect(reason)}")
         broadcast(conversation_id, {:error, reason})
+
+        # Notify user of failure
+        case Ash.get(AI.Conversation, conversation_id, load: [:agent]) do
+          {:ok, conv} -> notify_agent_failed(conv, inspect(reason))
+          _ -> :ok
+        end
+
         {:error, reason}
     end
+  end
+
+  @doc "Creates an agent_completed notification and broadcasts it to the user."
+  def notify_agent_completed(conversation, agent) do
+    user_id = conversation.user_id
+
+    if user_id do
+      {:ok, notif} =
+        Notifications.Notification
+        |> Ash.Changeset.for_create(:create, %{
+          type: :agent_completed,
+          title: "#{agent.name} completed a run",
+          body: "Agent run completed successfully",
+          action_url: "/agents/#{agent.id}",
+          user_id: user_id
+        })
+        |> Ash.create()
+
+      Notifications.broadcast_to_user(user_id, notif)
+    end
+
+    :ok
+  end
+
+  @doc "Creates an agent_failed notification and broadcasts it to the user."
+  def notify_agent_failed(conversation, reason) do
+    user_id = conversation.user_id
+
+    if user_id do
+      {:ok, notif} =
+        Notifications.Notification
+        |> Ash.Changeset.for_create(:create, %{
+          type: :agent_failed,
+          title: "Agent run failed",
+          body: "Agent run failed: #{reason}",
+          user_id: user_id
+        })
+        |> Ash.create()
+
+      Notifications.broadcast_to_user(user_id, notif)
+    end
+
+    :ok
   end
 
   defp get_provider(:anthropic), do: FounderPad.AI.Providers.Anthropic
