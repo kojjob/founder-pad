@@ -12,7 +12,7 @@ defmodule FounderPadWeb.SettingsLive do
        two_factor_enabled: true,
        compact_ui: false,
        high_contrast: false,
-       selected_theme: :midnight,
+       selected_theme: :midnight,  # JS hook will sync actual theme on mount
        avatar_url: user && user.avatar_url,
        upload_error: nil,
        department: "Engineering",
@@ -266,7 +266,7 @@ defmodule FounderPadWeb.SettingsLive do
         <%!-- Right Column --%>
         <div class="lg:col-span-4 space-y-6">
           <%!-- Theme Preference Card --%>
-          <div class="bg-surface-container-low rounded-xl p-6">
+          <div id="theme-settings" phx-hook="ThemeSettings" class="bg-surface-container-low rounded-xl p-6">
             <h2 class="text-lg font-bold text-on-surface mb-4">Theme Preference</h2>
 
             <%!-- Theme preview buttons --%>
@@ -503,7 +503,12 @@ defmodule FounderPadWeb.SettingsLive do
   end
 
   def handle_event("select_theme", %{"theme" => theme}, socket) do
-    {:noreply, assign(socket, selected_theme: String.to_existing_atom(theme))}
+    js_theme = if theme == "midnight", do: "dark", else: "light"
+
+    {:noreply,
+     socket
+     |> assign(selected_theme: String.to_existing_atom(theme))
+     |> push_event("set-theme", %{theme: js_theme})}
   end
 
   def handle_event("switch_tab", %{"tab" => tab}, socket) do
