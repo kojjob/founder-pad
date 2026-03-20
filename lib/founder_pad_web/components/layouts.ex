@@ -21,7 +21,8 @@ defmodule FounderPadWeb.Layouts do
         "flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-transform active:scale-95",
         if(@active,
           do: "text-primary font-semibold bg-surface-container-lowest editorial-shadow",
-          else: "text-on-surface/60 font-medium hover:text-on-surface hover:bg-surface-container-high/50 transition-colors duration-200"
+          else:
+            "text-on-surface/60 font-medium hover:text-on-surface hover:bg-surface-container-high/50 transition-colors duration-200"
         )
       ]}
     >
@@ -116,16 +117,26 @@ defmodule FounderPadWeb.Layouts do
   Returns "FP" if no user or no name.
   """
   def user_initials(nil), do: "FP"
-  def user_initials(%{name: nil}), do: "FP"
-  def user_initials(%{name: ""}), do: "FP"
 
-  def user_initials(%{name: name}) do
+  def user_initials(%{name: nil, email: email}) when not is_nil(email) do
+    email |> to_string() |> String.first() |> String.upcase()
+  end
+
+  def user_initials(%{name: "", email: email}) when not is_nil(email) do
+    email |> to_string() |> String.first() |> String.upcase()
+  end
+
+  def user_initials(%{name: name}) when is_binary(name) and name != "" do
     name
     |> String.split(~r/\s+/, trim: true)
     |> Enum.take(2)
     |> Enum.map(&String.first/1)
     |> Enum.join()
     |> String.upcase()
+  end
+
+  def user_initials(%{email: email}) when not is_nil(email) do
+    email |> to_string() |> String.first() |> String.upcase()
   end
 
   def user_initials(_), do: "FP"
