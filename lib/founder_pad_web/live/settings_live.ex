@@ -517,18 +517,24 @@ defmodule FounderPadWeb.SettingsLive do
 
   def handle_event("save_profile", %{"profile" => params}, socket) do
     user = socket.assigns.current_user
+    name = String.trim(params["name"] || "")
 
-    case user
-         |> Ash.Changeset.for_update(:update_profile, %{name: params["name"]})
-         |> Ash.update() do
-      {:ok, _updated} ->
-        {:noreply,
-         socket
-         |> assign(department: params["department"] || socket.assigns.department)
-         |> put_flash(:info, "Profile updated successfully")}
+    if name == "" do
+      {:noreply, put_flash(socket, :error, "Name cannot be empty")}
+    else
+      case user
+           |> Ash.Changeset.for_update(:update_profile, %{name: name})
+           |> Ash.update() do
+        {:ok, updated_user} ->
+          {:noreply,
+           socket
+           |> assign(current_user: updated_user)
+           |> assign(department: params["department"] || socket.assigns.department)
+           |> put_flash(:info, "Profile updated successfully")}
 
-      {:error, _} ->
-        {:noreply, put_flash(socket, :error, "Failed to update profile")}
+        {:error, _} ->
+          {:noreply, put_flash(socket, :error, "Failed to update profile")}
+      end
     end
   end
 
