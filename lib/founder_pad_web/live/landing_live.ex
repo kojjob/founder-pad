@@ -42,8 +42,8 @@ defmodule FounderPadWeb.LandingLive do
             <a href="#features" class="hover:text-on-surface transition-colors">Features</a>
             <a href="#pricing" class="hover:text-on-surface transition-colors">Pricing</a>
             <a
-              href="https://docs.founderpad.io"
-              target="_blank"
+              href="/docs"
+              
               class="hover:text-on-surface transition-colors"
             >
               Docs
@@ -114,7 +114,7 @@ defmodule FounderPadWeb.LandingLive do
                 <span class="material-symbols-outlined text-lg">arrow_forward</span>
               </a>
               <a
-                href="https://github.com/founderpad"
+                href="https://github.com/kojjob/founder-pad"
                 target="_blank"
                 class="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl text-base font-semibold text-on-surface bg-surface-container hover:bg-surface-container-high transition-colors"
               >
