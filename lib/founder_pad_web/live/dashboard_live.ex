@@ -151,7 +151,7 @@ defmodule FounderPadWeb.DashboardLive do
             <div
               :for={h <- @inference_chart}
               class="flex-1 rounded-t-sm transition-all duration-300"
-              style={"height: #{h}%; background-color: var(--fp-primary); opacity: #{max(h / 100, 0.25)};"}
+              style={"height: #{h}%; background-color: var(--fp-chart-primary); opacity: #{max(h / 100, 0.3)};"}
             >
             </div>
           </div>
@@ -173,7 +173,7 @@ defmodule FounderPadWeb.DashboardLive do
             <div
               :for={{h, opacity} <- @token_chart}
               class="flex-1 mt-auto rounded-sm transition-all duration-300"
-              style={"height: #{h}%; background-color: var(--fp-secondary); opacity: #{opacity};"}
+              style={"height: #{h}%; background-color: var(--fp-chart-secondary); opacity: #{opacity};"}
             >
             </div>
           </div>
@@ -205,7 +205,7 @@ defmodule FounderPadWeb.DashboardLive do
             <div
               :for={{h, i} <- Enum.with_index(@success_chart)}
               class="w-full rounded-t-lg transition-all duration-300"
-              style={"height: #{h}%; background-color: var(--fp-primary); opacity: #{min((i + 2) / (length(@success_chart) + 1), 1)};"}
+              style={"height: #{h}%; background-color: var(--fp-chart-primary); opacity: #{min((i + 2) / (length(@success_chart) + 1), 1)};"}
             >
             </div>
           </div>

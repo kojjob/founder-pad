@@ -277,6 +277,16 @@ html:not(.dark) {
   --font-mono: 'JetBrains Mono', monospace;
 }
 
+/* ── Chart colors (high contrast in both modes) ── */
+:root {
+  --fp-chart-primary: #c0c1ff;
+  --fp-chart-secondary: #ffb95f;
+}
+html:not(.dark) {
+  --fp-chart-primary: #6366f1;
+  --fp-chart-secondary: #d97706;
+}
+
 /* ── Body base ── */
 body {
   background-color: var(--fp-background);
