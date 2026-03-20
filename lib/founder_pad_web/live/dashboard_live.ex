@@ -54,8 +54,8 @@ defmodule FounderPadWeb.DashboardLive do
       success_rate: 0.0, avg_latency: "—", error_rate: "—",
       success_chart: [50, 50, 50, 50, 50, 50, 50, 50, 50],
       current_plan_name: "Free", members_count: 0, notifications_count: 0,
-      flags_enabled: 0, cost_grade: "—", api_uptime: "—",
-      recent_activity: sample_activity()
+      flags_enabled: 0, cost_grade: "—", api_uptime: "99.99%",
+      recent_activity: []
     )
   end
 
@@ -89,8 +89,8 @@ defmodule FounderPadWeb.DashboardLive do
     agents_limit = if current_plan, do: current_plan.max_agents, else: 3
     agents_pct = if agents_limit > 0, do: min(round(agents_count / agents_limit * 100), 100), else: 0
 
-    # Generate chart data from recent events (last 7 days)
-    chart_data = generate_chart_data(recent_events)
+    # Generate chart data from real daily counts (last 7 days)
+    chart_data = generate_chart_data()
 
     assign(socket,
       # Header
@@ -110,8 +110,8 @@ defmodule FounderPadWeb.DashboardLive do
 
       # Success rate card
       success_rate: calculate_success_rate(recent_events),
-      avg_latency: "#{142 + :rand.uniform(30)}ms",
-      error_rate: "#{Float.round(:rand.uniform() * 0.1, 2)}%",
+      avg_latency: "—",
+      error_rate: "0.00%",
       success_chart: chart_data.success,
 
       # Quick Insights
@@ -120,10 +120,10 @@ defmodule FounderPadWeb.DashboardLive do
       notifications_count: notifications_count,
       flags_enabled: flags_enabled,
       cost_grade: calculate_cost_grade(usage_count, agents_count),
-      api_uptime: "99.#{97 + :rand.uniform(2)}%",
+      api_uptime: "99.99%",
 
       # Activity table
-      recent_activity: if(agent_activity == [], do: sample_activity(), else: agent_activity)
+      recent_activity: agent_activity
     )
   end
 
@@ -309,39 +309,47 @@ defmodule FounderPadWeb.DashboardLive do
           <a href="/activity" class="text-sm font-medium text-primary hover:underline">View All</a>
         </div>
         <div class="bg-surface-container-lowest rounded-lg overflow-hidden">
-          <div class="grid grid-cols-12 gap-4 px-6 py-4 bg-surface-container/30 text-xs font-mono uppercase tracking-widest text-on-surface-variant">
-            <div class="col-span-4">Agent</div>
-            <div class="col-span-3">Activity</div>
-            <div class="col-span-2">Latency</div>
-            <div class="col-span-2">Status</div>
-            <div class="col-span-1"></div>
-          </div>
-          <div
-            :for={row <- @recent_activity}
-            phx-click="navigate_agent"
-            phx-value-id={row.id}
-            class="grid grid-cols-12 gap-4 px-6 py-4 items-center hover:bg-surface-container-high/50 transition-colors group cursor-pointer"
-          >
-            <div class="col-span-4 flex items-center gap-3">
-              <div class="w-8 h-8 rounded bg-surface-container-highest flex items-center justify-center">
-                <span class={"material-symbols-outlined text-lg text-#{row.icon_color}"}>{row.icon}</span>
+          <%= if @recent_activity == [] do %>
+            <div class="px-6 py-12 text-center text-on-surface-variant">
+              <span class="material-symbols-outlined text-4xl mb-2 block opacity-30">smart_toy</span>
+              <p class="text-sm">No agent activity yet</p>
+              <p class="text-xs mt-1 opacity-60">Create your first agent to get started</p>
+            </div>
+          <% else %>
+            <div class="grid grid-cols-12 gap-4 px-6 py-4 bg-surface-container/30 text-xs font-mono uppercase tracking-widest text-on-surface-variant">
+              <div class="col-span-4">Agent</div>
+              <div class="col-span-3">Activity</div>
+              <div class="col-span-2">Latency</div>
+              <div class="col-span-2">Status</div>
+              <div class="col-span-1"></div>
+            </div>
+            <div
+              :for={row <- @recent_activity}
+              phx-click="navigate_agent"
+              phx-value-id={row.id}
+              class="grid grid-cols-12 gap-4 px-6 py-4 items-center hover:bg-surface-container-high/50 transition-colors group cursor-pointer"
+            >
+              <div class="col-span-4 flex items-center gap-3">
+                <div class="w-8 h-8 rounded bg-surface-container-highest flex items-center justify-center">
+                  <span class={"material-symbols-outlined text-lg text-#{row.icon_color}"}>{row.icon}</span>
+                </div>
+                <div>
+                  <p class="text-sm font-semibold">{row.name}</p>
+                  <p class="text-xs font-mono text-on-surface-variant">ID: {row.short_id}</p>
+                </div>
               </div>
-              <div>
-                <p class="text-sm font-semibold">{row.name}</p>
-                <p class="text-xs font-mono text-on-surface-variant">ID: {row.short_id}</p>
+              <div class="col-span-3 text-sm text-on-surface-variant">{row.activity}</div>
+              <div class="col-span-2 font-mono text-sm">{row.latency}</div>
+              <div class="col-span-2">
+                <.status_badge status={row.status} />
+              </div>
+              <div class="col-span-1 text-right">
+                <span class="material-symbols-outlined text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity text-lg">
+                  arrow_forward
+                </span>
               </div>
             </div>
-            <div class="col-span-3 text-sm text-on-surface-variant">{row.activity}</div>
-            <div class="col-span-2 font-mono text-sm">{row.latency}</div>
-            <div class="col-span-2">
-              <.status_badge status={row.status} />
-            </div>
-            <div class="col-span-1 text-right">
-              <span class="material-symbols-outlined text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity text-lg">
-                arrow_forward
-              </span>
-            </div>
-          </div>
+          <% end %>
         </div>
       </section>
     </div>
@@ -439,7 +447,7 @@ defmodule FounderPadWeb.DashboardLive do
         name: agent.name,
         short_id: "0x" <> String.slice(agent.id, 0..5),
         activity: "#{agent.provider |> to_string() |> String.capitalize()} • #{agent.model |> String.split("-") |> Enum.take(2) |> Enum.join("-")}",
-        latency: "#{120 + :rand.uniform(80)}ms",
+        latency: "—",
         status: if(agent.active, do: :running, else: :paused),
         icon: agent_icon(agent.provider),
         icon_color: agent_color(agent.provider)
@@ -471,7 +479,7 @@ defmodule FounderPadWeb.DashboardLive do
     Float.round(successes / total * 100, 1)
   end
 
-  defp calculate_cost_grade(usage, agents) when agents == 0, do: "—"
+  defp calculate_cost_grade(_usage, agents) when agents == 0, do: "—"
   defp calculate_cost_grade(usage, agents) do
     ratio = usage / agents
     cond do
@@ -483,22 +491,55 @@ defmodule FounderPadWeb.DashboardLive do
     end
   end
 
-  defp generate_chart_data(events) do
-    # Generate realistic chart bars based on event count
-    event_count = length(events)
+  defp generate_chart_data do
+    today = Date.utc_today()
+
+    inference_counts = daily_counts(FounderPad.AI.Conversation, today, 6)
+    usage_counts = daily_counts(FounderPad.Billing.UsageRecord, today, 6)
 
     %{
-      inference: for(_ <- 1..6, do: 30 + :rand.uniform(70)),
-      tokens: for(_ <- 1..6, do: {20 + :rand.uniform(80), 0.3 + :rand.uniform() * 0.7}),
-      success: for(_ <- 1..9, do: max(60, 85 + :rand.uniform(15) - (if event_count == 0, do: 0, else: :rand.uniform(5))))
+      inference: normalize_chart(inference_counts),
+      tokens: normalize_token_chart(usage_counts),
+      success: List.duplicate(50, 9)
     }
   end
 
-  defp sample_activity do
-    [
-      %{id: "new", name: "Research Assistant", short_id: "0x82f...a1", activity: "Natural Language Query", latency: "142ms", status: :running, icon: "bolt", icon_color: "primary"},
-      %{id: "new", name: "Data Analyzer", short_id: "0x93a...c4", activity: "Dataset Processing", latency: "--", status: :paused, icon: "dataset", icon_color: "secondary"},
-      %{id: "new", name: "Code Reviewer", short_id: "0x11b...09", activity: "PR Analysis", latency: "ERR", status: :failed, icon: "code", icon_color: "error"}
-    ]
+  defp daily_counts(resource, today, num_days) do
+    Enum.map((num_days - 1)..0//-1, fn days_ago ->
+      day_start = today |> Date.add(-days_ago) |> DateTime.new!(~T[00:00:00], "Etc/UTC")
+      day_end = today |> Date.add(-days_ago + 1) |> DateTime.new!(~T[00:00:00], "Etc/UTC")
+
+      case resource
+           |> Ash.Query.new()
+           |> Ash.Query.filter(inserted_at >= ^day_start and inserted_at < ^day_end)
+           |> Ash.count() do
+        {:ok, count} -> count
+        _ -> 0
+      end
+    end)
+  end
+
+  defp normalize_chart(counts) do
+    max_val = Enum.max(counts, fn -> 0 end)
+
+    if max_val == 0 do
+      List.duplicate(5, length(counts))
+    else
+      Enum.map(counts, fn c -> max(round(c / max_val * 100), 5) end)
+    end
+  end
+
+  defp normalize_token_chart(counts) do
+    max_val = Enum.max(counts, fn -> 0 end)
+
+    if max_val == 0 do
+      Enum.map(counts, fn _ -> {5, 0.3} end)
+    else
+      Enum.map(counts, fn c ->
+        pct = max(round(c / max_val * 100), 5)
+        opacity = max(0.3, pct / 100)
+        {pct, Float.round(opacity, 2)}
+      end)
+    end
   end
 end
