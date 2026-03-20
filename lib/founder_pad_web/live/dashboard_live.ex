@@ -13,19 +13,50 @@ defmodule FounderPadWeb.DashboardLive do
 
     user = socket.assigns[:current_user]
 
-    {:ok,
-     socket
-     |> assign(active_nav: :dashboard, page_title: "Dashboard")
-     |> load_all_data(user)}
+    socket = socket |> assign(active_nav: :dashboard, page_title: "Dashboard")
+
+    socket =
+      try do
+        load_all_data(socket, user)
+      rescue
+        _ -> assign_defaults(socket)
+      end
+
+    {:ok, socket}
   end
 
   def handle_info(:refresh, socket) do
     Process.send_after(self(), :refresh, @refresh_interval)
-    {:noreply, load_all_data(socket, socket.assigns[:current_user])}
+
+    try do
+      {:noreply, load_all_data(socket, socket.assigns[:current_user])}
+    rescue
+      _ -> {:noreply, socket}
+    end
   end
 
   def handle_info({:app_event, _event}, socket) do
-    {:noreply, load_all_data(socket, socket.assigns[:current_user])}
+    try do
+      {:noreply, load_all_data(socket, socket.assigns[:current_user])}
+    rescue
+      _ -> {:noreply, socket}
+    end
+  end
+
+  def handle_info(_, socket), do: {:noreply, socket}
+
+  defp assign_defaults(socket) do
+    assign(socket,
+      user_name: "", last_sync: "—", system_status: :nominal,
+      agents_count: 0, agents_limit: 3, agents_pct: 0,
+      total_inference: "0", inference_chart: [30, 30, 30, 30, 30, 30],
+      token_usage: "0", token_quota_pct: 0, token_chart: [{30, 0.3}, {30, 0.3}, {30, 0.3}, {30, 0.3}, {30, 0.3}, {30, 0.3}],
+      success_rate: 0.0, avg_latency: "—", error_rate: "—",
+      success_chart: [50, 50, 50, 50, 50, 50, 50, 50, 50],
+      current_plan_name: "Free", members_count: 0, notifications_count: 0,
+      flags_enabled: 0, cost_grade: "—", api_uptime: "—",
+      recent_activity: sample_activity()
+    )
   end
 
   def handle_event("navigate_agent", %{"id" => id}, socket) do
