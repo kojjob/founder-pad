@@ -11,7 +11,11 @@ defmodule FounderPad.MixProject do
       aliases: aliases(),
       deps: deps(),
       consolidate_protocols: Mix.env() != :dev,
-      listeners: [Phoenix.CodeReloader]
+      listeners: [Phoenix.CodeReloader],
+      dialyzer: [
+        plt_add_apps: [:mix, :ex_unit],
+        ignore_warnings: ".dialyzer_ignore.exs"
+      ]
     ]
   end
 
