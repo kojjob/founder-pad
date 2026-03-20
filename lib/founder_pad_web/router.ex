@@ -50,6 +50,7 @@ defmodule FounderPadWeb.Router do
       live "/activity", ActivityLive
       live "/workspaces", WorkspacesLive
       live "/agents", AgentsLive
+      live "/agents/new", AgentCreateLive
       live "/agents/:id", AgentDetailLive
       live "/billing", BillingLive
       live "/team", TeamLive
