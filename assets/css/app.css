@@ -134,7 +134,7 @@
   --fp-secondary: #9c5c09;
   --fp-secondary-container: #a96c03;
   --fp-secondary-fixed: #ffddb8;
-  --fp-secondary-fixed-dim: #e29025;
+  --fp-secondary-fixed-dim: #d47e0e;
   --fp-on-secondary: #472a00;
   --fp-on-secondary-container: #5b3800;
   --fp-on-secondary-fixed: #2a1700;
@@ -178,9 +178,9 @@ html:not(.dark) {
   --fp-on-primary-fixed-variant: #2f2ebe;
   --fp-inverse-primary: #c0c1ff;
   --fp-secondary: #855300;
-  --fp-secondary-container: #fea619;
+  --fp-secondary-container: #e3920f;
   --fp-secondary-fixed: #ffddb8;
-  --fp-secondary-fixed-dim: #ffb95f;
+  --fp-secondary-fixed-dim: #c8760b;
   --fp-on-secondary: #ffffff;
   --fp-on-secondary-container: #684000;
   --fp-on-secondary-fixed: #2a1700;
@@ -212,7 +212,7 @@ html:not(.dark) {
 }
 
 .glass-effect {
-  background: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(20px);
 }
 
@@ -221,8 +221,8 @@ html:not(.dark) {
 }
 
 .dark .glass-effect {
-  background: rgba(11, 19, 38, 0.6);
-  backdrop-filter: blur(12px);
+  background: rgba(11, 19, 38, 0.95);
+  backdrop-filter: blur(16px);
 }
 
 /* ── Register vars with @theme so Tailwind generates utilities ── */
@@ -340,4 +340,66 @@ body {
 }
 .reveal-hidden[data-reveal="scale"].revealed {
   transform: scale(1);
+}
+
+/* ── Compact UI Mode ── */
+html.compact {
+  font-size: 14px;
+}
+
+html.compact aside {
+  width: 200px;
+  padding: 0.5rem;
+}
+
+html.compact main {
+  padding: 1rem 1.5rem;
+}
+
+html.compact h1 {
+  font-size: 1.75rem;
+}
+
+html.compact h2 {
+  font-size: 1.25rem;
+}
+
+html.compact .rounded-xl {
+  border-radius: 0.5rem;
+}
+
+html.compact .p-6 {
+  padding: 1rem;
+}
+
+html.compact .p-8 {
+  padding: 1.25rem;
+}
+
+html.compact .gap-6 {
+  gap: 0.75rem;
+}
+
+html.compact .space-y-8 > * + * {
+  margin-top: 1rem;
+}
+
+/* ── High Contrast Mode ── */
+html.high-contrast {
+  --fp-on-surface: #ffffff;
+  --fp-on-surface-variant: #e0e0e0;
+  --fp-outline-variant: #888888;
+  --fp-surface-container: #1a2236;
+  --fp-surface-container-high: #253046;
+  --fp-surface-container-highest: #354060;
+  --fp-primary: #a5a7ff;
+}
+
+html.high-contrast:not(.dark) {
+  --fp-on-surface: #000000;
+  --fp-on-surface-variant: #222222;
+  --fp-outline-variant: #555555;
+  --fp-surface-container: #e0e0e8;
+  --fp-surface-container-high: #d0d0d8;
+  --fp-primary: #3030c0;
 }

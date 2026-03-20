@@ -12,7 +12,7 @@ defmodule FounderPadWeb.SettingsLive do
        two_factor_enabled: true,
        compact_ui: false,
        high_contrast: false,
-       selected_theme: :midnight,  # JS hook will sync actual theme on mount
+       selected_theme: :midnight,
        avatar_url: user && user.avatar_url,
        upload_error: nil,
        department: "Engineering",
@@ -495,11 +495,21 @@ defmodule FounderPadWeb.SettingsLive do
   end
 
   def handle_event("toggle_compact_ui", _params, socket) do
-    {:noreply, assign(socket, compact_ui: !socket.assigns.compact_ui)}
+    new_val = !socket.assigns.compact_ui
+
+    {:noreply,
+     socket
+     |> assign(compact_ui: new_val)
+     |> push_event("set-ui-mode", %{compact: new_val})}
   end
 
   def handle_event("toggle_high_contrast", _params, socket) do
-    {:noreply, assign(socket, high_contrast: !socket.assigns.high_contrast)}
+    new_val = !socket.assigns.high_contrast
+
+    {:noreply,
+     socket
+     |> assign(high_contrast: new_val)
+     |> push_event("set-high-contrast", %{enabled: new_val})}
   end
 
   def handle_event("select_theme", %{"theme" => theme}, socket) do
