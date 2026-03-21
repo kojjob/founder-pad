@@ -109,10 +109,14 @@ defmodule FounderPadWeb.TeamLive do
   def handle_event("send_invites", _, socket) do
     org_id = socket.assigns.org_id
     role = String.to_existing_atom(socket.assigns.invite_role)
+
+    # Include any email still in the input field
+    pending = String.trim(socket.assigns.invite_email_input)
     emails = socket.assigns.invite_emails
+    emails = if pending != "" and pending not in emails, do: emails ++ [pending], else: emails
 
     if emails == [] do
-      {:noreply, assign(socket, invite_error: "Add at least one email address")}
+      {:noreply, assign(socket, invite_error: "Enter an email address")}
     else
       {success, errors} = process_invites(emails, org_id, role)
 
@@ -552,11 +556,10 @@ defmodule FounderPadWeb.TeamLive do
             <%!-- Submit --%>
             <button
               phx-click="send_invites"
-              disabled={@invite_emails == []}
-              class="w-full primary-gradient py-3 rounded-lg text-sm font-bold transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              class="w-full primary-gradient py-3 rounded-lg text-sm font-bold transition-all flex items-center justify-center gap-2"
             >
               <span class="material-symbols-outlined text-lg">group_add</span>
-              {if length(@invite_emails) > 0, do: "Add #{length(@invite_emails)} Member(s)", else: "Add Members"}
+              {if length(@invite_emails) > 0, do: "Add #{length(@invite_emails)} Member(s)", else: "Add Member"}
             </button>
           </div>
         </div>
