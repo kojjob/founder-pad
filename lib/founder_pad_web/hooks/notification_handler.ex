@@ -56,6 +56,40 @@ defmodule FounderPadWeb.Hooks.NotificationHandler do
     end
   end
 
+  defp handle_notification_event("global_search", %{"q" => query}, socket) do
+    query = String.trim(query) |> String.downcase()
+
+    path =
+      cond do
+        query == "" ->
+          nil
+
+        String.contains?(query, "agent") ->
+          "/agents"
+
+        String.contains?(query, "bill") or String.contains?(query, "plan") ->
+          "/billing"
+
+        String.contains?(query, "team") or String.contains?(query, "member") ->
+          "/team"
+
+        String.contains?(query, "setting") ->
+          "/settings"
+
+        String.contains?(query, "work") ->
+          "/workspaces"
+
+        true ->
+          "/activity"
+      end
+
+    if path do
+      {:halt, push_navigate(socket, to: path)}
+    else
+      {:halt, socket}
+    end
+  end
+
   defp handle_notification_event(_event, _params, socket), do: {:cont, socket}
 
   defp load_unread_notifications(nil), do: []
