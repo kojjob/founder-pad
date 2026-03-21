@@ -79,7 +79,7 @@ defmodule FounderPadWeb.AgentDetailLiveTest do
 
       html =
         view
-        |> form("form", %{message: "Hello agent"})
+        |> form("form[phx-submit=send_message]", %{message: "Hello agent"})
         |> render_submit()
 
       assert html =~ "Hello agent"
@@ -95,7 +95,7 @@ defmodule FounderPadWeb.AgentDetailLiveTest do
       view |> element("button[phx-value-tab=chat]") |> render_click()
 
       view
-      |> form("form", %{message: "Test message"})
+      |> form("form[phx-submit=send_message]", %{message: "Test message"})
       |> render_submit()
 
       assert_enqueued(
@@ -114,7 +114,7 @@ defmodule FounderPadWeb.AgentDetailLiveTest do
       view |> element("button[phx-value-tab=chat]") |> render_click()
 
       view
-      |> form("form", %{message: ""})
+      |> form("form[phx-submit=send_message]", %{message: ""})
       |> render_submit()
 
       refute_enqueued(worker: FounderPad.AI.Workers.AgentRunner)
