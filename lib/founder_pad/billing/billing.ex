@@ -18,5 +18,10 @@ defmodule FounderPad.Billing do
       define :create_usage_record, action: :create
       define :list_usage_records, action: :read
     end
+
+    resource FounderPad.Billing.Invoice do
+      define :create_invoice, action: :create
+      define :list_invoices, action: :read
+    end
   end
 end
