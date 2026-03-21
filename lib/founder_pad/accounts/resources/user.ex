@@ -53,6 +53,8 @@ defmodule FounderPad.Accounts.User do
 
     attribute :avatar_url, :string, public?: true
 
+    attribute :preferences, :map, default: %{}, public?: true
+
     attribute :confirmed_at, :utc_datetime_usec, public?: true
 
     timestamps()
@@ -84,7 +86,30 @@ defmodule FounderPad.Accounts.User do
     defaults [:read]
 
     update :update_profile do
-      accept [:name, :avatar_url]
+      accept [:name, :avatar_url, :preferences]
+    end
+
+    update :change_password do
+      require_atomic? false
+      accept []
+
+      argument :current_password, :string, allow_nil?: false, sensitive?: true
+      argument :password, :string, allow_nil?: false, sensitive?: true
+      argument :password_confirmation, :string, allow_nil?: false, sensitive?: true
+
+      validate confirm(:password, :password_confirmation)
+
+      change fn changeset, _ctx ->
+        current = Ash.Changeset.get_argument(changeset, :current_password)
+        user = changeset.data
+
+        if Bcrypt.verify_pass(current, user.hashed_password) do
+          hashed = Bcrypt.hash_pwd_salt(Ash.Changeset.get_argument(changeset, :password))
+          Ash.Changeset.force_change_attribute(changeset, :hashed_password, hashed)
+        else
+          Ash.Changeset.add_error(changeset, field: :current_password, message: "is incorrect")
+        end
+      end
     end
 
     destroy :destroy do
