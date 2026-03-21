@@ -445,7 +445,7 @@ defmodule FounderPadWeb.TeamLive do
 
       <%!-- ═══ Enhanced Invite Modal ═══ --%>
       <div :if={@show_invite_modal} class="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm">
-        <div class="bg-surface-container rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden" phx-click-away="close_invite_modal">
+        <div class="bg-surface-container rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden">
           <%!-- Modal Header --%>
           <div class="px-8 pt-8 pb-4">
             <div class="flex justify-between items-center mb-2">
@@ -481,7 +481,7 @@ defmodule FounderPadWeb.TeamLive do
             </div>
 
             <%!-- Email input with add button --%>
-            <form phx-submit="add_invite_email" class="flex gap-2">
+            <form id="add-email-form" phx-submit="add_invite_email" class="flex gap-2">
               <div class="flex-1 relative">
                 <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant/40 text-lg">mail</span>
                 <input
@@ -561,7 +561,7 @@ defmodule FounderPadWeb.TeamLive do
 
       <%!-- ═══ Manage Seats Modal ═══ --%>
       <div :if={@show_seats_modal} class="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm">
-        <div class="bg-surface-container rounded-2xl p-8 w-full max-w-md shadow-2xl space-y-6" phx-click-away="close_seats_modal">
+        <div class="bg-surface-container rounded-2xl p-8 w-full max-w-md shadow-2xl space-y-6">
           <div class="flex justify-between items-center">
             <h2 class="text-xl font-bold font-headline text-on-surface">Manage Seats</h2>
             <button phx-click="close_seats_modal" class="p-1 text-on-surface-variant hover:text-on-surface rounded-lg hover:bg-surface-container-high transition-colors">
