@@ -8,7 +8,7 @@ defmodule FounderPad.Notifications.BillingMailer do
 
   def subscription_created(user, plan) do
     new()
-    |> to({user.name || "User", user.email})
+    |> to({user.name || "User", to_string(user.email)})
     |> from(@from)
     |> subject("Welcome to #{plan.name}!")
     |> html_body("""
@@ -25,7 +25,7 @@ defmodule FounderPad.Notifications.BillingMailer do
 
   def payment_failed(user) do
     new()
-    |> to({user.name || "User", user.email})
+    |> to({user.name || "User", to_string(user.email)})
     |> from(@from)
     |> subject("Payment failed — action required")
     |> html_body("""
@@ -39,7 +39,7 @@ defmodule FounderPad.Notifications.BillingMailer do
 
   def subscription_canceled(user, plan) do
     new()
-    |> to({user.name || "User", user.email})
+    |> to({user.name || "User", to_string(user.email)})
     |> from(@from)
     |> subject("Your #{plan.name} subscription has been canceled")
     |> html_body("""

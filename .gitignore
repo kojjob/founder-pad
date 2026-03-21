@@ -35,3 +35,4 @@ founder_pad-*.tar
 npm-debug.log
 /assets/node_modules/
 
+stitch/

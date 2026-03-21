@@ -82,6 +82,21 @@ defmodule FounderPad.Factory do
     |> Ash.create!()
   end
 
+  def create_invoice!(org, attrs \\ %{}) do
+    default = %{
+      invoice_number: "INV-#{System.unique_integer([:positive])}",
+      amount_cents: 14900,
+      status: :paid,
+      period_start: Date.utc_today() |> Date.beginning_of_month(),
+      period_end: Date.utc_today() |> Date.end_of_month(),
+      organisation_id: org.id
+    }
+
+    FounderPad.Billing.Invoice
+    |> Ash.Changeset.for_create(:create, Map.merge(default, Map.new(attrs)))
+    |> Ash.create!()
+  end
+
   def create_conversation_chain! do
     org = create_organisation!()
     user = create_user!()

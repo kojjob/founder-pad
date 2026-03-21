@@ -35,18 +35,23 @@ defmodule FounderPadWeb.Router do
     get "/sitemap.xml", SitemapController, :index
     post "/checkout/:plan_slug", CheckoutController, :create
     live "/", LandingLive
+    live "/docs", Docs.DocsLive
+    live "/docs/api", Docs.ApiSpecsLive
+    live "/docs/changelog", Docs.ChangelogLive
 
     # App routes with sidebar layout
     live_session :app,
       layout: {FounderPadWeb.Layouts, :app},
       on_mount: [
         {FounderPadWeb.Hooks.AssignDefaults, :default},
-        {FounderPadWeb.Hooks.RequireAuth, :default}
+        {FounderPadWeb.Hooks.RequireAuth, :default},
+        {FounderPadWeb.Hooks.NotificationHandler, :default}
       ] do
       live "/dashboard", DashboardLive
       live "/activity", ActivityLive
       live "/workspaces", WorkspacesLive
       live "/agents", AgentsLive
+      live "/agents/new", AgentCreateLive
       live "/agents/:id", AgentDetailLive
       live "/billing", BillingLive
       live "/team", TeamLive

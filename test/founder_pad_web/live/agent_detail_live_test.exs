@@ -74,9 +74,12 @@ defmodule FounderPadWeb.AgentDetailLiveTest do
 
       {:ok, view, _html} = live(conn, "/agents/#{agent.id}")
 
+      # Switch to chat tab first (form is only rendered when chat tab is active)
+      view |> element("button[phx-value-tab=chat]") |> render_click()
+
       html =
         view
-        |> form("form", %{message: "Hello agent"})
+        |> form("form[phx-submit=send_message]", %{message: "Hello agent"})
         |> render_submit()
 
       assert html =~ "Hello agent"
@@ -88,8 +91,11 @@ defmodule FounderPadWeb.AgentDetailLiveTest do
 
       {:ok, view, _html} = live(conn, "/agents/#{agent.id}")
 
+      # Switch to chat tab first
+      view |> element("button[phx-value-tab=chat]") |> render_click()
+
       view
-      |> form("form", %{message: "Test message"})
+      |> form("form[phx-submit=send_message]", %{message: "Test message"})
       |> render_submit()
 
       assert_enqueued(
@@ -104,8 +110,11 @@ defmodule FounderPadWeb.AgentDetailLiveTest do
 
       {:ok, view, _html} = live(conn, "/agents/#{agent.id}")
 
+      # Switch to chat tab first
+      view |> element("button[phx-value-tab=chat]") |> render_click()
+
       view
-      |> form("form", %{message: ""})
+      |> form("form[phx-submit=send_message]", %{message: ""})
       |> render_submit()
 
       refute_enqueued(worker: FounderPad.AI.Workers.AgentRunner)
@@ -118,6 +127,9 @@ defmodule FounderPadWeb.AgentDetailLiveTest do
       agent = create_agent!(org)
 
       {:ok, view, _html} = live(conn, "/agents/#{agent.id}")
+
+      # Switch to chat tab so messages are rendered
+      view |> element("button[phx-value-tab=chat]") |> render_click()
 
       # Get conversation_id from the LiveView process state
       state = :sys.get_state(view.pid)

@@ -86,5 +86,10 @@ defmodule FounderPad.Billing.Subscription do
       argument :organisation_id, :uuid, allow_nil?: false
       filter expr(organisation_id == ^arg(:organisation_id) and status in [:active, :trialing])
     end
+
+    read :by_stripe_id do
+      argument :stripe_subscription_id, :string, allow_nil?: false
+      filter expr(stripe_subscription_id == ^arg(:stripe_subscription_id))
+    end
   end
 end

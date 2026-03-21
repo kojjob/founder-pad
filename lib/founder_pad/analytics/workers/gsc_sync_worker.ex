@@ -11,33 +11,27 @@ defmodule FounderPad.Analytics.Workers.GscSyncWorker do
   def perform(%Oban.Job{args: %{"organisation_id" => org_id}}) do
     Logger.info("GSC sync starting for org #{org_id}")
 
-    case fetch_gsc_data(org_id) do
-      {:ok, data} ->
-        Enum.each(data, fn row ->
-          FounderPad.Analytics.SearchConsoleData
-          |> Ash.Changeset.for_create(:create, Map.put(row, :organisation_id, org_id))
-          |> Ash.create()
-        end)
+    {:ok, data} = fetch_gsc_data(org_id)
 
-        Logger.info("GSC sync completed for org #{org_id}: #{length(data)} rows")
-        :ok
+    Enum.each(data, fn row ->
+      FounderPad.Analytics.SearchConsoleData
+      |> Ash.Changeset.for_create(:create, Map.put(row, :organisation_id, org_id))
+      |> Ash.create()
+    end)
 
-      {:error, reason} ->
-        Logger.error("GSC sync failed for org #{org_id}: #{inspect(reason)}")
-        {:error, reason}
-    end
+    Logger.info("GSC sync completed for org #{org_id}: #{length(data)} rows")
+    :ok
   end
 
   defp fetch_gsc_data(_org_id) do
-    # Stub: returns empty data until GSC API credentials are configured
-    gsc_configured? = Application.get_env(:founder_pad, :gsc_credentials) != nil
+    case Application.get_env(:founder_pad, :gsc_credentials) do
+      nil ->
+        Logger.debug("GSC not configured, skipping sync")
+        {:ok, []}
 
-    if gsc_configured? do
-      # TODO: Call actual Google Search Console API
-      {:ok, []}
-    else
-      Logger.debug("GSC not configured, skipping sync")
-      {:ok, []}
+      _credentials ->
+        # TODO: Call actual Google Search Console API with credentials
+        {:ok, []}
     end
   end
 end
