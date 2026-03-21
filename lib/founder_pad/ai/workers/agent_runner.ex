@@ -10,6 +10,7 @@ defmodule FounderPad.AI.Workers.AgentRunner do
 
   alias FounderPad.AI
   alias FounderPad.Notifications
+  alias FounderPad.Notifications.AgentMailer
 
   @impl Oban.Worker
   def perform(%Oban.Job{
@@ -52,7 +53,7 @@ defmodule FounderPad.AI.Workers.AgentRunner do
     end
   end
 
-  @doc "Creates an agent_completed notification and broadcasts it to the user."
+  @doc "Creates an agent_completed notification, sends email, and broadcasts it to the user."
   def notify_agent_completed(conversation, agent) do
     user_id = conversation.user_id
 
@@ -69,12 +70,17 @@ defmodule FounderPad.AI.Workers.AgentRunner do
         |> Ash.create()
 
       Notifications.broadcast_to_user(user_id, notif)
+
+      # Send email notification
+      with {:ok, user} <- Ash.get(FounderPad.Accounts.User, user_id) do
+        AgentMailer.agent_run_completed(user, agent, conversation)
+      end
     end
 
     :ok
   end
 
-  @doc "Creates an agent_failed notification and broadcasts it to the user."
+  @doc "Creates an agent_failed notification, sends email, and broadcasts it to the user."
   def notify_agent_failed(conversation, reason) do
     user_id = conversation.user_id
 
@@ -90,6 +96,23 @@ defmodule FounderPad.AI.Workers.AgentRunner do
         |> Ash.create()
 
       Notifications.broadcast_to_user(user_id, notif)
+
+      # Send email notification — load user and use agent from conversation
+      with {:ok, user} <- Ash.get(FounderPad.Accounts.User, user_id) do
+        agent =
+          if is_map(conversation) and Map.has_key?(conversation, :agent),
+            do: conversation.agent,
+            else: nil
+
+        if agent do
+          AgentMailer.agent_run_failed(user, agent, reason)
+        else
+          case Ash.get(AI.Conversation, conversation.id, load: [:agent]) do
+            {:ok, conv} -> AgentMailer.agent_run_failed(user, conv.agent, reason)
+            _ -> :ok
+          end
+        end
+      end
     end
 
     :ok

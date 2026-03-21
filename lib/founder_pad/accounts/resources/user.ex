@@ -82,6 +82,10 @@ defmodule FounderPad.Accounts.User do
     end
   end
 
+  changes do
+    change FounderPad.Accounts.Changes.SendWelcomeEmail, on: [:create], where: [action_is(:register_with_password)]
+  end
+
   actions do
     defaults [:read]
 
