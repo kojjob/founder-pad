@@ -26,7 +26,10 @@ defmodule FounderPadWeb.TeamLive do
        used_seats: length(members),
        active_now: Enum.count(members, fn m -> m.status == :active end),
        pending: 0,
-       next_billing: "Oct 24"
+       next_billing: "Oct 24",
+       show_invite_modal: false,
+       invite_error: nil,
+       org_id: get_user_org_id(socket.assigns[:current_user])
      )}
   end
 
@@ -36,6 +39,60 @@ defmodule FounderPadWeb.TeamLive do
 
   def handle_event("change_page", %{"page" => page}, socket) do
     {:noreply, assign(socket, current_page: String.to_integer(page))}
+  end
+
+  def handle_event("show_invite_modal", _, socket) do
+    {:noreply, assign(socket, show_invite_modal: true, invite_error: nil)}
+  end
+
+  def handle_event("close_invite_modal", _, socket) do
+    {:noreply, assign(socket, show_invite_modal: false)}
+  end
+
+  def handle_event("send_invite", %{"email" => email, "role" => role}, socket) do
+    org_id = socket.assigns.org_id
+    email = String.trim(email)
+
+    case FounderPad.Accounts.User |> Ash.Query.filter(email == ^email) |> Ash.read() do
+      {:ok, [user | _]} ->
+        case FounderPad.Accounts.Membership
+             |> Ash.Changeset.for_create(:create, %{
+               role: String.to_existing_atom(role),
+               user_id: user.id,
+               organisation_id: org_id
+             })
+             |> Ash.create() do
+          {:ok, _} ->
+            members = reload_members()
+
+            {:noreply,
+             socket
+             |> assign(show_invite_modal: false, members: members, used_seats: length(members))
+             |> put_flash(:info, "#{email} added to team")}
+
+          {:error, _} ->
+            {:noreply, assign(socket, invite_error: "User is already a team member")}
+        end
+
+      _ ->
+        {:noreply, assign(socket, invite_error: "No user found with that email")}
+    end
+  end
+
+  def handle_event("delete_member", %{"id" => id}, socket) do
+    case Ash.get(FounderPad.Accounts.Membership, id) do
+      {:ok, membership} ->
+        membership |> Ash.Changeset.for_destroy(:destroy) |> Ash.destroy()
+        members = reload_members()
+
+        {:noreply,
+         socket
+         |> assign(members: members, used_seats: length(members))
+         |> put_flash(:info, "Member removed")}
+
+      _ ->
+        {:noreply, put_flash(socket, :error, "Member not found")}
+    end
   end
 
   def render(assigns) do
@@ -57,7 +114,7 @@ defmodule FounderPadWeb.TeamLive do
             the Agent Architecture cluster.
           </p>
         </div>
-        <button class="primary-gradient text-on-primary px-6 py-3 rounded-lg flex items-center gap-2 font-label font-semibold text-xs tracking-wider uppercase editorial-shadow hover:scale-[1.02] transition-transform whitespace-nowrap">
+        <button phx-click="show_invite_modal" class="primary-gradient text-on-primary px-6 py-3 rounded-lg flex items-center gap-2 font-label font-semibold text-xs tracking-wider uppercase editorial-shadow hover:scale-[1.02] transition-transform whitespace-nowrap">
           <span class="material-symbols-outlined text-sm">person_add</span>
           Invite New Member
         </button>
@@ -227,7 +284,12 @@ defmodule FounderPadWeb.TeamLive do
                       <button class="p-1.5 rounded-lg text-on-surface-variant/40 hover:text-primary hover:bg-primary/5 transition-all">
                         <span class="material-symbols-outlined text-lg">edit</span>
                       </button>
-                      <button class="p-1.5 rounded-lg text-on-surface-variant/40 hover:text-error hover:bg-error/5 transition-all">
+                      <button
+                        phx-click="delete_member"
+                        phx-value-id={m.id}
+                        data-confirm="Remove this member?"
+                        class="p-1.5 rounded-lg text-on-surface-variant/40 hover:text-error hover:bg-error/5 transition-all"
+                      >
                         <span class="material-symbols-outlined text-lg">delete</span>
                       </button>
                       <button class="p-1.5 rounded-lg text-on-surface-variant/40 hover:text-on-surface hover:bg-surface-container-highest/50 transition-all">
@@ -287,6 +349,34 @@ defmodule FounderPadWeb.TeamLive do
           <span class="material-symbols-outlined text-sm">arrow_forward</span>
         </button>
       </div>
+
+      <%!-- Invite Modal --%>
+      <div :if={@show_invite_modal} class="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm" phx-click="close_invite_modal">
+        <div class="bg-surface-container rounded-2xl p-8 w-full max-w-md space-y-6 shadow-2xl" phx-click-away="close_invite_modal">
+          <div class="flex justify-between items-center">
+            <h2 class="text-xl font-bold font-headline">Invite Team Member</h2>
+            <button phx-click="close_invite_modal" class="text-on-surface-variant hover:text-on-surface">
+              <span class="material-symbols-outlined">close</span>
+            </button>
+          </div>
+          <div :if={@invite_error} class="bg-error/10 text-error text-sm p-3 rounded-lg">{@invite_error}</div>
+          <form phx-submit="send_invite" id="invite-form" class="space-y-4">
+            <div>
+              <label class="text-xs font-bold uppercase tracking-wider text-on-surface-variant mb-1 block">Email</label>
+              <input type="email" name="email" required placeholder="teammate@company.com"
+                class="w-full bg-surface-container-highest border-none rounded-lg px-4 py-3 text-sm text-on-surface focus:ring-2 focus:ring-primary" />
+            </div>
+            <div>
+              <label class="text-xs font-bold uppercase tracking-wider text-on-surface-variant mb-1 block">Role</label>
+              <select name="role" class="w-full bg-surface-container-highest border-none rounded-lg px-4 py-3 text-sm text-on-surface focus:ring-2 focus:ring-primary">
+                <option value="member">Member</option>
+                <option value="admin">Admin</option>
+              </select>
+            </div>
+            <button type="submit" class="w-full primary-gradient py-3 rounded-lg text-sm font-bold">Add to Team</button>
+          </form>
+        </div>
+      </div>
     </div>
     """
   end
@@ -335,10 +425,33 @@ defmodule FounderPadWeb.TeamLive do
   defp status_label(:offline), do: "Offline"
   defp status_label(_), do: "Offline"
 
+  defp get_user_org_id(nil), do: nil
+
+  defp get_user_org_id(user) do
+    case FounderPad.Accounts.Membership
+         |> Ash.Query.filter(user_id: user.id)
+         |> Ash.Query.limit(1)
+         |> Ash.read() do
+      {:ok, [m | _]} -> m.organisation_id
+      _ -> nil
+    end
+  end
+
+  defp reload_members do
+    case FounderPad.Accounts.Membership
+         |> Ash.Query.new()
+         |> Ash.Query.load([:user])
+         |> Ash.read() do
+      {:ok, memberships} -> Enum.map(memberships, &format_member/1)
+      _ -> []
+    end
+  end
+
   defp format_member(membership) do
     user = membership.user
 
     %{
+      id: membership.id,
       name: user.name || "Unnamed User",
       email: to_string(user.email),
       role: membership.role,
@@ -351,6 +464,7 @@ defmodule FounderPadWeb.TeamLive do
   defp sample_members do
     [
       %{
+        id: "sample-1",
         name: "Adrian Stern",
         email: "a.stern@agent-os.dev",
         role: :owner,
@@ -359,6 +473,7 @@ defmodule FounderPadWeb.TeamLive do
         avatar: nil
       },
       %{
+        id: "sample-2",
         name: "Elena Rodriguez",
         email: "elena.r@company.com",
         role: :developer,
@@ -367,6 +482,7 @@ defmodule FounderPadWeb.TeamLive do
         avatar: nil
       },
       %{
+        id: "sample-3",
         name: "Marcus Holloway",
         email: "m.holloway@org.io",
         role: :contributor,
@@ -375,6 +491,7 @@ defmodule FounderPadWeb.TeamLive do
         avatar: nil
       },
       %{
+        id: "sample-4",
         name: "Sarah Chen",
         email: "sarah@company.com",
         role: :developer,
