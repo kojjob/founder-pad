@@ -6,9 +6,11 @@ defmodule FounderPadWeb.BillingLive do
   def mount(params, _session, socket) do
     plans = load_plans()
     current_plan = find_current_plan(plans)
-    usage = load_usage()
-    invoices = load_invoices()
     user = socket.assigns[:current_user]
+    org_id = get_user_org_id(user)
+    plan_resource = Enum.find(plans, List.first(plans), &(&1.slug == current_plan.slug))
+    usage = load_usage(org_id, plan_resource)
+    invoices = load_invoices(org_id)
 
     socket =
       socket
@@ -19,6 +21,7 @@ defmodule FounderPadWeb.BillingLive do
         current_plan: current_plan,
         usage: usage,
         invoices: invoices,
+        org_id: org_id,
         payment: %{last_four: "4242", expires: "12/26"},
         billing_contact: %{
           legal_entity: if(user, do: "#{user.name || "Your"} Organization", else: "Your Organization"),
@@ -83,36 +86,84 @@ defmodule FounderPadWeb.BillingLive do
     end
   end
 
-  defp load_usage do
-    usage_count =
-      case FounderPad.Billing.UsageRecord |> Ash.count() do
-        {:ok, n} -> n
-        _ -> 0
-      end
-
-    agent_count =
-      case FounderPad.AI.Agent |> Ash.count() do
-        {:ok, n} -> n
-        _ -> 0
-      end
+  defp load_usage(org_id, plan) do
+    usage = count_org_usage(org_id)
+    agents = count_org_agents(org_id)
+    api_limit = if(plan, do: plan.max_api_calls_per_month, else: 1000)
+    agents_limit = if(plan, do: plan.max_agents, else: 3)
 
     %{
-      compute_used: min(usage_count * 10, 1000),
-      compute_limit: 1000,
-      token_used: usage_count * 50_000,
-      token_limit: 50_000_000,
-      agents_used: agent_count,
-      agents_limit: 50
+      compute_used: usage,
+      compute_limit: api_limit,
+      compute_display: "#{usage} / #{format_number(api_limit)}",
+      compute_pct: usage_pct(usage, api_limit),
+      agents_used: agents,
+      agents_limit: agents_limit,
+      token_used: usage * 500,
+      token_limit: api_limit * 500,
+      token_display: "#{format_number(usage * 500)} / #{format_number(api_limit * 500)}",
+      token_pct: usage_pct(usage * 500, api_limit * 500)
     }
   end
 
-  defp load_invoices do
-    # In production, query from Stripe. For now, generate from subscription history
-    [
-      %{id: "INV-2026-003", date: "Mar 1, 2026", amount: "$79.00", status: :paid},
-      %{id: "INV-2026-002", date: "Feb 1, 2026", amount: "$79.00", status: :paid},
-      %{id: "INV-2026-001", date: "Jan 1, 2026", amount: "$29.00", status: :paid}
-    ]
+  defp count_org_usage(nil), do: 0
+
+  defp count_org_usage(org_id) do
+    case FounderPad.Billing.UsageRecord
+         |> Ash.Query.filter(organisation_id: org_id)
+         |> Ash.count() do
+      {:ok, n} -> n
+      _ -> 0
+    end
+  end
+
+  defp count_org_agents(nil), do: 0
+
+  defp count_org_agents(org_id) do
+    case FounderPad.AI.Agent
+         |> Ash.Query.filter(organisation_id: org_id)
+         |> Ash.count() do
+      {:ok, n} -> n
+      _ -> 0
+    end
+  end
+
+  defp load_invoices(nil), do: []
+
+  defp load_invoices(org_id) do
+    case FounderPad.Billing.Invoice
+         |> Ash.Query.filter(organisation_id: org_id)
+         |> Ash.Query.sort(period_start: :desc)
+         |> Ash.Query.limit(10)
+         |> Ash.read() do
+      {:ok, invs} -> Enum.map(invs, &format_invoice/1)
+      _ -> []
+    end
+  end
+
+  defp format_invoice(inv) do
+    %{
+      id: inv.invoice_number,
+      date:
+        if(inv.period_start,
+          do: Calendar.strftime(inv.period_start, "%b %d, %Y"),
+          else: "—"
+        ),
+      amount: "$#{:erlang.float_to_binary(inv.amount_cents / 100, decimals: 2)}",
+      status: inv.status
+    }
+  end
+
+  defp get_user_org_id(nil), do: nil
+
+  defp get_user_org_id(user) do
+    case FounderPad.Accounts.Membership
+         |> Ash.Query.filter(user_id: user.id)
+         |> Ash.Query.limit(1)
+         |> Ash.read() do
+      {:ok, [membership | _]} -> membership.organisation_id
+      _ -> nil
+    end
   end
 
   defp format_number(n) when n >= 1_000_000, do: "#{Float.round(n / 1_000_000, 1)}M"
@@ -368,6 +419,12 @@ defmodule FounderPadWeb.BillingLive do
               </tr>
             </thead>
             <tbody>
+              <tr :if={@invoices == []} >
+                <td colspan="5" class="px-6 py-12 text-center text-on-surface-variant text-sm">
+                  <span class="material-symbols-outlined text-3xl mb-2 block opacity-40">receipt_long</span>
+                  No invoices yet
+                </td>
+              </tr>
               <tr :for={inv <- @invoices} class="hover:bg-surface-container-high transition-colors group">
                 <td class="px-6 py-4 font-mono text-sm text-on-surface-variant">{inv.id}</td>
                 <td class="px-6 py-4 text-sm font-medium">{inv.date}</td>

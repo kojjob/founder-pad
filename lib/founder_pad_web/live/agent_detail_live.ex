@@ -30,7 +30,10 @@ defmodule FounderPadWeb.AgentDetailLive do
            activities: load_activities(agent.id),
            auto_recovery: true,
            temperature: agent.temperature,
-           max_tokens: agent.max_tokens
+           max_tokens: agent.max_tokens,
+           system_prompt: agent.system_prompt,
+           model: agent.model,
+           provider: agent.provider
          )}
 
       {:error, _} ->
@@ -126,11 +129,31 @@ defmodule FounderPadWeb.AgentDetailLive do
     {:noreply, assign(socket, max_tokens: t)}
   end
 
+  def handle_event("update_system_prompt", %{"value" => val}, socket) do
+    {:noreply, assign(socket, system_prompt: val)}
+  end
+
+  def handle_event("change_provider", %{"provider" => provider}, socket) do
+    provider_atom = String.to_existing_atom(provider)
+    default_model = if provider_atom == :openai, do: "gpt-4o", else: "claude-sonnet-4-20250514"
+    {:noreply, assign(socket, provider: provider_atom, model: default_model)}
+  end
+
+  def handle_event("change_model", %{"model" => model}, socket) do
+    {:noreply, assign(socket, model: model)}
+  end
+
   def handle_event("save_config", _, socket) do
     agent = socket.assigns.agent
 
     case agent
-         |> Ash.Changeset.for_update(:update, %{temperature: socket.assigns.temperature, max_tokens: socket.assigns.max_tokens})
+         |> Ash.Changeset.for_update(:update, %{
+           temperature: socket.assigns.temperature,
+           max_tokens: socket.assigns.max_tokens,
+           system_prompt: socket.assigns.system_prompt,
+           model: socket.assigns.model,
+           provider: socket.assigns.provider
+         })
          |> Ash.update() do
       {:ok, updated} ->
         {:noreply, socket |> assign(agent: updated) |> put_flash(:info, "Configuration saved")}
@@ -339,6 +362,42 @@ defmodule FounderPadWeb.AgentDetailLive do
             <h3 class="font-bold text-lg text-on-surface mb-6">Parameters</h3>
             <div class="space-y-8">
               <div>
+                <p class="text-[10px] font-bold tracking-wider uppercase text-on-surface-variant mb-2">System Prompt</p>
+                <textarea
+                  phx-change="update_system_prompt"
+                  name="value"
+                  rows="4"
+                  class="w-full bg-surface-container-highest rounded-lg px-4 py-3 text-sm text-on-surface placeholder:text-on-surface-variant/50 focus:ring-1 focus:ring-primary resize-y"
+                  placeholder="Enter the system prompt for this agent..."
+                >{@system_prompt}</textarea>
+              </div>
+
+              <div>
+                <p class="text-[10px] font-bold tracking-wider uppercase text-on-surface-variant mb-2">Provider</p>
+                <select
+                  phx-change="change_provider"
+                  name="provider"
+                  class="w-full bg-surface-container-highest rounded-lg px-4 py-3 text-sm text-on-surface focus:ring-1 focus:ring-primary"
+                >
+                  <option value="anthropic" selected={@provider == :anthropic}>Anthropic</option>
+                  <option value="openai" selected={@provider == :openai}>OpenAI</option>
+                </select>
+              </div>
+
+              <div>
+                <p class="text-[10px] font-bold tracking-wider uppercase text-on-surface-variant mb-2">Model</p>
+                <select
+                  phx-change="change_model"
+                  name="model"
+                  class="w-full bg-surface-container-highest rounded-lg px-4 py-3 text-sm text-on-surface focus:ring-1 focus:ring-primary"
+                >
+                  <option :for={{label, value} <- models_for_provider(@provider)} value={value} selected={@model == value}>
+                    {label}
+                  </option>
+                </select>
+              </div>
+
+              <div>
                 <div class="flex justify-between items-center mb-3">
                   <p class="text-[10px] font-bold tracking-wider uppercase text-on-surface-variant">Temperature</p>
                   <span class="text-sm font-mono text-primary font-bold">{@temperature}</span>
@@ -348,14 +407,6 @@ defmodule FounderPadWeb.AgentDetailLive do
                   class="w-full h-1.5 bg-surface-container-highest rounded-full appearance-none cursor-pointer accent-primary" />
                 <div class="flex justify-between text-[10px] text-on-surface-variant mt-1">
                   <span>Precise</span><span>Creative</span>
-                </div>
-              </div>
-
-              <div>
-                <p class="text-[10px] font-bold tracking-wider uppercase text-on-surface-variant mb-2">Model</p>
-                <div class="w-full bg-surface-container-high rounded-lg px-4 py-3 flex items-center justify-between text-sm text-on-surface">
-                  <span>{@agent.model}</span>
-                  <span class="text-xs font-mono text-on-surface-variant">{@agent.provider}</span>
                 </div>
               </div>
 
@@ -480,6 +531,10 @@ defmodule FounderPadWeb.AgentDetailLive do
     </span>
     """
   end
+
+  defp models_for_provider(:anthropic), do: [{"Claude Sonnet 4", "claude-sonnet-4-20250514"}, {"Claude Opus 4", "claude-opus-4-20250514"}]
+  defp models_for_provider(:openai), do: [{"GPT-4o", "gpt-4o"}, {"GPT-4o Mini", "gpt-4o-mini"}]
+  defp models_for_provider(_), do: models_for_provider(:anthropic)
 
   defp log_color("INFO"), do: "text-[#58a6ff]"
   defp log_color("DEBUG"), do: "text-[#8b949e]"

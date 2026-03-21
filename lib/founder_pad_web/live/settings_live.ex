@@ -3,6 +3,7 @@ defmodule FounderPadWeb.SettingsLive do
 
   def mount(_params, _session, socket) do
     user = socket.assigns.current_user
+    prefs = (user && user.preferences) || %{}
 
     {:ok,
      socket
@@ -10,13 +11,15 @@ defmodule FounderPadWeb.SettingsLive do
        active_nav: :settings,
        page_title: "Settings",
        two_factor_enabled: true,
-       compact_ui: false,
-       high_contrast: false,
-       selected_theme: :midnight,
+       compact_ui: prefs["compact_ui"] || false,
+       high_contrast: prefs["high_contrast"] || false,
+       selected_theme: (prefs["theme"] && String.to_existing_atom(prefs["theme"])) || :midnight,
        avatar_url: user && user.avatar_url,
        upload_error: nil,
        department: "Engineering",
        show_delete_confirm: false,
+       show_password_form: false,
+       password_error: nil,
        login_history: load_login_history(user)
      )
      |> allow_upload(:avatar,
@@ -210,7 +213,7 @@ defmodule FounderPadWeb.SettingsLive do
 
             <%!-- Action Buttons --%>
             <div class="space-y-3 mb-6">
-              <button phx-click="change_password" class="w-full flex items-center justify-between bg-surface-container-low rounded-lg px-4 py-3 hover:bg-surface-container-highest transition-colors group">
+              <button phx-click="show_password_form" class="w-full flex items-center justify-between bg-surface-container-low rounded-lg px-4 py-3 hover:bg-surface-container-highest transition-colors group">
                 <div class="flex items-center gap-3">
                   <span class="material-symbols-outlined text-on-surface-variant text-xl">
                     lock
@@ -221,6 +224,50 @@ defmodule FounderPadWeb.SettingsLive do
                   chevron_right
                 </span>
               </button>
+
+              <%!-- Password Change Form --%>
+              <div :if={@show_password_form} class="bg-surface-container-low rounded-lg p-4 space-y-3">
+                <.form for={%{}} as={:password} phx-submit="submit_password_change" id="password-form" class="space-y-3">
+                  <div>
+                    <label class="block text-xs font-medium text-on-surface-variant mb-1">Current Password</label>
+                    <input
+                      type="password"
+                      name="password[current_password]"
+                      required
+                      class="w-full bg-surface-container-highest border-none rounded-lg px-3 py-2 text-sm text-on-surface focus:ring-1 focus:ring-primary"
+                    />
+                  </div>
+                  <div>
+                    <label class="block text-xs font-medium text-on-surface-variant mb-1">New Password</label>
+                    <input
+                      type="password"
+                      name="password[password]"
+                      required
+                      class="w-full bg-surface-container-highest border-none rounded-lg px-3 py-2 text-sm text-on-surface focus:ring-1 focus:ring-primary"
+                    />
+                  </div>
+                  <div>
+                    <label class="block text-xs font-medium text-on-surface-variant mb-1">Confirm New Password</label>
+                    <input
+                      type="password"
+                      name="password[password_confirmation]"
+                      required
+                      class="w-full bg-surface-container-highest border-none rounded-lg px-3 py-2 text-sm text-on-surface focus:ring-1 focus:ring-primary"
+                    />
+                  </div>
+                  <%= if @password_error do %>
+                    <p class="text-xs text-error">{@password_error}</p>
+                  <% end %>
+                  <div class="flex items-center gap-2 pt-1">
+                    <button type="submit" class="px-4 py-2 bg-primary text-on-primary text-xs font-semibold rounded-lg hover:opacity-90 transition-opacity">
+                      Update Password
+                    </button>
+                    <button type="button" phx-click="hide_password_form" class="px-4 py-2 text-on-surface-variant text-xs font-medium hover:text-on-surface transition-colors">
+                      Cancel
+                    </button>
+                  </div>
+                </.form>
+              </div>
               <button phx-click="view_sessions" class="w-full flex items-center justify-between bg-surface-container-low rounded-lg px-4 py-3 hover:bg-surface-container-highest transition-colors group">
                 <div class="flex items-center gap-3">
                   <span class="material-symbols-outlined text-on-surface-variant text-xl">
@@ -560,8 +607,38 @@ defmodule FounderPadWeb.SettingsLive do
     end
   end
 
-  def handle_event("change_password", _, socket) do
-    {:noreply, put_flash(socket, :info, "Password reset email sent to your inbox")}
+  def handle_event("show_password_form", _, socket) do
+    {:noreply, assign(socket, show_password_form: true, password_error: nil)}
+  end
+
+  def handle_event("hide_password_form", _, socket) do
+    {:noreply, assign(socket, show_password_form: false, password_error: nil)}
+  end
+
+  def handle_event("submit_password_change", %{"password" => params}, socket) do
+    user = socket.assigns.current_user
+
+    case user
+         |> Ash.Changeset.for_update(:change_password, %{
+           current_password: params["current_password"],
+           password: params["password"],
+           password_confirmation: params["password_confirmation"]
+         })
+         |> Ash.update() do
+      {:ok, _updated_user} ->
+        {:noreply,
+         socket
+         |> assign(show_password_form: false, password_error: nil)
+         |> put_flash(:info, "Password changed successfully")}
+
+      {:error, changeset} ->
+        error_msg = extract_password_error(changeset)
+
+        {:noreply,
+         socket
+         |> assign(password_error: error_msg)
+         |> put_flash(:error, error_msg)}
+    end
   end
 
   def handle_event("view_sessions", _, socket) do
@@ -581,6 +658,7 @@ defmodule FounderPadWeb.SettingsLive do
 
   def handle_event("discard_changes", _, socket) do
     user = socket.assigns.current_user
+    prefs = (user && user.preferences) || %{}
 
     {:noreply,
      socket
@@ -588,19 +666,51 @@ defmodule FounderPadWeb.SettingsLive do
        avatar_url: user && user.avatar_url,
        department: "Engineering",
        two_factor_enabled: true,
-       compact_ui: false,
-       high_contrast: false,
-       selected_theme: :midnight
+       compact_ui: prefs["compact_ui"] || false,
+       high_contrast: prefs["high_contrast"] || false,
+       selected_theme: (prefs["theme"] && String.to_existing_atom(prefs["theme"])) || :midnight
      )
      |> put_flash(:info, "Changes discarded")}
   end
 
   def handle_event("save_preferences", _, socket) do
-    {:noreply, put_flash(socket, :info, "Preferences saved successfully")
+    user = socket.assigns.current_user
+
+    prefs = %{
+      "theme" => to_string(socket.assigns.selected_theme),
+      "compact_ui" => socket.assigns.compact_ui,
+      "high_contrast" => socket.assigns.high_contrast
     }
+
+    case user |> Ash.Changeset.for_update(:update_profile, %{preferences: prefs}) |> Ash.update() do
+      {:ok, _} -> {:noreply, put_flash(socket, :info, "Preferences saved successfully")}
+      {:error, _} -> {:noreply, put_flash(socket, :error, "Failed to save preferences")}
+    end
   end
 
   # -- Private helpers --
+
+  defp extract_password_error(error) do
+    errors =
+      case error do
+        %{errors: errors} when is_list(errors) -> errors
+        _ -> []
+      end
+
+    errors
+    |> List.flatten()
+    |> Enum.map(fn
+      %{field: :current_password, message: msg} -> "Current password #{msg}"
+      %{vars: %{field: :current_password}, message: msg} -> "Current password #{msg}"
+      %{message: msg} -> msg
+      err -> inspect(err)
+    end)
+    |> Enum.join(", ")
+    |> case do
+      "" -> "Failed to change password"
+      msg -> msg
+    end
+  end
 
   defp load_login_history(nil), do: []
 
