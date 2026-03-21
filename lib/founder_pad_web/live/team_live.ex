@@ -25,6 +25,7 @@ defmodule FounderPadWeb.TeamLive do
        next_billing: next_billing_date(),
        show_invite_modal: false,
        show_seats_modal: false,
+       new_seat_count: if(plan, do: plan.max_seats, else: 5),
        invite_emails: [],
        invite_email_input: "",
        invite_role: "member",
@@ -190,11 +191,27 @@ defmodule FounderPadWeb.TeamLive do
   # ── Seats Modal ──
 
   def handle_event("show_seats_modal", _, socket) do
-    {:noreply, assign(socket, show_seats_modal: true)}
+    {:noreply, assign(socket, show_seats_modal: true, new_seat_count: socket.assigns.total_seats)}
   end
 
   def handle_event("close_seats_modal", _, socket) do
     {:noreply, assign(socket, show_seats_modal: false)}
+  end
+
+  def handle_event("increment_seats", _, socket) do
+    {:noreply, assign(socket, new_seat_count: socket.assigns.new_seat_count + 1)}
+  end
+
+  def handle_event("decrement_seats", _, socket) do
+    new = max(socket.assigns.used_seats, socket.assigns.new_seat_count - 1)
+    {:noreply, assign(socket, new_seat_count: new)}
+  end
+
+  def handle_event("save_seats", _, socket) do
+    {:noreply,
+     socket
+     |> assign(total_seats: socket.assigns.new_seat_count, show_seats_modal: false)
+     |> put_flash(:info, "Seats updated to #{socket.assigns.new_seat_count}")}
   end
 
   # ── Render ──
@@ -597,18 +614,51 @@ defmodule FounderPadWeb.TeamLive do
               </div>
             </div>
 
+            <%!-- Adjust Seats Controls --%>
+            <div class="p-4 bg-surface-container-high/50 rounded-xl">
+              <p class="text-xs font-bold uppercase tracking-wider text-on-surface-variant mb-3">Adjust Seats</p>
+              <div class="flex items-center justify-center gap-4">
+                <button
+                  phx-click="decrement_seats"
+                  disabled={@new_seat_count <= @used_seats}
+                  class="w-10 h-10 rounded-lg bg-surface-container-highest flex items-center justify-center text-on-surface hover:bg-error/10 hover:text-error transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                >
+                  <span class="material-symbols-outlined text-xl">remove</span>
+                </button>
+                <span class="font-mono text-3xl font-bold text-on-surface min-w-[3ch] text-center">{@new_seat_count}</span>
+                <button
+                  phx-click="increment_seats"
+                  class="w-10 h-10 rounded-lg bg-surface-container-highest flex items-center justify-center text-on-surface hover:bg-primary/10 hover:text-primary transition-colors"
+                >
+                  <span class="material-symbols-outlined text-xl">add</span>
+                </button>
+              </div>
+              <p :if={@new_seat_count != @total_seats} class="text-center text-xs text-on-surface-variant mt-2">
+                {if @new_seat_count > @total_seats, do: "Adding #{@new_seat_count - @total_seats} seat(s)", else: "Removing #{@total_seats - @new_seat_count} seat(s)"}
+              </p>
+            </div>
+
             <div class="p-4 bg-primary/5 rounded-xl">
               <p class="text-xs text-on-surface-variant leading-relaxed">
                 <span class="material-symbols-outlined text-primary text-sm align-middle mr-1">info</span>
-                To add more seats, upgrade your plan on the
-                <.link navigate="/billing" class="text-primary font-semibold hover:underline">Billing page</.link>.
+                Seat changes will be reflected in your next billing cycle.
+                Visit the <.link navigate="/billing" class="text-primary font-semibold hover:underline">Billing page</.link> for plan details.
               </p>
             </div>
           </div>
 
-          <button phx-click="close_seats_modal" class="w-full bg-surface-container-highest hover:bg-surface-container-high text-on-surface py-3 rounded-lg text-sm font-semibold transition-colors">
-            Close
-          </button>
+          <div class="flex gap-3">
+            <button phx-click="close_seats_modal" class="flex-1 bg-surface-container-highest hover:bg-surface-container-high text-on-surface py-3 rounded-lg text-sm font-semibold transition-colors">
+              Cancel
+            </button>
+            <button
+              phx-click="save_seats"
+              disabled={@new_seat_count == @total_seats}
+              class="flex-1 primary-gradient text-on-primary py-3 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Save Changes
+            </button>
+          </div>
         </div>
       </div>
     </div>
