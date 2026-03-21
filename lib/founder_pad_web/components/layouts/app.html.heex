@@ -15,7 +15,7 @@
         </span>
       </div>
     </div>
-    
+
 <!-- Navigation -->
     <nav class="flex flex-col gap-1 flex-1">
       <.nav_link
@@ -49,12 +49,12 @@
         active={@active_nav == :settings}
       />
     </nav>
-    
+
 <!-- Help + Docs -->
     <div class="space-y-1">
       <a
         href="/docs"
-        
+
         class="flex items-center gap-3 px-3 py-2 text-on-surface/40 text-sm hover:text-on-surface hover:bg-surface-container-high rounded-md transition-colors"
       >
         <span class="material-symbols-outlined text-lg">menu_book</span>
@@ -62,14 +62,14 @@
       </a>
       <a
         href="/docs/changelog"
-        
+
         class="flex items-center gap-3 px-3 py-2 text-on-surface/40 text-sm hover:text-on-surface hover:bg-surface-container-high rounded-md transition-colors"
       >
         <span class="material-symbols-outlined text-lg">new_releases</span>
         <span>Changelog</span>
       </a>
     </div>
-    
+
 <!-- Workspace Switcher -->
     <div class="mt-auto pt-2">
       <button class="w-full flex items-center justify-between px-3 py-2 rounded-md hover:bg-surface-container-high text-on-surface/70 text-sm font-medium transition-colors">
@@ -80,7 +80,7 @@
   </aside>
 
   <%!-- Mobile drawer overlay --%>
-  <div id="mobile-nav" class="fixed inset-0 z-50 hidden md:hidden">
+  <div id="mobile-nav" class="fixed inset-0 z-50 hidden md:hidden" role="dialog" aria-modal="true" aria-label="Navigation menu">
     <div
       class="absolute inset-0 bg-background/80 backdrop-blur-sm"
       phx-click={JS.hide(to: "#mobile-nav")}
@@ -104,7 +104,7 @@
         </div>
         <button
           phx-click={JS.hide(to: "#mobile-nav")}
-          class="p-2 text-on-surface-variant hover:text-on-surface transition-colors rounded-lg hover:bg-surface-container-high"
+          class="p-2 text-on-surface-variant hover:text-on-surface transition-colors rounded-lg hover:bg-surface-container-high min-w-[44px] min-h-[44px] flex items-center justify-center"
           aria-label="Close navigation menu"
         >
           <span class="material-symbols-outlined text-xl">close</span>
@@ -154,7 +154,7 @@
       <div class="space-y-1">
         <a
           href="/docs"
-          
+
           class="flex items-center gap-3 px-3 py-2 text-on-surface/40 text-sm hover:text-on-surface hover:bg-surface-container-high rounded-md transition-colors"
         >
           <span class="material-symbols-outlined text-lg">menu_book</span>
@@ -162,7 +162,7 @@
         </a>
         <a
           href="/docs/changelog"
-          
+
           class="flex items-center gap-3 px-3 py-2 text-on-surface/40 text-sm hover:text-on-surface hover:bg-surface-container-high rounded-md transition-colors"
         >
           <span class="material-symbols-outlined text-lg">new_releases</span>
@@ -179,7 +179,7 @@
       </div>
     </aside>
   </div>
-  
+
 <!-- Main Content -->
   <div class="flex-1 flex flex-col min-w-0">
     <!-- TopNavBar -->
@@ -188,7 +188,7 @@
         <div class="flex items-center gap-8 flex-1">
           <%!-- Mobile menu button --%>
           <button
-            class="md:hidden p-2 text-on-surface-variant hover:text-on-surface transition-colors rounded-lg hover:bg-surface-container-high"
+            class="md:hidden p-2 text-on-surface-variant hover:text-on-surface transition-colors rounded-lg hover:bg-surface-container-high min-w-[44px] min-h-[44px] flex items-center justify-center"
             phx-click={JS.toggle(to: "#mobile-nav", in: "fade-in", out: "fade-out")}
             aria-label="Open navigation menu"
           >
@@ -197,21 +197,34 @@
           <span class="text-lg font-black font-headline md:hidden text-on-surface">
             FounderPad
           </span>
-          <div class="relative max-w-md w-full hidden md:block">
+          <form id="global-search-form" phx-submit="global_search" class="relative max-w-md w-full hidden md:block">
             <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">
               search
             </span>
             <input
               type="text"
-              placeholder="Search..."
+              name="q"
+              placeholder="Search agents, settings..."
+              autocomplete="off"
+              aria-label="Global search"
               class="w-full bg-surface-container-highest rounded-sm pl-10 pr-4 py-1.5 text-sm focus:ring-1 focus:ring-primary text-on-surface placeholder:text-on-surface-variant/50"
             />
-          </div>
+          </form>
         </div>
         <div class="flex items-center gap-3">
           <%!-- Notifications Dropdown --%>
           <div class="relative group/notif">
-            <button class="relative p-2 text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer rounded-lg hover:bg-surface-container-high">
+            <span class="sr-only" aria-live="polite">
+              <%= if assigns[:notification_count] && @notification_count > 0 do %>
+                {@notification_count} unread notifications
+              <% else %>
+                No unread notifications
+              <% end %>
+            </span>
+            <button
+              class="relative p-2 text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer rounded-lg hover:bg-surface-container-high"
+              aria-label="Notifications"
+            >
               <span class="material-symbols-outlined text-xl">notifications</span>
               <%= if assigns[:notification_count] && @notification_count > 0 do %>
                 <span
@@ -464,7 +477,7 @@
               <div class="py-1.5">
                 <a
                   href="/docs"
-                  
+
                   class="flex items-center gap-3 px-4 py-2 text-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/40 transition-colors group/item"
                 >
                   <span class="material-symbols-outlined text-lg opacity-60 group-hover/item:opacity-100 transition-opacity">
@@ -484,7 +497,7 @@
                 </a>
                 <a
                   href="/docs/changelog"
-                  
+
                   class="flex items-center gap-3 px-4 py-2 text-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/40 transition-colors group/item"
                 >
                   <span class="material-symbols-outlined text-lg opacity-60 group-hover/item:opacity-100 transition-opacity">
@@ -519,25 +532,26 @@
           </div>
 
           <div class="w-px h-6 bg-outline-variant/30"></div>
-          
+
 <!-- Theme Toggle (rightmost) -->
           <button
             id="theme-toggle"
             phx-hook="ThemeToggle"
             class="p-2 text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer rounded-lg hover:bg-surface-container-high"
+            aria-label="Toggle theme"
           >
             <span class="material-symbols-outlined text-xl">dark_mode</span>
           </button>
         </div>
       </div>
     </header>
-    
+
 <!-- Page Content -->
     <main class="flex-1 p-6 md:p-8 max-w-[1280px] mx-auto w-full space-y-8">
       <.flash_group flash={@flash} />
       {@inner_content}
     </main>
-    
+
 <!-- Footer -->
     <footer class="mt-auto p-8">
       <div class="max-w-[1280px] mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
@@ -547,7 +561,7 @@
           <a
             class="text-xs text-on-surface-variant hover:text-primary transition-colors"
             href="/docs"
-            
+
           >
             Documentation
           </a>
@@ -560,7 +574,7 @@
           <a
             class="text-xs text-on-surface-variant hover:text-primary transition-colors"
             href="/docs/changelog"
-            
+
           >
             Changelog
           </a>
