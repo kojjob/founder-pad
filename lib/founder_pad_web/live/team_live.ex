@@ -98,6 +98,10 @@ defmodule FounderPadWeb.TeamLive do
     {:noreply, assign(socket, invite_emails: List.delete(socket.assigns.invite_emails, email))}
   end
 
+  def handle_event("update_invite_email", %{"email" => email}, socket) do
+    {:noreply, assign(socket, invite_email_input: email)}
+  end
+
   def handle_event("update_invite_role", %{"role" => role}, socket) do
     {:noreply, assign(socket, invite_role: role)}
   end
@@ -481,14 +485,13 @@ defmodule FounderPadWeb.TeamLive do
             </div>
 
             <%!-- Email input with add button --%>
-            <form id="add-email-form" phx-submit="add_invite_email" class="flex gap-2">
+            <form id="add-email-form" phx-submit="add_invite_email" phx-change="update_invite_email" class="flex gap-2">
               <div class="flex-1 relative">
                 <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant/40 text-lg">mail</span>
                 <input
                   type="email"
                   name="email"
                   value={@invite_email_input}
-                  required
                   placeholder="colleague@company.com"
                   class="w-full pl-10 pr-4 bg-surface-container-highest border-none rounded-lg py-3 text-sm text-on-surface focus:ring-2 focus:ring-primary placeholder:text-on-surface-variant/40"
                 />
