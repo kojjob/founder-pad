@@ -8,7 +8,7 @@ defmodule FounderPad.Notifications.AuthMailer do
 
   def welcome(user) do
     new()
-    |> to({user.name || "User", user.email})
+    |> to({user.name || "User", to_string(user.email)})
     |> from(@from)
     |> subject("Welcome to FounderPad!")
     |> html_body("""
@@ -40,7 +40,7 @@ defmodule FounderPad.Notifications.AuthMailer do
     url = "#{FounderPadWeb.Endpoint.url()}/auth/reset-password?token=#{token}"
 
     new()
-    |> to({user.name || "User", user.email})
+    |> to({user.name || "User", to_string(user.email)})
     |> from(@from)
     |> subject("Reset your FounderPad password")
     |> html_body("""

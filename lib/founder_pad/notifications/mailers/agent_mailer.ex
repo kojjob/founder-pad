@@ -10,7 +10,7 @@ defmodule FounderPad.Notifications.AgentMailer do
     url = "#{FounderPadWeb.Endpoint.url()}/conversations/#{conversation.id}"
 
     new()
-    |> to({user.name || "User", user.email})
+    |> to({user.name || "User", to_string(user.email)})
     |> from(@from)
     |> subject("Agent \"#{agent.name}\" completed a run")
     |> html_body("""
@@ -24,7 +24,7 @@ defmodule FounderPad.Notifications.AgentMailer do
 
   def agent_run_failed(user, agent, error) do
     new()
-    |> to({user.name || "User", user.email})
+    |> to({user.name || "User", to_string(user.email)})
     |> from(@from)
     |> subject("Agent \"#{agent.name}\" run failed")
     |> html_body("""
