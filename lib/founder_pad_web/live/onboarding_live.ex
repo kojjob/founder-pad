@@ -77,7 +77,7 @@ defmodule FounderPadWeb.OnboardingLive do
           <div
             :for={i <- 1..@total_steps}
             class={[
-              "h-1 flex-1 rounded-full transition-colors",
+              "h-1.5 flex-1 rounded-full transition-all duration-300",
               if(i <= @step, do: "bg-primary", else: "bg-surface-container-highest")
             ]}
           >
@@ -88,13 +88,16 @@ defmodule FounderPadWeb.OnboardingLive do
         </p>
 
         <%!-- Error display --%>
-        <div :if={@error} class="bg-error/10 text-error text-sm font-medium p-4 rounded-xl text-center">
+        <div :if={@error} class="flex items-center gap-2 bg-error/10 text-error text-sm font-medium p-4 rounded-xl">
+          <span class="material-symbols-outlined text-lg">error</span>
           {@error}
         </div>
 
         <%!-- Step 1: Create Organisation --%>
         <div :if={@step == 1} class="space-y-6 text-center">
-          <span class="material-symbols-outlined text-5xl text-primary">apartment</span>
+          <div class="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto">
+            <span class="material-symbols-outlined text-3xl text-primary">apartment</span>
+          </div>
           <h1 class="text-3xl font-extrabold font-headline">Create Your Organisation</h1>
           <p class="text-on-surface-variant">
             This is your workspace where your team and agents live.
@@ -106,13 +109,19 @@ defmodule FounderPadWeb.OnboardingLive do
             placeholder="Organisation name"
             phx-change="update_org_name"
             phx-debounce="300"
+            autofocus
             class="w-full bg-surface-container-highest border-none rounded-lg px-4 py-3 text-sm text-on-surface text-center focus:ring-2 focus:ring-primary"
           />
+          <p :if={String.trim(@org_name) == ""} class="text-xs text-on-surface-variant/50">
+            You'll be able to change this later in Settings
+          </p>
         </div>
 
         <%!-- Step 2: Invite Team --%>
         <div :if={@step == 2} class="space-y-6 text-center">
-          <span class="material-symbols-outlined text-5xl text-primary">group_add</span>
+          <div class="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto">
+            <span class="material-symbols-outlined text-3xl text-primary">group_add</span>
+          </div>
           <h1 class="text-3xl font-extrabold font-headline">Invite Your Team</h1>
           <p class="text-on-surface-variant">
             Add team members by email. You can always do this later.
@@ -123,7 +132,8 @@ defmodule FounderPadWeb.OnboardingLive do
               name="email"
               value={@invite_input}
               placeholder="teammate@company.com"
-              class="flex-1 bg-surface-container-highest border-none rounded-lg px-4 py-3 text-sm text-on-surface text-center focus:ring-2 focus:ring-primary"
+              autofocus
+              class="flex-1 bg-surface-container-highest border-none rounded-lg px-4 py-3 text-sm text-on-surface focus:ring-2 focus:ring-primary"
             />
             <button type="submit" class="primary-gradient px-4 py-2.5 rounded-lg text-sm font-semibold">
               Add
@@ -139,19 +149,24 @@ defmodule FounderPadWeb.OnboardingLive do
                 type="button"
                 phx-click="remove_invite"
                 phx-value-email={email}
-                class="hover:text-error transition-colors"
+                class="hover:text-error transition-colors cursor-pointer"
               >
                 <span class="material-symbols-outlined text-[14px]">close</span>
               </button>
             </span>
           </div>
+          <p :if={@invite_emails == []} class="text-xs text-on-surface-variant/50">
+            They'll receive an email with a link to create their account
+          </p>
         </div>
 
         <%!-- Step 3: Create First Agent --%>
         <div :if={@step == 3} class="space-y-6 text-center">
-          <span class="material-symbols-outlined text-5xl text-primary">smart_toy</span>
+          <div class="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto">
+            <span class="material-symbols-outlined text-3xl text-primary">smart_toy</span>
+          </div>
           <h1 class="text-3xl font-extrabold font-headline">Create Your First Agent</h1>
-          <p class="text-on-surface-variant">Choose a template to get started quickly.</p>
+          <p class="text-on-surface-variant">Choose a template to get started, or skip to create one later.</p>
           <div class="grid grid-cols-2 gap-3 text-left">
             <button
               :for={{key, tmpl} <- @templates |> Enum.sort()}
@@ -159,51 +174,95 @@ defmodule FounderPadWeb.OnboardingLive do
               phx-click="select_template"
               phx-value-template={key}
               class={[
-                "bg-surface-container p-4 rounded-lg cursor-pointer transition-all border-2 text-left",
+                "bg-surface-container p-4 rounded-xl cursor-pointer transition-all border-2 text-left group",
                 if(@selected_template == key,
                   do: "border-primary shadow-md bg-primary/5",
                   else: "border-transparent hover:bg-surface-container-high hover:border-primary/20"
                 )
               ]}
             >
-              <span class="material-symbols-outlined text-primary mb-2">{template_icon(key)}</span>
-              <p class="text-sm font-semibold">{tmpl.name}</p>
+              <span class="material-symbols-outlined text-primary mb-2 group-hover:scale-110 transition-transform">{template_icon(key)}</span>
+              <p class="text-sm font-bold text-on-surface">{tmpl.name}</p>
+              <p class="text-[11px] text-on-surface-variant mt-1 line-clamp-2">{tmpl.description}</p>
             </button>
           </div>
         </div>
 
         <%!-- Step 4: All Set --%>
         <div :if={@step == 4} class="space-y-6 text-center">
-          <span class="material-symbols-outlined text-5xl text-primary">rocket_launch</span>
+          <div class="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
+            <span class="material-symbols-outlined text-4xl text-primary">rocket_launch</span>
+          </div>
           <h1 class="text-3xl font-extrabold font-headline">You're All Set!</h1>
           <p class="text-on-surface-variant">
             Your workspace is ready. Let's see your agent in action.
           </p>
-          <div class="space-y-3 text-sm text-on-surface-variant">
-            <p :if={@org_name != ""}>Organisation: <strong class="text-on-surface">{@org_name}</strong></p>
-            <p :if={@invite_emails != []}>Invites: <strong class="text-on-surface">{length(@invite_emails)} team member(s)</strong></p>
-            <p :if={@selected_template}>
-              Agent: <strong class="text-on-surface">{@templates[@selected_template].name}</strong>
-            </p>
+          <div class="bg-surface-container rounded-xl p-5 space-y-3 text-sm text-left">
+            <div class="flex items-center gap-3">
+              <span class="material-symbols-outlined text-primary text-lg">check_circle</span>
+              <span class="text-on-surface font-medium">{@org_name}</span>
+              <span class="text-on-surface-variant text-xs ml-auto">Organisation</span>
+            </div>
+            <div :if={@invite_emails != []} class="flex items-center gap-3">
+              <span class="material-symbols-outlined text-primary text-lg">check_circle</span>
+              <span class="text-on-surface font-medium">{length(@invite_emails)} invite(s) will be sent</span>
+              <span class="text-on-surface-variant text-xs ml-auto">Team</span>
+            </div>
+            <div :if={@invite_emails == []} class="flex items-center gap-3">
+              <span class="material-symbols-outlined text-on-surface-variant/40 text-lg">remove_circle_outline</span>
+              <span class="text-on-surface-variant">No team invites</span>
+              <span class="text-on-surface-variant text-xs ml-auto">Skipped</span>
+            </div>
+            <div :if={@selected_template} class="flex items-center gap-3">
+              <span class="material-symbols-outlined text-primary text-lg">check_circle</span>
+              <span class="text-on-surface font-medium">{@templates[@selected_template].name}</span>
+              <span class="text-on-surface-variant text-xs ml-auto">Agent</span>
+            </div>
+            <div :if={!@selected_template} class="flex items-center gap-3">
+              <span class="material-symbols-outlined text-on-surface-variant/40 text-lg">remove_circle_outline</span>
+              <span class="text-on-surface-variant">No agent selected</span>
+              <span class="text-on-surface-variant text-xs ml-auto">Skipped</span>
+            </div>
           </div>
         </div>
 
         <%!-- Navigation --%>
-        <div class="flex justify-between">
+        <div class="flex justify-between items-center">
           <button
             :if={@step > 1}
             phx-click="prev_step"
-            class="px-4 py-2 text-sm font-medium text-on-surface-variant hover:text-on-surface transition-colors"
+            class="flex items-center gap-1 px-4 py-2 text-sm font-medium text-on-surface-variant hover:text-on-surface transition-colors"
           >
+            <span class="material-symbols-outlined text-lg">arrow_back</span>
             Back
           </button>
           <div :if={@step == 1}></div>
-          <button
-            phx-click={if @step < @total_steps, do: "next_step", else: "complete"}
-            class="primary-gradient font-semibold px-6 py-2.5 rounded-lg text-sm"
-          >
-            {if @step < @total_steps, do: "Continue", else: "Go to Dashboard"}
-          </button>
+
+          <div class="flex items-center gap-3">
+            <button
+              :if={@step == 2 or @step == 3}
+              phx-click="next_step"
+              class="px-4 py-2 text-sm font-medium text-on-surface-variant hover:text-on-surface transition-colors"
+            >
+              Skip
+            </button>
+            <button
+              phx-click={if @step < @total_steps, do: "next_step", else: "complete"}
+              disabled={@step == 1 and String.trim(@org_name) == ""}
+              class={[
+                "font-semibold px-6 py-2.5 rounded-lg text-sm flex items-center gap-2 transition-all",
+                if(@step == 1 and String.trim(@org_name) == "",
+                  do: "bg-surface-container-highest text-on-surface-variant/40 cursor-not-allowed",
+                  else: "primary-gradient hover:scale-[1.02] active:scale-95"
+                )
+              ]}
+            >
+              {if @step < @total_steps, do: "Continue", else: "Go to Dashboard"}
+              <span class="material-symbols-outlined text-lg">
+                {if @step < @total_steps, do: "arrow_forward", else: "rocket_launch"}
+              </span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
