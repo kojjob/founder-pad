@@ -45,19 +45,27 @@ defmodule FounderPadWeb.OnboardingLive do
           end
       end
 
-    {:ok,
-     assign(socket,
-       page_title: "Welcome",
-       step: 1,
-       total_steps: 4,
-       current_user: current_user,
-       org_name: "",
-       invite_emails: [],
-       invite_input: "",
-       selected_template: nil,
-       templates: @templates,
-       error: nil
-     )}
+    if current_user && has_membership?(current_user.id) do
+      {:ok,
+       socket
+       |> assign(current_user: current_user)
+       |> put_flash(:info, "You've already completed onboarding")
+       |> push_navigate(to: "/dashboard")}
+    else
+      {:ok,
+       assign(socket,
+         page_title: "Welcome",
+         step: 1,
+         total_steps: 4,
+         current_user: current_user,
+         org_name: "",
+         invite_emails: [],
+         invite_input: "",
+         selected_template: nil,
+         templates: @templates,
+         error: nil
+       )}
+    end
   end
 
   def render(assigns) do
@@ -205,7 +213,12 @@ defmodule FounderPadWeb.OnboardingLive do
   # ── Events ──
 
   def handle_event("next_step", _, socket) do
-    {:noreply, update(socket, :step, &min(&1 + 1, socket.assigns.total_steps))}
+    case validate_step(socket.assigns.step, socket.assigns) do
+      :ok ->
+        {:noreply, socket |> assign(error: nil) |> update(:step, &min(&1 + 1, socket.assigns.total_steps))}
+      {:error, msg} ->
+        {:noreply, assign(socket, error: msg)}
+    end
   end
 
   def handle_event("prev_step", _, socket) do
@@ -219,10 +232,15 @@ defmodule FounderPadWeb.OnboardingLive do
   def handle_event("add_invite", %{"email" => email}, socket) do
     email = String.trim(email)
 
-    if email != "" and email not in socket.assigns.invite_emails do
-      {:noreply, assign(socket, invite_emails: socket.assigns.invite_emails ++ [email], invite_input: "")}
-    else
-      {:noreply, assign(socket, invite_input: "")}
+    cond do
+      email == "" ->
+        {:noreply, assign(socket, invite_input: "")}
+      not valid_email?(email) ->
+        {:noreply, assign(socket, error: "Please enter a valid email address.")}
+      email in socket.assigns.invite_emails ->
+        {:noreply, assign(socket, invite_input: "", error: "This email has already been added.")}
+      true ->
+        {:noreply, assign(socket, invite_emails: socket.assigns.invite_emails ++ [email], invite_input: "", error: nil)}
     end
   end
 
@@ -253,12 +271,14 @@ defmodule FounderPadWeb.OnboardingLive do
       true ->
         case create_workspace(user, org_name, selected) do
           {:ok, _org, agent} when not is_nil(agent) ->
+            send_invite_emails(socket.assigns.invite_emails, org_name)
             {:noreply,
              socket
              |> put_flash(:info, "Welcome to FounderPad!")
              |> push_navigate(to: "/agents/#{agent.id}")}
 
           {:ok, _org, nil} ->
+            send_invite_emails(socket.assigns.invite_emails, org_name)
             {:noreply,
              socket
              |> put_flash(:info, "Welcome to FounderPad!")
@@ -273,48 +293,46 @@ defmodule FounderPadWeb.OnboardingLive do
   # ── Helpers ──
 
   defp create_workspace(user, org_name, selected_template) do
-    try do
-      # Create Organisation
-      {:ok, org} =
-        FounderPad.Accounts.Organisation
-        |> Ash.Changeset.for_create(:create, %{name: org_name})
-        |> Ash.create()
-
-      # Create Membership (owner)
-      {:ok, _membership} =
-        FounderPad.Accounts.Membership
-        |> Ash.Changeset.for_create(:create, %{
-          role: :owner,
-          user_id: user.id,
-          organisation_id: org.id
-        })
-        |> Ash.create()
-
-      # Create Agent from template (if selected)
-      agent =
-        if selected_template && Map.has_key?(@templates, selected_template) do
-          tmpl = @templates[selected_template]
-
-          {:ok, agent} =
-            FounderPad.AI.Agent
-            |> Ash.Changeset.for_create(:create, %{
-              name: tmpl.name,
-              description: tmpl.description,
-              system_prompt: tmpl.system_prompt,
-              model: "claude-sonnet-4-20250514",
-              provider: :anthropic,
-              temperature: tmpl.temperature,
-              max_tokens: tmpl.max_tokens,
-              organisation_id: org.id
-            })
-            |> Ash.create()
-
-          agent
-        end
-
+    with {:ok, org} <-
+           FounderPad.Accounts.Organisation
+           |> Ash.Changeset.for_create(:create, %{name: String.trim(org_name)})
+           |> Ash.create(),
+         {:ok, _membership} <-
+           FounderPad.Accounts.Membership
+           |> Ash.Changeset.for_create(:create, %{
+             role: :owner,
+             user_id: user.id,
+             organisation_id: org.id
+           })
+           |> Ash.create() do
+      agent = create_agent_from_template(selected_template, org.id)
       {:ok, org, agent}
-    rescue
-      e -> {:error, Exception.message(e)}
+    else
+      {:error, error} -> {:error, Exception.message(error)}
+    end
+  end
+
+  defp create_agent_from_template(nil, _org_id), do: nil
+
+  defp create_agent_from_template(template_key, org_id) do
+    case Map.get(@templates, template_key) do
+      nil -> nil
+      tmpl ->
+        case FounderPad.AI.Agent
+             |> Ash.Changeset.for_create(:create, %{
+               name: tmpl.name,
+               description: tmpl.description,
+               system_prompt: tmpl.system_prompt,
+               model: "claude-sonnet-4-20250514",
+               provider: :anthropic,
+               temperature: tmpl.temperature,
+               max_tokens: tmpl.max_tokens,
+               organisation_id: org_id
+             })
+             |> Ash.create() do
+          {:ok, agent} -> agent
+          {:error, _} -> nil
+        end
     end
   end
 
@@ -323,4 +341,43 @@ defmodule FounderPadWeb.OnboardingLive do
   defp template_icon("writing"), do: "edit_note"
   defp template_icon("custom"), do: "tune"
   defp template_icon(_), do: "smart_toy"
+
+  defp validate_step(1, assigns) do
+    if String.trim(assigns.org_name) == "", do: {:error, "Please enter an organisation name."}, else: :ok
+  end
+
+  defp validate_step(2, assigns) do
+    pending = String.trim(assigns.invite_input)
+    if pending != "" and not valid_email?(pending) do
+      {:error, "Please enter a valid email address or clear the input."}
+    else
+      :ok
+    end
+  end
+
+  defp validate_step(_, _), do: :ok
+
+  defp valid_email?(email) do
+    String.match?(email, ~r/^[^\s@]+@[^\s@]+\.[^\s@]+$/)
+  end
+
+  defp send_invite_emails([], _org_name), do: :ok
+
+  defp send_invite_emails(emails, org_name) do
+    Enum.each(emails, fn email ->
+      Task.start(fn ->
+        FounderPad.Notifications.InviteMailer.invite(email, org_name)
+      end)
+    end)
+  end
+
+  defp has_membership?(user_id) do
+    case FounderPad.Accounts.Membership
+         |> Ash.Query.filter(user_id: user_id)
+         |> Ash.Query.limit(1)
+         |> Ash.read() do
+      {:ok, [_ | _]} -> true
+      _ -> false
+    end
+  end
 end
