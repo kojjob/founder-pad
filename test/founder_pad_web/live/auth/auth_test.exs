@@ -101,7 +101,7 @@ defmodule FounderPadWeb.Auth.AuthTest do
       assert render(view) =~ "Create your account"
     end
 
-    test "registration creates default organisation and membership", %{conn: conn} do
+    test "registration does not create organisation (deferred to onboarding)", %{conn: conn} do
       {:ok, view, _html} = live(conn, "/auth/register")
 
       view
@@ -114,7 +114,6 @@ defmodule FounderPadWeb.Auth.AuthTest do
       )
       |> render_submit()
 
-      # Verify user was created
       users =
         FounderPad.Accounts.User
         |> Ash.read!()
@@ -123,14 +122,12 @@ defmodule FounderPadWeb.Auth.AuthTest do
       assert length(users) == 1
       user = hd(users)
 
-      # Verify organisation was created with membership
       memberships =
         FounderPad.Accounts.Membership
         |> Ash.read!()
         |> Enum.filter(&(&1.user_id == user.id))
 
-      assert length(memberships) == 1
-      assert hd(memberships).role == :owner
+      assert memberships == []
     end
   end
 

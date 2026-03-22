@@ -128,6 +128,9 @@ defmodule FounderPadWeb.ScreensTest do
     test "navigates through all steps", %{conn: conn} do
       {:ok, view, _html} = live(conn, "/onboarding")
 
+      # Fill org name first (required)
+      render_change(view, "update_org_name", %{"org_name" => "Test Org"})
+
       # Step 1 -> Step 2
       html = render_click(view, "next_step")
       assert html =~ "Step 2 of 4"
@@ -145,6 +148,7 @@ defmodule FounderPadWeb.ScreensTest do
 
     test "step 4 shows completion message", %{conn: conn} do
       {:ok, view, _html} = live(conn, "/onboarding")
+      render_change(view, "update_org_name", %{"org_name" => "Test Org"})
       render_click(view, "next_step")
       render_click(view, "next_step")
       html = render_click(view, "next_step")
@@ -154,6 +158,7 @@ defmodule FounderPadWeb.ScreensTest do
     test "can go back to previous step", %{conn: conn} do
       {:ok, view, _html} = live(conn, "/onboarding")
 
+      render_change(view, "update_org_name", %{"org_name" => "Test Org"})
       render_click(view, "next_step")
       html = render_click(view, "prev_step")
       assert html =~ "Step 1 of 4"
@@ -168,7 +173,8 @@ defmodule FounderPadWeb.ScreensTest do
     test "complete event shows error when not authenticated", %{conn: conn} do
       {:ok, view, _html} = live(conn, "/onboarding")
 
-      # Navigate to step 4
+      # Fill org name and navigate to step 4
+      render_change(view, "update_org_name", %{"org_name" => "Test Org"})
       render_click(view, "next_step")
       render_click(view, "next_step")
       render_click(view, "next_step")
@@ -181,6 +187,7 @@ defmodule FounderPadWeb.ScreensTest do
     test "cannot go past step 4 with next_step", %{conn: conn} do
       {:ok, view, _html} = live(conn, "/onboarding")
 
+      render_change(view, "update_org_name", %{"org_name" => "Test Org"})
       render_click(view, "next_step")
       render_click(view, "next_step")
       render_click(view, "next_step")
