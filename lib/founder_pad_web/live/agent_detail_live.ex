@@ -67,25 +67,28 @@ defmodule FounderPadWeb.AgentDetailLive do
     trimmed = String.trim(content)
 
     # Save user message to DB here (not in the worker) to prevent duplicates
-    {:ok, _saved_msg} =
-      FounderPad.AI.Message
-      |> Ash.Changeset.for_create(:create, %{
-        role: :user,
-        content: trimmed,
-        conversation_id: conversation.id
-      })
-      |> Ash.create()
+    case FounderPad.AI.Message
+         |> Ash.Changeset.for_create(:create, %{
+           role: :user,
+           content: trimmed,
+           conversation_id: conversation.id
+         })
+         |> Ash.create() do
+      {:ok, _saved_msg} ->
+        # Enqueue agent runner — it will NOT create the user message again
+        %{conversation_id: conversation.id, message_content: trimmed, organisation_id: agent.organisation_id}
+        |> FounderPad.AI.Workers.AgentRunner.new()
+        |> Oban.insert()
 
-    # Enqueue agent runner — it will NOT create the user message again
-    %{conversation_id: conversation.id, message_content: trimmed, organisation_id: agent.organisation_id}
-    |> FounderPad.AI.Workers.AgentRunner.new()
-    |> Oban.insert()
+        msg = %{role: :user, content: trimmed, time: format_time(DateTime.utc_now())}
 
-    msg = %{role: :user, content: trimmed, time: format_time(DateTime.utc_now())}
+        {:noreply,
+         socket
+         |> assign(messages: socket.assigns.messages ++ [msg], message_input: "", streaming: true)}
 
-    {:noreply,
-     socket
-     |> assign(messages: socket.assigns.messages ++ [msg], message_input: "", streaming: true)}
+      {:error, _reason} ->
+        {:noreply, put_flash(socket, :error, "Failed to send message. Please try again.")}
+    end
   end
 
   def handle_event("send_message", _, socket), do: {:noreply, socket}
@@ -120,7 +123,11 @@ defmodule FounderPadWeb.AgentDetailLive do
   end
 
   def handle_event("update_temperature", %{"value" => val}, socket) do
-    {temp, _} = Float.parse(val)
+    temp = case Float.parse(val) do
+      {t, _} when t >= 0.0 and t <= 1.0 -> t
+      _ -> socket.assigns.temperature
+    end
+
     {:noreply, assign(socket, temperature: temp)}
   end
 

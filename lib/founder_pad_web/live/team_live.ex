@@ -48,7 +48,12 @@ defmodule FounderPadWeb.TeamLive do
   end
 
   def handle_event("change_page", %{"page" => page}, socket) do
-    {:noreply, assign(socket, current_page: String.to_integer(page))}
+    page_num = case Integer.parse(page) do
+      {n, _} when n > 0 -> n
+      _ -> 1
+    end
+
+    {:noreply, assign(socket, current_page: page_num)}
   end
 
   def handle_event("prev_page", _, socket) do
@@ -109,7 +114,7 @@ defmodule FounderPadWeb.TeamLive do
 
   def handle_event("send_invites", _, socket) do
     org_id = socket.assigns.org_id
-    role = String.to_existing_atom(socket.assigns.invite_role)
+    role = validated_role(socket.assigns.invite_role)
 
     # Include any email still in the input field
     pending = String.trim(socket.assigns.invite_email_input)
@@ -173,7 +178,7 @@ defmodule FounderPadWeb.TeamLive do
     case Ash.get(FounderPad.Accounts.Membership, id) do
       {:ok, membership} ->
         case membership
-             |> Ash.Changeset.for_update(:change_role, %{role: String.to_existing_atom(role)})
+             |> Ash.Changeset.for_update(:change_role, %{role: validated_role(role)})
              |> Ash.update() do
           {:ok, _} ->
             members = reload_members(socket.assigns.org_id)
@@ -733,6 +738,10 @@ defmodule FounderPadWeb.TeamLive do
   end
 
   defp get_current_user_role(_, _), do: :member
+
+  @valid_roles ~w(owner admin member viewer)
+  defp validated_role(role) when role in @valid_roles, do: String.to_existing_atom(role)
+  defp validated_role(_), do: :member
 
   defp reload_members(nil), do: []
 

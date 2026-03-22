@@ -77,6 +77,10 @@ defmodule FounderPad.Accounts.User do
       authorize_if always()
     end
 
+    # TODO: Tighten update/destroy policies once all call sites pass actor:
+    # policy action_type([:update, :destroy]) do
+    #   authorize_if expr(id == ^actor(:id))
+    # end
     policy always() do
       authorize_if always()
     end
