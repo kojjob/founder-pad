@@ -33,7 +33,18 @@ defmodule FounderPadWeb.CheckoutController do
           line_items: [%{price: plan.stripe_price_id, quantity: 1}]
         }
 
-        Stripe.Checkout.Session.create(params)
+        case Stripe.Checkout.Session.create(params) do
+          {:ok, session} ->
+            {:ok, session}
+
+          {:error, %Stripe.Error{} = error} ->
+            Logger.error("Stripe checkout failed: #{inspect(error)}")
+            {:error, error}
+
+          {:error, error} ->
+            Logger.error("Stripe checkout failed: #{inspect(error)}")
+            {:error, error}
+        end
     end
   end
 end

@@ -37,9 +37,17 @@ defmodule FounderPadWeb.WebhookController do
       [signature] when is_binary(signing_secret) and signing_secret != "" ->
         Stripe.Webhook.construct_event(raw_body, signature, signing_secret)
 
+      _ when is_binary(signing_secret) ->
+        {:error, :missing_stripe_signature_header}
+
       _ ->
-        # Dev mode: parse without verification
-        {:ok, Jason.decode!(raw_body)}
+        if Application.get_env(:founder_pad, :env) == :prod do
+          Logger.error("Stripe signing secret not configured in production")
+          {:error, :missing_signing_secret}
+        else
+          # Dev/test only: parse without verification
+          {:ok, Jason.decode!(raw_body)}
+        end
     end
   end
 end

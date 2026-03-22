@@ -42,6 +42,7 @@ defmodule FounderPad.Accounts.Organisation do
   end
 
   policies do
+    # TODO: Restrict update/destroy to org owners once all call sites pass actor:
     policy always() do
       authorize_if always()
     end

@@ -8,6 +8,7 @@
 import Config
 
 config :founder_pad,
+  env: config_env(),
   generators: [timestamp_type: :utc_datetime]
 
 # Configure the endpoint
@@ -63,9 +64,9 @@ config :phoenix, :json_library, Jason
 config :founder_pad,
   ash_domains: [FounderPad.Accounts, FounderPad.Billing, FounderPad.AI, FounderPad.Notifications, FounderPad.Audit, FounderPad.FeatureFlags, FounderPad.Webhooks, FounderPad.Analytics]
 
-# Token signing secret (override in runtime.exs for production)
+# Token signing secret — loaded from env var; fallback only for dev/test
 config :founder_pad,
-  token_signing_secret: "super-secret-token-signing-key-at-least-32-bytes-long!!"
+  token_signing_secret: System.get_env("TOKEN_SIGNING_SECRET", "dev-only-not-for-production-at-least-32-bytes!!")
 
 # Database
 config :founder_pad, FounderPad.Repo,
