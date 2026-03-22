@@ -55,8 +55,14 @@ defmodule FounderPadWeb.DashboardLive do
       success_chart: [50, 50, 50, 50, 50, 50, 50, 50, 50],
       current_plan_name: "Free", members_count: 0, notifications_count: 0,
       flags_enabled: 0, cost_grade: "—", api_uptime: "99.99%",
-      recent_activity: []
+      recent_activity: [],
+      onboarding_complete: socket.assigns[:onboarding_complete] || false,
+      setup_banner_dismissed: socket.assigns[:setup_banner_dismissed] || false
     )
+  end
+
+  def handle_event("dismiss_setup_banner", _, socket) do
+    {:noreply, assign(socket, setup_banner_dismissed: true)}
   end
 
   def handle_event("navigate_agent", %{"id" => id}, socket) do
@@ -123,13 +129,45 @@ defmodule FounderPadWeb.DashboardLive do
       api_uptime: "99.99%",
 
       # Activity table
-      recent_activity: agent_activity
+      recent_activity: agent_activity,
+
+      # Preserve hook assigns across data reload
+      onboarding_complete: socket.assigns[:onboarding_complete] || false,
+      setup_banner_dismissed: socket.assigns[:setup_banner_dismissed] || false
     )
   end
 
   def render(assigns) do
     ~H"""
     <div class="space-y-8">
+      <%!-- Onboarding Banner --%>
+      <div
+        :if={not @onboarding_complete and not @setup_banner_dismissed}
+        class="flex items-center justify-between gap-4 p-4 rounded-xl bg-primary/10 border border-primary/20"
+      >
+        <div class="flex items-center gap-3">
+          <span class="material-symbols-outlined text-primary text-xl">rocket_launch</span>
+          <p class="text-sm font-medium text-on-surface">
+            Complete your workspace setup to get the most out of FounderPad
+          </p>
+        </div>
+        <div class="flex items-center gap-2">
+          <.link
+            navigate="/onboarding"
+            class="primary-gradient px-4 py-2 rounded-lg text-xs font-bold whitespace-nowrap"
+          >
+            Complete Setup
+          </.link>
+          <button
+            phx-click="dismiss_setup_banner"
+            class="p-1 text-on-surface-variant hover:text-on-surface transition-colors"
+            aria-label="Dismiss"
+          >
+            <span class="material-symbols-outlined text-lg">close</span>
+          </button>
+        </div>
+      </div>
+
       <%!-- Editorial Header --%>
       <section class="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div class="space-y-1">
