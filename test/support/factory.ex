@@ -31,6 +31,15 @@ defmodule FounderPad.Factory do
     Map.merge(default, Map.new(attrs))
   end
 
+  def create_admin_user!(attrs \\ %{}) do
+    user = create_user!(attrs)
+
+    user
+    |> Ash.Changeset.for_update(:update_profile, %{})
+    |> Ash.Changeset.force_change_attribute(:is_admin, true)
+    |> Ash.update!()
+  end
+
   def create_organisation!(attrs \\ %{}) do
     params = build_organisation(attrs)
 
