@@ -63,6 +63,10 @@ defmodule FounderPad.Accounts.User do
       public? true
     end
 
+    attribute :suspended_at, :utc_datetime_usec do
+      public? true
+    end
+
     timestamps()
   end
 
@@ -87,6 +91,10 @@ defmodule FounderPad.Accounts.User do
     # policy action_type([:update, :destroy]) do
     #   authorize_if expr(id == ^actor(:id))
     # end
+    policy action([:suspend, :unsuspend, :list_all]) do
+      authorize_if expr(^actor(:is_admin) == true)
+    end
+
     policy always() do
       authorize_if always()
     end
@@ -128,6 +136,20 @@ defmodule FounderPad.Accounts.User do
 
     destroy :destroy do
       primary? true
+    end
+
+    update :suspend do
+      accept []
+      change set_attribute(:suspended_at, &DateTime.utc_now/0)
+    end
+
+    update :unsuspend do
+      accept []
+      change set_attribute(:suspended_at, nil)
+    end
+
+    read :list_all do
+      prepare build(sort: [inserted_at: :desc])
     end
   end
 end

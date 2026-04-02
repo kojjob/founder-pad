@@ -7,6 +7,9 @@ defmodule FounderPad.Accounts do
       define :sign_in_with_password, args: [:email, :password]
       define :request_magic_link, args: [:email]
       define :get_user_by_id, action: :read, get_by: [:id]
+      define :suspend_user, action: :suspend
+      define :unsuspend_user, action: :unsuspend
+      define :list_all_users, action: :list_all
     end
 
     resource FounderPad.Accounts.Organisation do
