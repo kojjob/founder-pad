@@ -48,6 +48,15 @@
         label="Settings"
         active={@active_nav == :settings}
       />
+
+      <%= if @current_user && @current_user.is_admin do %>
+        <div class="mt-6 pt-4 border-t border-neutral-200/60">
+          <p class="px-3 mb-2 text-[10px] font-semibold uppercase tracking-wider text-on-surface-variant/50">Admin</p>
+          <.nav_link href="/admin/blog" icon="edit_note" label="Blog" active={@active_nav == :admin_blog} />
+          <.nav_link href="/admin/changelog" icon="new_releases" label="Changelog" active={@active_nav == :admin_changelog} />
+          <.nav_link href="/admin/seo" icon="search" label="SEO" active={@active_nav == :admin_seo} />
+        </div>
+      <% end %>
     </nav>
 
 <!-- Help + Docs -->
@@ -148,6 +157,15 @@
           label="Settings"
           active={@active_nav == :settings}
         />
+
+        <%= if @current_user && @current_user.is_admin do %>
+          <div class="mt-6 pt-4 border-t border-neutral-200/60">
+            <p class="px-3 mb-2 text-[10px] font-semibold uppercase tracking-wider text-on-surface-variant/50">Admin</p>
+            <.nav_link href="/admin/blog" icon="edit_note" label="Blog" active={@active_nav == :admin_blog} />
+            <.nav_link href="/admin/changelog" icon="new_releases" label="Changelog" active={@active_nav == :admin_changelog} />
+            <.nav_link href="/admin/seo" icon="search" label="SEO" active={@active_nav == :admin_seo} />
+          </div>
+        <% end %>
       </nav>
 
       <%!-- Help + Docs --%>
