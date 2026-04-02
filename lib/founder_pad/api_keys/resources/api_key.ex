@@ -112,7 +112,7 @@ defmodule FounderPad.ApiKeys.ApiKey do
   end
 
   policies do
-    policy action(:read) do
+    policy action_type(:read) do
       authorize_if always()
     end
 

@@ -168,6 +168,17 @@ defmodule FounderPad.Factory do
     |> Ash.create!()
   end
 
+  def create_api_key!(org, user, attrs \\ %{}) do
+    FounderPad.ApiKeys.ApiKey
+    |> Ash.Changeset.for_create(:create, %{
+      name: Map.get(attrs, :name, "Test Key #{System.unique_integer([:positive])}"),
+      scopes: Map.get(attrs, :scopes, [:read]),
+      organisation_id: org.id,
+      created_by_id: user.id
+    })
+    |> Ash.create!()
+  end
+
   def create_conversation_chain! do
     org = create_organisation!()
     user = create_user!()
