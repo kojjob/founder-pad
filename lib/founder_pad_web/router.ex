@@ -29,6 +29,22 @@ defmodule FounderPadWeb.Router do
     live "/register", RegisterLive
   end
 
+  # RSS feed routes (controller, not LiveView)
+  scope "/", FounderPadWeb do
+    pipe_through :browser
+    get "/blog/feed.xml", FeedController, :blog_feed
+    get "/changelog/feed.xml", FeedController, :changelog_feed
+  end
+
+  # Public blog routes
+  scope "/blog", FounderPadWeb.Blog do
+    pipe_through :browser
+    live "/", BlogIndexLive
+    live "/category/:slug", BlogCategoryLive
+    live "/tag/:slug", BlogTagLive
+    live "/:slug", BlogPostLive
+  end
+
   scope "/", FounderPadWeb do
     pipe_through :browser
 
@@ -56,6 +72,27 @@ defmodule FounderPadWeb.Router do
       live "/billing", BillingLive
       live "/team", TeamLive
       live "/settings", SettingsLive
+    end
+
+    # Admin routes with admin authorization
+    live_session :admin,
+      layout: {FounderPadWeb.Layouts, :app},
+      on_mount: [
+        {FounderPadWeb.Hooks.AssignDefaults, :default},
+        {FounderPadWeb.Hooks.RequireAuth, :default},
+        {FounderPadWeb.Hooks.RequireAdmin, :default}
+      ] do
+      scope "/admin", Admin do
+        live "/blog", BlogListLive
+        live "/blog/new", BlogEditorLive
+        live "/blog/:id/edit", BlogEditorLive
+        live "/blog/categories", BlogCategoriesLive
+        live "/blog/tags", BlogTagsLive
+        live "/changelog", ChangelogListLive
+        live "/changelog/new", ChangelogEditorLive
+        live "/changelog/:id/edit", ChangelogEditorLive
+        live "/seo", SeoDashboardLive
+      end
     end
 
     live "/onboarding", OnboardingLive
