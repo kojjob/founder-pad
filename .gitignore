@@ -36,3 +36,6 @@ npm-debug.log
 /assets/node_modules/
 
 stitch/
+
+# Override global gitignore that blocks lib/ (Python pattern)
+!lib/
