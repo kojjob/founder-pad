@@ -79,7 +79,12 @@ config :founder_pad,
 config :founder_pad, Oban,
   engine: Oban.Engines.Basic,
   queues: [default: 10, mailers: 20, billing: 5, ai: 3],
-  repo: FounderPad.Repo
+  repo: FounderPad.Repo,
+  plugins: [
+    {Oban.Plugins.Cron, crontab: [
+      {"*/5 * * * *", FounderPad.Content.Workers.PublishScheduledPostsWorker}
+    ]}
+  ]
 
 # Stripe (keys loaded from runtime.exs)
 config :stripity_stripe,
