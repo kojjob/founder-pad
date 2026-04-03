@@ -16,6 +16,10 @@ defmodule FounderPadWeb.Router do
     plug FounderPadWeb.Plugs.RateLimiter, limit: 100, window_ms: 60_000
   end
 
+  pipeline :api_public do
+    plug :accepts, ["json"]
+  end
+
   # Auth session controller (sets/clears session cookie)
   scope "/auth", FounderPadWeb do
     pipe_through :browser
@@ -123,6 +127,12 @@ defmodule FounderPadWeb.Router do
     end
 
     live "/onboarding", OnboardingLive
+  end
+
+  # Public privacy API (no API key required)
+  scope "/api/privacy", FounderPadWeb do
+    pipe_through :api_public
+    post "/cookie-consent", CookieConsentController, :create
   end
 
   # Webhook routes (no CSRF, raw body needed)
