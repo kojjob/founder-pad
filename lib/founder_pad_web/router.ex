@@ -93,6 +93,7 @@ defmodule FounderPadWeb.Router do
       live "/agents", AgentsLive
       live "/agents/new", AgentCreateLive
       live "/agents/:id", AgentDetailLive
+      live "/agents/:id/analytics", AgentAnalyticsLive
       live "/billing", BillingLive
       live "/team", TeamLive
       live "/settings", SettingsLive
@@ -136,6 +137,12 @@ defmodule FounderPadWeb.Router do
     end
 
     live "/onboarding", OnboardingLive
+  end
+
+  # Global search API (no API key required)
+  scope "/api", FounderPadWeb do
+    pipe_through :api_public
+    get "/search", SearchController, :search
   end
 
   # Push notification subscription (no API key required)
