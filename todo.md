@@ -34,16 +34,16 @@
 **Plan:** `docs/superpowers/plans/2026-04-03-admin-api-keys.md`
 **Depends on:** Sub-project 1 (is_admin field) ✅
 
-- [ ] Task 1: Add suspended_at to User + suspend/unsuspend actions
-- [ ] Task 2: ApiKeys domain + resources (ApiKey, ApiKeyUsage)
-- [ ] Task 3: ApiKey tests + factories
-- [ ] Task 4: ApiKeyAuth plug
-- [ ] Task 5: Admin routes + dashboard
-- [ ] Task 6: Admin users LiveView (list, detail, suspend)
-- [ ] Task 7: Admin organisations + subscriptions LiveViews
-- [ ] Task 8: Admin feature flags LiveView
-- [ ] Task 9: User-facing API keys LiveView
-- [ ] Task 10: Impersonation + admin nav + final integration
+- [x] Task 1: Add suspended_at to User + suspend/unsuspend actions
+- [x] Task 2: ApiKeys domain + resources (ApiKey, ApiKeyUsage)
+- [x] Task 3: ApiKey tests + factories
+- [x] Task 4: ApiKeyAuth plug
+- [x] Task 5: Admin routes + dashboard
+- [x] Task 6: Admin users LiveView (list, detail, suspend)
+- [x] Task 7: Admin organisations + subscriptions LiveViews
+- [x] Task 8: Admin feature flags LiveView
+- [x] Task 9: User-facing API keys LiveView
+- [x] Task 10: Impersonation + admin nav + final integration
 
 ---
 
