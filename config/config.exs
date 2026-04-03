@@ -83,7 +83,8 @@ config :founder_pad, Oban,
   plugins: [
     {Oban.Plugins.Cron, crontab: [
       {"*/5 * * * *", FounderPad.Content.Workers.PublishScheduledPostsWorker},
-      {"0 3 * * *", FounderPad.Privacy.Workers.HardDeleteWorker}
+      {"0 3 * * *", FounderPad.Privacy.Workers.HardDeleteWorker},
+      {"0 9 * * 1", FounderPad.Notifications.Workers.WeeklyDigestWorker}
     ]}
   ]
 
