@@ -13,6 +13,12 @@ defmodule FounderPad.Notifications do
       define :create_email_log, action: :create
       define :list_email_logs, action: :read
     end
+
+    resource FounderPad.Notifications.PushSubscription do
+      define :create_push_subscription, action: :create
+      define :deactivate_push_subscription, action: :deactivate
+      define :list_active_push_subscriptions, action: :active_for_user, args: [:user_id]
+    end
   end
 
   @doc "Broadcast a notification to a user via PubSub."
