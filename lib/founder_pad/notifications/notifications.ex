@@ -21,12 +21,22 @@ defmodule FounderPad.Notifications do
     end
   end
 
-  @doc "Broadcast a notification to a user via PubSub."
+  @doc "Broadcast a notification to a user via PubSub and enqueue push delivery."
   def broadcast_to_user(user_id, notification) do
     Phoenix.PubSub.broadcast(
       FounderPad.PubSub,
       "user_notifications:#{user_id}",
       {:new_notification, notification}
     )
+
+    # Enqueue push notification for all registered devices
+    %{
+      user_id: user_id,
+      title: Map.get(notification, :title, ""),
+      body: Map.get(notification, :body, ""),
+      action_url: Map.get(notification, :action_url, "/")
+    }
+    |> FounderPad.Notifications.Workers.PushNotificationWorker.new()
+    |> Oban.insert()
   end
 end
