@@ -82,7 +82,8 @@ config :founder_pad, Oban,
   repo: FounderPad.Repo,
   plugins: [
     {Oban.Plugins.Cron, crontab: [
-      {"*/5 * * * *", FounderPad.Content.Workers.PublishScheduledPostsWorker}
+      {"*/5 * * * *", FounderPad.Content.Workers.PublishScheduledPostsWorker},
+      {"0 3 * * *", FounderPad.Privacy.Workers.HardDeleteWorker}
     ]}
   ]
 
