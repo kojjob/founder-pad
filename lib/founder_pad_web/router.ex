@@ -76,6 +76,12 @@ defmodule FounderPadWeb.Router do
       live "/api-keys", ApiKeysLive
     end
 
+    # Admin impersonation controller routes (must be before live_session)
+    scope "/admin", Admin do
+      get "/impersonate/:id", ImpersonationController, :start
+      get "/stop-impersonation", ImpersonationController, :stop
+    end
+
     # Admin routes with admin authorization
     live_session :admin,
       layout: {FounderPadWeb.Layouts, :app},
