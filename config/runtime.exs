@@ -59,6 +59,13 @@ if config_env() == :prod do
   # Plausible
   config :founder_pad, :plausible_domain, System.get_env("PLAUSIBLE_DOMAIN")
 
+  # Push notifications
+  config :founder_pad, :push,
+    fcm_service_account: System.get_env("FIREBASE_SERVICE_ACCOUNT_JSON"),
+    vapid_public_key: System.get_env("VAPID_PUBLIC_KEY"),
+    vapid_private_key: System.get_env("VAPID_PRIVATE_KEY"),
+    vapid_subject: System.get_env("VAPID_SUBJECT") || "mailto:support@founderpad.io"
+
   # AI Providers
   config :founder_pad, :ai,
     anthropic_api_key: System.get_env("ANTHROPIC_API_KEY"),

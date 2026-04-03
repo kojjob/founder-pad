@@ -218,6 +218,17 @@ defmodule FounderPad.Factory do
     |> Ash.update!()
   end
 
+  def create_push_subscription!(user, attrs \\ %{}) do
+    FounderPad.Notifications.PushSubscription
+    |> Ash.Changeset.for_create(:create, %{
+      type: Map.get(attrs, :type, :web_push),
+      token: Map.get(attrs, :token, "test_token_#{System.unique_integer([:positive])}"),
+      device_name: Map.get(attrs, :device_name, "Test Browser"),
+      user_id: user.id
+    })
+    |> Ash.create!()
+  end
+
   def create_conversation_chain! do
     org = create_organisation!()
     user = create_user!()

@@ -270,6 +270,16 @@
           </form>
         </div>
         <div class="flex items-center gap-3">
+          <%!-- Push Notifications Toggle --%>
+          <button
+            phx-hook="PushNotifications"
+            id="push-notifications-btn"
+            class="flex items-center gap-2 px-3 py-1.5 text-xs rounded-lg border border-neutral-200/60 hover:bg-neutral-50 dark:border-neutral-700 dark:hover:bg-neutral-800 transition-colors"
+          >
+            <span class="material-symbols-outlined text-sm">notifications_active</span>
+            <span>Enable Notifications</span>
+          </button>
+
           <%!-- Notifications Dropdown --%>
           <div class="relative group/notif">
             <span class="sr-only" aria-live="polite">
