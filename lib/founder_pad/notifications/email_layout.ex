@@ -1,6 +1,12 @@
 defmodule FounderPad.Notifications.EmailLayout do
   @moduledoc "Shared branded HTML wrapper for all transactional emails."
 
+  @doc "Generates a signed unsubscribe URL for a given user and email category."
+  def unsubscribe_url(user_id, category) do
+    token = Phoenix.Token.sign(FounderPadWeb.Endpoint, "unsubscribe", {user_id, category})
+    "#{FounderPadWeb.Endpoint.url()}/unsubscribe/#{token}"
+  end
+
   @doc "Wraps email content in the standard FounderPad branded template."
   def wrap(subject, inner_html, opts \\ []) do
     unsubscribe_url = Keyword.get(opts, :unsubscribe_url)

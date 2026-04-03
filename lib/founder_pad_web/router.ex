@@ -34,6 +34,12 @@ defmodule FounderPadWeb.Router do
     live "/register", RegisterLive
   end
 
+  # Unsubscribe route (public, no auth required)
+  scope "/", FounderPadWeb do
+    pipe_through :browser
+    get "/unsubscribe/:token", UnsubscribeController, :unsubscribe
+  end
+
   # RSS feed routes (controller, not LiveView)
   scope "/", FounderPadWeb do
     pipe_through :browser
