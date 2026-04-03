@@ -2,8 +2,6 @@ defmodule FounderPadWeb.Admin.OrganisationsLiveTest do
   use FounderPadWeb.ConnCase, async: true
   use FounderPad.LiveViewHelpers
 
-  alias FounderPad.Factory
-
   describe "admin organisations list" do
     test "admin can see organisation list", %{conn: conn} do
       {conn, _admin, org} = setup_authenticated_admin(conn)
