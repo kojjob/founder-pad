@@ -4,21 +4,6 @@ defmodule FounderPadWeb.Admin.BlogListLiveTest do
 
   alias FounderPad.Factory
 
-  defp setup_authenticated_admin(conn) do
-    admin = Factory.create_admin_user!()
-    org = Factory.create_organisation!()
-    Factory.create_membership!(admin, org, :owner)
-
-    token = AshAuthentication.user_to_subject(admin)
-
-    conn =
-      conn
-      |> Phoenix.ConnTest.init_test_session(%{})
-      |> Plug.Conn.put_session(:user_token, token)
-
-    {conn, admin, org}
-  end
-
   describe "admin blog list" do
     test "admin can see all posts including drafts", %{conn: conn} do
       {conn, admin, _org} = setup_authenticated_admin(conn)

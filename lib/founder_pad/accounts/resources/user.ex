@@ -91,7 +91,7 @@ defmodule FounderPad.Accounts.User do
     # policy action_type([:update, :destroy]) do
     #   authorize_if expr(id == ^actor(:id))
     # end
-    policy action([:suspend, :unsuspend, :list_all]) do
+    policy action([:suspend, :unsuspend, :list_all, :toggle_admin]) do
       authorize_if expr(^actor(:is_admin) == true)
     end
 
@@ -146,6 +146,16 @@ defmodule FounderPad.Accounts.User do
     update :unsuspend do
       accept []
       change set_attribute(:suspended_at, nil)
+    end
+
+    update :toggle_admin do
+      require_atomic? false
+      accept []
+
+      change fn changeset, _ctx ->
+        current = changeset.data.is_admin
+        Ash.Changeset.force_change_attribute(changeset, :is_admin, !current)
+      end
     end
 
     read :list_all do
