@@ -29,12 +29,13 @@ import ScrollReveal from "./hooks/scroll_reveal"
 import AutoDismiss from "./hooks/auto_dismiss"
 import ThemeSettings from "./hooks/theme_settings"
 import TiptapEditor from "./hooks/tiptap_editor"
+import PushNotifications from "./hooks/push_notifications"
 
 const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 const liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,
   params: {_csrf_token: csrfToken},
-  hooks: {ThemeToggle, Analytics, ScrollReveal, AutoDismiss, ThemeSettings, TiptapEditor},
+  hooks: {ThemeToggle, Analytics, ScrollReveal, AutoDismiss, ThemeSettings, TiptapEditor, PushNotifications},
 })
 
 // Show progress bar on live navigation and form submits

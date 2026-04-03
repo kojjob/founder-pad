@@ -138,6 +138,12 @@ defmodule FounderPadWeb.Router do
     live "/onboarding", OnboardingLive
   end
 
+  # Push notification subscription (no API key required)
+  scope "/api/push", FounderPadWeb do
+    pipe_through :api_public
+    post "/subscribe", PushSubscriptionController, :create
+  end
+
   # Public privacy API (no API key required)
   scope "/api/privacy", FounderPadWeb do
     pipe_through :api_public
