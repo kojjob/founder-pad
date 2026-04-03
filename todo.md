@@ -51,18 +51,18 @@
 **Branch:** `feature/oauth-gdpr-email`
 **Independent** — can run in parallel with Sub-project 2
 
-- [ ] OAuth2 strategies (Google, GitHub, Microsoft)
-- [ ] SocialIdentity resource + account linking
-- [ ] Connected Accounts UI in Settings
-- [ ] Privacy domain (CookieConsent, DataExportRequest, DeletionRequest)
-- [ ] Cookie consent banner
-- [ ] Data export pipeline (Oban worker)
-- [ ] Account deletion pipeline (soft delete → hard delete)
-- [ ] Shared EmailLayout wrapper
-- [ ] Onboarding drip emails (day 1, 3, 7)
-- [ ] Weekly digest worker
-- [ ] Billing alert emails
-- [ ] Unsubscribe flow + email preferences
+- [x] OAuth2 strategies (Google, GitHub, Microsoft)
+- [x] SocialIdentity resource + account linking
+- [x] Connected Accounts UI in Settings
+- [x] Privacy domain (CookieConsent, DataExportRequest, DeletionRequest)
+- [x] Cookie consent banner
+- [x] Data export pipeline (Oban worker)
+- [x] Account deletion pipeline (soft delete → hard delete)
+- [x] Shared EmailLayout wrapper
+- [x] Onboarding drip emails (day 1, 3, 7)
+- [x] Weekly digest worker
+- [x] Billing alert emails
+- [x] Unsubscribe flow + email preferences
 
 ---
 

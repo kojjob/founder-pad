@@ -70,6 +70,8 @@ defmodule FounderPadWeb.Router do
   scope "/", FounderPadWeb do
     pipe_through :browser
 
+    live "/privacy", PrivacyLive
+    live "/terms", TermsLive
     get "/sitemap.xml", SitemapController, :index
     post "/checkout/:plan_slug", CheckoutController, :create
     live "/", LandingLive
