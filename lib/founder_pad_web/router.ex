@@ -25,6 +25,7 @@ defmodule FounderPadWeb.Router do
     pipe_through :browser
     get "/session", AuthSessionController, :create
     delete "/session", AuthSessionController, :delete
+    get "/oauth/:provider/callback", OAuthCallbackController, :callback
   end
 
   # Auth routes (no layout - full-page auth screens)

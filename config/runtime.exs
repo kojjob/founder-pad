@@ -23,6 +23,14 @@ end
 config :founder_pad, FounderPadWeb.Endpoint,
   http: [port: String.to_integer(System.get_env("PORT", "4000"))]
 
+config :founder_pad, :oauth,
+  google_client_id: System.get_env("GOOGLE_CLIENT_ID"),
+  google_client_secret: System.get_env("GOOGLE_CLIENT_SECRET"),
+  github_client_id: System.get_env("GITHUB_CLIENT_ID"),
+  github_client_secret: System.get_env("GITHUB_CLIENT_SECRET"),
+  microsoft_client_id: System.get_env("MICROSOFT_CLIENT_ID"),
+  microsoft_client_secret: System.get_env("MICROSOFT_CLIENT_SECRET")
+
 if config_env() == :prod do
   # Database
   database_url =

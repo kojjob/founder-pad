@@ -23,5 +23,11 @@ defmodule FounderPad.Accounts do
     end
 
     resource FounderPad.Accounts.Token
+
+    resource FounderPad.Accounts.SocialIdentity do
+      define :create_social_identity, action: :create
+      define :find_social_identity, action: :by_provider, args: [:provider, :provider_uid]
+      define :list_user_social_identities, action: :by_user, args: [:user_id]
+    end
   end
 end

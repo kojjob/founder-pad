@@ -84,6 +84,7 @@ defmodule FounderPad.Accounts.User do
 
   relationships do
     has_many :memberships, FounderPad.Accounts.Membership
+    has_many :social_identities, FounderPad.Accounts.SocialIdentity
 
     many_to_many :organisations, FounderPad.Accounts.Organisation do
       through FounderPad.Accounts.Membership
