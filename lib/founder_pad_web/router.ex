@@ -99,6 +99,7 @@ defmodule FounderPadWeb.Router do
       live "/settings", SettingsLive
       live "/api-keys", ApiKeysLive
       live "/webhooks", WebhookLogsLive
+      live "/audit-log", AuditLogLive
     end
 
     # Admin impersonation controller routes (must be before live_session)
