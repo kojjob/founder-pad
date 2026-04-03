@@ -179,6 +179,45 @@ defmodule FounderPad.Factory do
     |> Ash.create!()
   end
 
+  def create_help_category!(attrs \\ %{}) do
+    admin = Map.get_lazy(attrs, :actor, fn -> create_admin_user!() end)
+
+    FounderPad.HelpCenter.Category
+    |> Ash.Changeset.for_create(:create, %{
+      name: Map.get(attrs, :name, "Category #{System.unique_integer([:positive])}"),
+      slug: Map.get(attrs, :slug, nil),
+      description: Map.get(attrs, :description, "Help category"),
+      icon: Map.get(attrs, :icon, "help"),
+      position: Map.get(attrs, :position, 0)
+    }, actor: admin)
+    |> Ash.create!()
+  end
+
+  def create_help_article!(category, attrs \\ %{}) do
+    admin = Map.get_lazy(attrs, :actor, fn -> create_admin_user!() end)
+
+    FounderPad.HelpCenter.Article
+    |> Ash.Changeset.for_create(:create, %{
+      title: Map.get(attrs, :title, "Article #{System.unique_integer([:positive])}"),
+      slug: Map.get(attrs, :slug, nil),
+      body: Map.get(attrs, :body, "This is help article content about billing and payments."),
+      excerpt: Map.get(attrs, :excerpt, "Help article excerpt"),
+      status: Map.get(attrs, :status, :draft),
+      position: Map.get(attrs, :position, 0),
+      category_id: category.id
+    }, actor: admin)
+    |> Ash.create!()
+  end
+
+  def create_published_help_article!(category, attrs \\ %{}) do
+    admin = Map.get_lazy(attrs, :actor, fn -> create_admin_user!() end)
+    article = create_help_article!(category, Map.put(attrs, :actor, admin))
+
+    article
+    |> Ash.Changeset.for_update(:publish, %{}, actor: admin)
+    |> Ash.update!()
+  end
+
   def create_conversation_chain! do
     org = create_organisation!()
     user = create_user!()
