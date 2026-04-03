@@ -31,16 +31,19 @@
 
 ## Sub-project 2: Admin & API Infrastructure
 **Branch:** `feature/admin-api-keys`
-**Depends on:** Sub-project 1 (is_admin field)
+**Plan:** `docs/superpowers/plans/2026-04-03-admin-api-keys.md`
+**Depends on:** Sub-project 1 (is_admin field) ✅
 
-- [ ] Admin panel foundation (layout, dashboard, RequireAdmin)
-- [ ] User management (list, search, suspend, impersonate)
-- [ ] Organisation management
-- [ ] Subscription management
-- [ ] Feature flag management UI
-- [ ] API Keys domain (ApiKey + ApiKeyUsage resources)
-- [ ] ApiKeyAuth plug + rate limiting integration
-- [ ] API keys LiveView UI
+- [x] Task 1: Add suspended_at to User + suspend/unsuspend actions
+- [x] Task 2: ApiKeys domain + resources (ApiKey, ApiKeyUsage)
+- [x] Task 3: ApiKey tests + factories
+- [x] Task 4: ApiKeyAuth plug
+- [x] Task 5: Admin routes + dashboard
+- [x] Task 6: Admin users LiveView (list, detail, suspend)
+- [x] Task 7: Admin organisations + subscriptions LiveViews
+- [x] Task 8: Admin feature flags LiveView
+- [x] Task 9: User-facing API keys LiveView
+- [x] Task 10: Impersonation + admin nav + final integration
 
 ---
 

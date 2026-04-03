@@ -4,21 +4,6 @@ defmodule FounderPadWeb.Admin.ChangelogListLiveTest do
 
   alias FounderPad.Factory
 
-  defp setup_authenticated_admin(conn) do
-    admin = Factory.create_admin_user!()
-    org = Factory.create_organisation!()
-    Factory.create_membership!(admin, org, :owner)
-
-    token = AshAuthentication.user_to_subject(admin)
-
-    conn =
-      conn
-      |> Phoenix.ConnTest.init_test_session(%{})
-      |> Plug.Conn.put_session(:user_token, token)
-
-    {conn, admin, org}
-  end
-
   describe "admin changelog list" do
     test "admin can see all changelog entries", %{conn: conn} do
       {conn, admin, _org} = setup_authenticated_admin(conn)

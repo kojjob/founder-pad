@@ -12,6 +12,7 @@ defmodule FounderPadWeb.Router do
 
   pipeline :api do
     plug :accepts, ["json"]
+    plug FounderPadWeb.Plugs.ApiKeyAuth
     plug FounderPadWeb.Plugs.RateLimiter, limit: 100, window_ms: 60_000
   end
 
@@ -72,6 +73,13 @@ defmodule FounderPadWeb.Router do
       live "/billing", BillingLive
       live "/team", TeamLive
       live "/settings", SettingsLive
+      live "/api-keys", ApiKeysLive
+    end
+
+    # Admin impersonation controller routes (must be before live_session)
+    scope "/admin", Admin do
+      get "/impersonate/:id", ImpersonationController, :start
+      get "/stop-impersonation", ImpersonationController, :stop
     end
 
     # Admin routes with admin authorization
@@ -83,6 +91,12 @@ defmodule FounderPadWeb.Router do
         {FounderPadWeb.Hooks.RequireAdmin, :default}
       ] do
       scope "/admin", Admin do
+        live "/", AdminDashboardLive
+        live "/users", UsersLive
+        live "/users/:id", UserDetailLive
+        live "/organisations", OrganisationsLive
+        live "/subscriptions", SubscriptionsLive
+        live "/feature-flags", FeatureFlagsLive
         live "/blog", BlogListLive
         live "/blog/new", BlogEditorLive
         live "/blog/:id/edit", BlogEditorLive
