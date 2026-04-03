@@ -639,4 +639,24 @@ defmodule FounderPadWeb.CoreComponents do
     </footer>
     """
   end
+
+  @doc "Renders a contextual help link icon."
+  attr :context, :string, required: true, doc: "Help context key, e.g. 'agents.create'"
+  attr :class, :string, default: ""
+
+  def help_link(assigns) do
+    ~H"""
+    <a
+      href={"/help/search?q=#{@context}"}
+      target="_blank"
+      class={[
+        "inline-flex items-center justify-center w-5 h-5 rounded-full text-on-surface-variant/50 hover:text-primary hover:bg-primary/10 transition-colors cursor-help",
+        @class
+      ]}
+      title="Help"
+    >
+      <span class="material-symbols-outlined text-sm">help</span>
+    </a>
+    """
+  end
 end

@@ -60,12 +60,20 @@
           <.nav_link href="/admin/blog" icon="edit_note" label="Blog" active={@active_nav == :admin_blog} />
           <.nav_link href="/admin/changelog" icon="new_releases" label="Changelog" active={@active_nav == :admin_changelog} />
           <.nav_link href="/admin/seo" icon="search" label="SEO" active={@active_nav == :admin_seo} />
+          <.nav_link href="/admin/help" icon="support_agent" label="Help" active={@active_nav == :admin_help} />
         </div>
       <% end %>
     </nav>
 
 <!-- Help + Docs -->
     <div class="space-y-1">
+      <a
+        href="/help"
+        class="flex items-center gap-3 px-3 py-2 text-on-surface/40 text-sm hover:text-on-surface hover:bg-surface-container-high rounded-md transition-colors"
+      >
+        <span class="material-symbols-outlined text-lg">support</span>
+        <span>Help Center</span>
+      </a>
       <a
         href="/docs"
 
@@ -174,12 +182,20 @@
             <.nav_link href="/admin/blog" icon="edit_note" label="Blog" active={@active_nav == :admin_blog} />
             <.nav_link href="/admin/changelog" icon="new_releases" label="Changelog" active={@active_nav == :admin_changelog} />
             <.nav_link href="/admin/seo" icon="search" label="SEO" active={@active_nav == :admin_seo} />
+            <.nav_link href="/admin/help" icon="support_agent" label="Help" active={@active_nav == :admin_help} />
           </div>
         <% end %>
       </nav>
 
       <%!-- Help + Docs --%>
       <div class="space-y-1">
+        <a
+          href="/help"
+          class="flex items-center gap-3 px-3 py-2 text-on-surface/40 text-sm hover:text-on-surface hover:bg-surface-container-high rounded-md transition-colors"
+        >
+          <span class="material-symbols-outlined text-lg">support</span>
+          <span>Help Center</span>
+        </a>
         <a
           href="/docs"
 

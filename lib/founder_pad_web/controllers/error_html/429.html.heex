@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>404 — Page Not Found | FounderPad</title>
+  <title>429 — Too Many Requests | FounderPad</title>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@700;800&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
   <style>
@@ -19,22 +19,16 @@
 </head>
 <body>
   <div style="position: relative; text-align: center; max-width: 500px; padding: 2rem;">
-    <div class="error-code">404</div>
+    <div class="error-code">429</div>
     <div style="position: relative; z-index: 1;">
-      <span class="material-symbols-outlined" style="font-size: 64px; color: #c0c1ff; opacity: 0.6;">explore_off</span>
-      <h1 class="headline" style="font-size: 2.5rem; margin: 1rem 0 0.5rem;">Lost in the void.</h1>
-      <p class="muted" style="font-size: 1rem; line-height: 1.6; margin-bottom: 2rem;">The page you're looking for doesn't exist or has been moved to another dimension.</p>
+      <span class="material-symbols-outlined" style="font-size: 64px; color: #c0c1ff; opacity: 0.6;">speed</span>
+      <h1 class="headline" style="font-size: 2.5rem; margin: 1rem 0 0.5rem;">Too many requests.</h1>
+      <p class="muted" style="font-size: 1rem; line-height: 1.6; margin-bottom: 2rem;">You've hit our rate limit. Please wait a moment and try again.</p>
       <a href="/" class="btn">
         <span class="material-symbols-outlined" style="font-size: 18px;">arrow_back</span>
         Back to Safety
       </a>
-      <div style="margin-top: 1rem;">
-        <a href="/help" style="color: #c0c1ff; font-size: 14px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; opacity: 0.7; transition: opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'">
-          <span class="material-symbols-outlined" style="font-size: 16px;">search</span>
-          Search Help Center
-        </a>
-      </div>
-      <p class="mono" style="font-size: 11px; color: #464554; margin-top: 2rem;">ERROR_CODE: 404_NOT_FOUND // FOUNDERPAD</p>
+      <p class="mono" style="font-size: 11px; color: #464554; margin-top: 2rem;">ERROR_CODE: 429_RATE_LIMITED // FOUNDERPAD</p>
     </div>
   </div>
 </body>
