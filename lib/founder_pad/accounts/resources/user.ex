@@ -67,6 +67,18 @@ defmodule FounderPad.Accounts.User do
       public? true
     end
 
+    attribute :email_preferences, :map do
+      default %{
+        "marketing" => true,
+        "product_updates" => true,
+        "weekly_digest" => true,
+        "billing" => true,
+        "team" => true
+      }
+      allow_nil? false
+      public? true
+    end
+
     timestamps()
   end
 
@@ -156,6 +168,10 @@ defmodule FounderPad.Accounts.User do
         current = changeset.data.is_admin
         Ash.Changeset.force_change_attribute(changeset, :is_admin, !current)
       end
+    end
+
+    update :update_email_preferences do
+      accept [:email_preferences]
     end
 
     read :list_all do
