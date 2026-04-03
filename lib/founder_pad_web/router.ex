@@ -46,6 +46,16 @@ defmodule FounderPadWeb.Router do
     live "/:slug", BlogPostLive
   end
 
+  # Help center routes (public, no auth required)
+  scope "/help", FounderPadWeb.Help do
+    pipe_through :browser
+    live "/", HelpIndexLive
+    live "/search", HelpSearchLive
+    live "/contact", HelpContactLive
+    live "/:category_slug", HelpCategoryLive
+    live "/:category_slug/:slug", HelpArticleLive
+  end
+
   scope "/", FounderPadWeb do
     pipe_through :browser
 
@@ -106,6 +116,9 @@ defmodule FounderPadWeb.Router do
         live "/changelog/new", ChangelogEditorLive
         live "/changelog/:id/edit", ChangelogEditorLive
         live "/seo", SeoDashboardLive
+        live "/help", HelpArticlesLive
+        live "/help/new", HelpArticleEditorLive
+        live "/help/:id/edit", HelpArticleEditorLive
       end
     end
 
