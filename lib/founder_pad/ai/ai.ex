@@ -23,5 +23,13 @@ defmodule FounderPad.AI do
       define :create_tool_call, action: :create
       define :list_tool_calls, action: :read
     end
+
+    resource FounderPad.AI.AgentTemplate do
+      define :create_agent_template, action: :create
+      define :list_agent_templates, action: :read
+      define :get_agent_template, action: :read, get_by: [:id]
+      define :list_featured_templates, action: :featured
+      define :list_templates_by_category, action: :by_category, args: [:category]
+    end
   end
 end
