@@ -70,6 +70,7 @@ defmodule FounderPadWeb.Router do
   scope "/", FounderPadWeb do
     pipe_through :browser
 
+    live "/status", StatusLive
     live "/privacy", PrivacyLive
     live "/terms", TermsLive
     get "/sitemap.xml", SitemapController, :index
@@ -92,14 +93,19 @@ defmodule FounderPadWeb.Router do
       live "/workspaces", WorkspacesLive
       live "/agents", AgentsLive
       live "/agents/new", AgentCreateLive
+      live "/agents/templates", AgentTemplatesLive
       live "/agents/:id", AgentDetailLive
       live "/agents/:id/analytics", AgentAnalyticsLive
+      live "/agents/:id/widget", WidgetConfigLive
       live "/billing", BillingLive
       live "/team", TeamLive
       live "/settings", SettingsLive
+      live "/settings/two-factor", TwoFactorLive
       live "/api-keys", ApiKeysLive
       live "/webhooks", WebhookLogsLive
       live "/audit-log", AuditLogLive
+      live "/usage", UsageLive
+      live "/referrals", ReferralsLive
     end
 
     # Admin impersonation controller routes (must be before live_session)
@@ -135,10 +141,19 @@ defmodule FounderPadWeb.Router do
         live "/help", HelpArticlesLive
         live "/help/new", HelpArticleEditorLive
         live "/help/:id/edit", HelpArticleEditorLive
+        live "/incidents", IncidentsLive
+        live "/templates", AgentTemplatesLive
       end
     end
 
     live "/onboarding", OnboardingLive
+  end
+
+  # Widget routes (public, no auth required)
+  scope "/widget", FounderPadWeb do
+    pipe_through :api_public
+    get "/embed/:agent_id", WidgetController, :script
+    get "/chat/:agent_id", WidgetController, :chat
   end
 
   # Global search API (no API key required)

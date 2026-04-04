@@ -3,6 +3,7 @@ defmodule FounderPad.Accounts.UserTotpTest do
 
   alias FounderPad.Accounts.UserTotp
   import FounderPad.Factory
+  import Bitwise
 
   describe "generate_secret/0" do
     test "generates a base32-encoded string" do

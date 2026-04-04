@@ -1,6 +1,7 @@
 defmodule FounderPadWeb.TwoFactorLiveTest do
   use FounderPadWeb.ConnCase, async: true
   use FounderPad.LiveViewHelpers
+  import Bitwise
 
   alias FounderPad.Accounts.UserTotp
 

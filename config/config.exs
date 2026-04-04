@@ -62,7 +62,7 @@ config :phoenix, :json_library, Jason
 
 # Ash Framework
 config :founder_pad,
-  ash_domains: [FounderPad.Accounts, FounderPad.Billing, FounderPad.AI, FounderPad.Notifications, FounderPad.Audit, FounderPad.FeatureFlags, FounderPad.Webhooks, FounderPad.Analytics, FounderPad.Content, FounderPad.ApiKeys, FounderPad.HelpCenter, FounderPad.Privacy]
+  ash_domains: [FounderPad.Accounts, FounderPad.Billing, FounderPad.AI, FounderPad.Notifications, FounderPad.Audit, FounderPad.FeatureFlags, FounderPad.Webhooks, FounderPad.Analytics, FounderPad.Content, FounderPad.ApiKeys, FounderPad.HelpCenter, FounderPad.Privacy, FounderPad.System, FounderPad.Referrals]
 
 # Token signing secret — loaded from env var; fallback only for dev/test
 config :founder_pad,
