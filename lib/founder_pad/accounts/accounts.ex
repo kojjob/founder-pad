@@ -29,5 +29,13 @@ defmodule FounderPad.Accounts do
       define :find_social_identity, action: :by_provider, args: [:provider, :provider_uid]
       define :list_user_social_identities, action: :by_user, args: [:user_id]
     end
+
+    resource FounderPad.Accounts.UserTotp do
+      define :create_user_totp, action: :create
+      define :enable_totp, action: :enable
+      define :disable_totp, action: :disable
+      define :get_totp_by_user, action: :by_user, args: [:user_id]
+      define :destroy_user_totp, action: :destroy
+    end
   end
 end

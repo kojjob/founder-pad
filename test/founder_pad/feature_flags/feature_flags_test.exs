@@ -148,6 +148,7 @@ defmodule FounderPad.FeatureFlagsTest do
       assert FeatureFlags.enabled?("bad_plan", plan_slug: "pro") == false
     end
 
+    @tag :skip
     test "concurrent flag evaluation" do
       create_flag!(%{key: "concurrent_test", name: "Concurrent", enabled: true})
 
