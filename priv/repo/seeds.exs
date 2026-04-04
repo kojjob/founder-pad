@@ -8,36 +8,30 @@ IO.puts("🌱 Seeding FounderPad...")
 # --- Admin User ---
 IO.puts("  Creating admin user...")
 {:ok, admin} =
-  Accounts.User
-  |> Ash.Changeset.for_create(:register_with_password, %{
-    email: "admin@founderpad.io",
-    password: "Admin123!",
-    password_confirmation: "Admin123!"
+  FounderPad.Repo.insert(%Accounts.User{
+    id: Ecto.UUID.generate(),
+    email: %Ash.CiString{string: "admin@founderpad.io"},
+    hashed_password: Bcrypt.hash_pwd_salt("Admin123!"),
+    name: "Admin User",
+    is_admin: true,
+    preferences: %{},
+    email_preferences: %{"marketing" => true, "product_updates" => true, "weekly_digest" => true, "billing" => true, "team" => true}
   })
-  |> Ash.create()
-
-admin
-|> Ash.Changeset.for_update(:update_profile, %{name: "Admin User"})
-|> Ash.update!()
-
-admin
-|> Ash.Changeset.force_change_attribute(:is_admin, true)
-|> Ash.update!()
+IO.puts("    Admin: admin@founderpad.io / Admin123!")
 
 # --- Demo User ---
 IO.puts("  Creating demo user...")
 {:ok, demo_user} =
-  Accounts.User
-  |> Ash.Changeset.for_create(:register_with_password, %{
-    email: "demo@founderpad.io",
-    password: "Demo123!",
-    password_confirmation: "Demo123!"
+  FounderPad.Repo.insert(%Accounts.User{
+    id: Ecto.UUID.generate(),
+    email: %Ash.CiString{string: "demo@founderpad.io"},
+    hashed_password: Bcrypt.hash_pwd_salt("Demo123!"),
+    name: "Demo User",
+    is_admin: false,
+    preferences: %{},
+    email_preferences: %{"marketing" => true, "product_updates" => true, "weekly_digest" => true, "billing" => true, "team" => true}
   })
-  |> Ash.create()
-
-demo_user
-|> Ash.Changeset.for_update(:update_profile, %{name: "Demo User"})
-|> Ash.update!()
+IO.puts("    Demo: demo@founderpad.io / Demo123!")
 
 # --- Organisation ---
 IO.puts("  Creating organisation...")
@@ -48,11 +42,11 @@ IO.puts("  Creating organisation...")
 
 Accounts.Membership
 |> Ash.Changeset.for_create(:create, %{user_id: admin.id, organisation_id: org.id, role: :owner})
-|> Ash.create!()
+|> Ash.create!(authorize?: false)
 
 Accounts.Membership
 |> Ash.Changeset.for_create(:create, %{user_id: demo_user.id, organisation_id: org.id, role: :member})
-|> Ash.create!()
+|> Ash.create!(authorize?: false)
 
 # --- Feature Flags ---
 IO.puts("  Creating feature flags...")
@@ -70,7 +64,7 @@ flags = [
 for flag <- flags do
   FeatureFlags.FeatureFlag
   |> Ash.Changeset.for_create(:create, flag, actor: admin)
-  |> Ash.create!()
+  |> Ash.create!(authorize?: false)
 end
 
 # --- Blog Categories ---
@@ -85,7 +79,7 @@ categories = [
 blog_cats = for cat <- categories do
   Content.Category
   |> Ash.Changeset.for_create(:create, cat, actor: admin)
-  |> Ash.create!()
+  |> Ash.create!(authorize?: false)
 end
 
 # --- Blog Posts ---
@@ -117,12 +111,13 @@ posts = [
 ]
 
 for post <- posts do
+  post_params = post |> Map.drop([:category_id]) |> Map.put(:author_id, admin.id)
   p = Content.Post
-  |> Ash.Changeset.for_create(:create, Map.put(post, :author_id, admin.id), actor: admin)
-  |> Ash.create!()
+  |> Ash.Changeset.for_create(:create, post_params, actor: admin)
+  |> Ash.create!(authorize?: false)
 
   if post.status == :published do
-    p |> Ash.Changeset.for_update(:publish, %{}, actor: admin) |> Ash.update!()
+    p |> Ash.Changeset.for_update(:publish, %{}, actor: admin) |> Ash.update!(authorize?: false)
   end
 end
 
@@ -137,9 +132,9 @@ changelog = [
 for entry <- changelog do
   e = Content.ChangelogEntry
   |> Ash.Changeset.for_create(:create, Map.put(entry, :author_id, admin.id), actor: admin)
-  |> Ash.create!()
+  |> Ash.create!(authorize?: false)
 
-  e |> Ash.Changeset.for_update(:publish, %{}, actor: admin) |> Ash.update!()
+  e |> Ash.Changeset.for_update(:publish, %{}, actor: admin) |> Ash.update!(authorize?: false)
 end
 
 # --- Help Center ---
@@ -156,7 +151,7 @@ help_categories = [
 help_cats = for cat <- help_categories do
   HelpCenter.Category
   |> Ash.Changeset.for_create(:create, cat, actor: admin)
-  |> Ash.create!()
+  |> Ash.create!(authorize?: false)
 end
 
 help_articles = [
@@ -170,9 +165,9 @@ help_articles = [
 for article <- help_articles do
   a = HelpCenter.Article
   |> Ash.Changeset.for_create(:create, article, actor: admin)
-  |> Ash.create!()
+  |> Ash.create!(authorize?: false)
 
-  a |> Ash.Changeset.for_update(:publish, %{}, actor: admin) |> Ash.update!()
+  a |> Ash.Changeset.for_update(:publish, %{}, actor: admin) |> Ash.update!(authorize?: false)
 end
 
 # --- Agent Templates ---
@@ -188,7 +183,7 @@ templates = [
 for tmpl <- templates do
   AI.AgentTemplate
   |> Ash.Changeset.for_create(:create, tmpl, actor: admin)
-  |> Ash.create!()
+  |> Ash.create!(authorize?: false)
 end
 
 IO.puts("✅ Seed complete!")
