@@ -11,9 +11,25 @@ defmodule FounderPadWeb.AgentDetailLive do
         stats = compute_agent_stats(agent)
         logs = load_audit_logs(agent.id)
 
+        user = socket.assigns[:current_user]
+
         if connected?(socket) do
           Phoenix.PubSub.subscribe(FounderPad.PubSub, "conversation:#{conversation.id}")
+
+          # Track presence for real-time collaboration
+          topic = "agent:#{agent.id}"
+          Phoenix.PubSub.subscribe(FounderPad.PubSub, topic)
+
+          if user do
+            FounderPadWeb.Presence.track(self(), topic, user.id, %{
+              name: user.name || to_string(user.email),
+              avatar_url: user.avatar_url,
+              joined_at: DateTime.utc_now()
+            })
+          end
         end
+
+        present_users = list_present_users(agent.id)
 
         {:ok,
          assign(socket,
@@ -33,7 +49,8 @@ defmodule FounderPadWeb.AgentDetailLive do
            max_tokens: agent.max_tokens,
            system_prompt: agent.system_prompt,
            model: agent.model,
-           provider: agent.provider
+           provider: agent.provider,
+           present_users: present_users
          )}
 
       {:error, _} ->
@@ -57,6 +74,13 @@ defmodule FounderPadWeb.AgentDetailLive do
      socket
      |> put_flash(:error, "Agent error: #{inspect(reason)}")
      |> assign(streaming: false)}
+  end
+
+  # ── Presence Handlers ──
+
+  def handle_info(%Phoenix.Socket.Broadcast{event: "presence_diff"}, socket) do
+    present_users = list_present_users(socket.assigns.agent.id)
+    {:noreply, assign(socket, present_users: present_users)}
   end
 
   # ── Event Handlers ──
@@ -211,6 +235,20 @@ defmodule FounderPadWeb.AgentDetailLive do
         </div>
 
         <div class="flex items-center gap-3">
+          <%!-- Presence indicators --%>
+          <%= if @present_users != [] do %>
+            <div class="flex items-center gap-1 mr-2" title={"#{length(@present_users)} user(s) viewing"}>
+              <div class="flex -space-x-2">
+                <div :for={{user, idx} <- Enum.with_index(@present_users)} class={[
+                  "w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white ring-2 ring-surface",
+                  presence_color(idx)
+                ]} title={user.name}>
+                  {user_initials(user.name)}
+                </div>
+              </div>
+              <span class="text-xs text-on-surface-variant ml-2">{length(@present_users)} online</span>
+            </div>
+          <% end %>
           <button phx-click="toggle_agent" class={[
             "px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors flex items-center gap-2",
             if(@agent.active,
@@ -663,4 +701,25 @@ defmodule FounderPadWeb.AgentDetailLive do
       %{time: "14:02:18", level: "INFO", msg: "Ready to process messages."}
     ]
   end
+
+  defp list_present_users(agent_id) do
+    "agent:#{agent_id}"
+    |> FounderPadWeb.Presence.list()
+    |> Enum.map(fn {_user_id, %{metas: [meta | _]}} -> meta end)
+  end
+
+  defp presence_color(index) do
+    colors = ["bg-primary", "bg-secondary", "bg-tertiary", "bg-error", "bg-warning"]
+    Enum.at(colors, rem(index, length(colors)))
+  end
+
+  defp user_initials(name) when is_binary(name) and byte_size(name) > 0 do
+    name
+    |> String.split(" ", parts: 2)
+    |> Enum.map(&String.first/1)
+    |> Enum.join()
+    |> String.upcase()
+  end
+
+  defp user_initials(_), do: "?"
 end
