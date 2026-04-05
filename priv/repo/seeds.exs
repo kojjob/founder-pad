@@ -1,73 +1,109 @@
 # priv/repo/seeds.exs
 # Run with: mix run priv/repo/seeds.exs
+# Idempotent — safe to run multiple times.
 
 alias FounderPad.{Accounts, Content, HelpCenter, FeatureFlags, AI}
+import Ecto.Query
+require Ash.Query
 
 IO.puts("🌱 Seeding FounderPad...")
 
 # --- Admin User ---
 IO.puts("  Creating admin user...")
 
-{:ok, admin} =
-  FounderPad.Repo.insert(%Accounts.User{
-    id: Ecto.UUID.generate(),
-    email: %Ash.CiString{string: "admin@founderpad.io"},
-    hashed_password: Bcrypt.hash_pwd_salt("Admin123!"),
-    name: "Admin User",
-    is_admin: true,
-    preferences: %{},
-    email_preferences: %{
-      "marketing" => true,
-      "product_updates" => true,
-      "weekly_digest" => true,
-      "billing" => true,
-      "team" => true
-    }
-  })
+admin =
+  case FounderPad.Repo.one(from(u in Accounts.User, where: u.email == ^"admin@founderpad.io")) do
+    nil ->
+      {:ok, u} =
+        FounderPad.Repo.insert(%Accounts.User{
+          id: Ecto.UUID.generate(),
+          email: %Ash.CiString{string: "admin@founderpad.io"},
+          hashed_password: Bcrypt.hash_pwd_salt("Admin123!"),
+          name: "Admin User",
+          is_admin: true,
+          preferences: %{},
+          email_preferences: %{
+            "marketing" => true,
+            "product_updates" => true,
+            "weekly_digest" => true,
+            "billing" => true,
+            "team" => true
+          }
+        })
 
-IO.puts("    Admin: admin@founderpad.io / Admin123!")
+      IO.puts("    Created admin: admin@founderpad.io / Admin123!")
+      u
+
+    existing ->
+      IO.puts("    Admin already exists, skipping.")
+      existing
+  end
 
 # --- Demo User ---
 IO.puts("  Creating demo user...")
 
-{:ok, demo_user} =
-  FounderPad.Repo.insert(%Accounts.User{
-    id: Ecto.UUID.generate(),
-    email: %Ash.CiString{string: "demo@founderpad.io"},
-    hashed_password: Bcrypt.hash_pwd_salt("Demo123!"),
-    name: "Demo User",
-    is_admin: false,
-    preferences: %{},
-    email_preferences: %{
-      "marketing" => true,
-      "product_updates" => true,
-      "weekly_digest" => true,
-      "billing" => true,
-      "team" => true
-    }
-  })
+demo_user =
+  case FounderPad.Repo.one(from(u in Accounts.User, where: u.email == ^"demo@founderpad.io")) do
+    nil ->
+      {:ok, u} =
+        FounderPad.Repo.insert(%Accounts.User{
+          id: Ecto.UUID.generate(),
+          email: %Ash.CiString{string: "demo@founderpad.io"},
+          hashed_password: Bcrypt.hash_pwd_salt("Demo123!"),
+          name: "Demo User",
+          is_admin: false,
+          preferences: %{},
+          email_preferences: %{
+            "marketing" => true,
+            "product_updates" => true,
+            "weekly_digest" => true,
+            "billing" => true,
+            "team" => true
+          }
+        })
 
-IO.puts("    Demo: demo@founderpad.io / Demo123!")
+      IO.puts("    Created demo: demo@founderpad.io / Demo123!")
+      u
+
+    existing ->
+      IO.puts("    Demo user already exists, skipping.")
+      existing
+  end
 
 # --- Organisation ---
 IO.puts("  Creating organisation...")
 
-{:ok, org} =
-  Accounts.Organisation
-  |> Ash.Changeset.for_create(:create, %{name: "Acme Corp"})
-  |> Ash.create()
+_org =
+  case FounderPad.Repo.one(from(o in Accounts.Organisation, limit: 1)) do
+    nil ->
+      {:ok, o} =
+        Accounts.Organisation
+        |> Ash.Changeset.for_create(:create, %{name: "Acme Corp"})
+        |> Ash.create()
 
-Accounts.Membership
-|> Ash.Changeset.for_create(:create, %{user_id: admin.id, organisation_id: org.id, role: :owner})
-|> Ash.create!(authorize?: false)
+      Accounts.Membership
+      |> Ash.Changeset.for_create(:create, %{
+        user_id: admin.id,
+        organisation_id: o.id,
+        role: :owner
+      })
+      |> Ash.create!(authorize?: false)
 
-Accounts.Membership
-|> Ash.Changeset.for_create(:create, %{
-  user_id: demo_user.id,
-  organisation_id: org.id,
-  role: :member
-})
-|> Ash.create!(authorize?: false)
+      Accounts.Membership
+      |> Ash.Changeset.for_create(:create, %{
+        user_id: demo_user.id,
+        organisation_id: o.id,
+        role: :member
+      })
+      |> Ash.create!(authorize?: false)
+
+      IO.puts("    Created org: Acme Corp")
+      o
+
+    existing ->
+      IO.puts("    Organisation already exists, skipping.")
+      existing
+  end
 
 # --- Feature Flags ---
 IO.puts("  Creating feature flags...")
@@ -128,9 +164,12 @@ flags = [
 ]
 
 for flag <- flags do
-  FeatureFlags.FeatureFlag
-  |> Ash.Changeset.for_create(:create, flag, actor: admin)
-  |> Ash.create!(authorize?: false)
+  case FeatureFlags.FeatureFlag
+       |> Ash.Changeset.for_create(:create, flag, actor: admin)
+       |> Ash.create(authorize?: false) do
+    {:ok, _} -> :ok
+    {:error, _} -> IO.puts("    Flag '#{flag.key}' already exists, skipping.")
+  end
 end
 
 # --- Blog Categories ---
@@ -158,9 +197,16 @@ categories = [
 
 blog_cats =
   for cat <- categories do
-    Content.Category
-    |> Ash.Changeset.for_create(:create, cat, actor: admin)
-    |> Ash.create!(authorize?: false)
+    case Content.Category
+         |> Ash.Changeset.for_create(:create, cat, actor: admin)
+         |> Ash.create(authorize?: false) do
+      {:ok, c} ->
+        c
+
+      {:error, _} ->
+        IO.puts("    Category '#{cat.name}' already exists, loading.")
+        Content.Category |> Ash.Query.filter(slug: cat.slug) |> Ash.read_one!(authorize?: false)
+    end
   end
 
 # --- Blog Posts ---
@@ -199,13 +245,18 @@ posts = [
 for post <- posts do
   post_params = post |> Map.drop([:category_id]) |> Map.put(:author_id, admin.id)
 
-  p =
-    Content.Post
-    |> Ash.Changeset.for_create(:create, post_params, actor: admin)
-    |> Ash.create!(authorize?: false)
+  case Content.Post
+       |> Ash.Changeset.for_create(:create, post_params, actor: admin)
+       |> Ash.create(authorize?: false) do
+    {:ok, p} ->
+      if post.status == :published do
+        p
+        |> Ash.Changeset.for_update(:publish, %{}, actor: admin)
+        |> Ash.update!(authorize?: false)
+      end
 
-  if post.status == :published do
-    p |> Ash.Changeset.for_update(:publish, %{}, actor: admin) |> Ash.update!(authorize?: false)
+    {:error, _} ->
+      IO.puts("    Post '#{post.title}' already exists, skipping.")
   end
 end
 
@@ -337,13 +388,18 @@ doc_posts = [
 for doc_post <- doc_posts do
   post_params = doc_post |> Map.drop([:category_id]) |> Map.put(:author_id, admin.id)
 
-  p =
-    Content.Post
-    |> Ash.Changeset.for_create(:create, post_params, actor: admin)
-    |> Ash.create!(authorize?: false)
+  case Content.Post
+       |> Ash.Changeset.for_create(:create, post_params, actor: admin)
+       |> Ash.create(authorize?: false) do
+    {:ok, p} ->
+      if doc_post.status == :published do
+        p
+        |> Ash.Changeset.for_update(:publish, %{}, actor: admin)
+        |> Ash.update!(authorize?: false)
+      end
 
-  if doc_post.status == :published do
-    p |> Ash.Changeset.for_update(:publish, %{}, actor: admin) |> Ash.update!(authorize?: false)
+    {:error, _} ->
+      IO.puts("    Doc post '#{doc_post.title}' already exists, skipping.")
   end
 end
 
@@ -375,12 +431,15 @@ changelog = [
 ]
 
 for entry <- changelog do
-  e =
-    Content.ChangelogEntry
-    |> Ash.Changeset.for_create(:create, Map.put(entry, :author_id, admin.id), actor: admin)
-    |> Ash.create!(authorize?: false)
+  case Content.ChangelogEntry
+       |> Ash.Changeset.for_create(:create, Map.put(entry, :author_id, admin.id), actor: admin)
+       |> Ash.create(authorize?: false) do
+    {:ok, e} ->
+      e |> Ash.Changeset.for_update(:publish, %{}, actor: admin) |> Ash.update!(authorize?: false)
 
-  e |> Ash.Changeset.for_update(:publish, %{}, actor: admin) |> Ash.update!(authorize?: false)
+    {:error, _} ->
+      IO.puts("    Changelog '#{entry.version}' already exists, skipping.")
+  end
 end
 
 # --- Help Center ---
@@ -433,9 +492,19 @@ help_categories = [
 
 help_cats =
   for cat <- help_categories do
-    HelpCenter.Category
-    |> Ash.Changeset.for_create(:create, cat, actor: admin)
-    |> Ash.create!(authorize?: false)
+    case HelpCenter.Category
+         |> Ash.Changeset.for_create(:create, cat, actor: admin)
+         |> Ash.create(authorize?: false) do
+      {:ok, c} ->
+        c
+
+      {:error, _} ->
+        IO.puts("    Help category '#{cat.name}' already exists, loading.")
+
+        HelpCenter.Category
+        |> Ash.Query.filter(slug: cat.slug)
+        |> Ash.read_one!(authorize?: false)
+    end
   end
 
 help_articles = [
@@ -492,12 +561,15 @@ help_articles = [
 ]
 
 for article <- help_articles do
-  a =
-    HelpCenter.Article
-    |> Ash.Changeset.for_create(:create, article, actor: admin)
-    |> Ash.create!(authorize?: false)
+  case HelpCenter.Article
+       |> Ash.Changeset.for_create(:create, article, actor: admin)
+       |> Ash.create(authorize?: false) do
+    {:ok, a} ->
+      a |> Ash.Changeset.for_update(:publish, %{}, actor: admin) |> Ash.update!(authorize?: false)
 
-  a |> Ash.Changeset.for_update(:publish, %{}, actor: admin) |> Ash.update!(authorize?: false)
+    {:error, _} ->
+      IO.puts("    Article '#{article.title}' already exists, skipping.")
+  end
 end
 
 # --- Agent Templates ---
@@ -552,9 +624,12 @@ templates = [
 ]
 
 for tmpl <- templates do
-  AI.AgentTemplate
-  |> Ash.Changeset.for_create(:create, tmpl, actor: admin)
-  |> Ash.create!(authorize?: false)
+  case AI.AgentTemplate
+       |> Ash.Changeset.for_create(:create, tmpl, actor: admin)
+       |> Ash.create(authorize?: false) do
+    {:ok, _} -> :ok
+    {:error, _} -> IO.puts("    Template '#{tmpl.name}' already exists, skipping.")
+  end
 end
 
 IO.puts("✅ Seed complete!")
