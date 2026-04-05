@@ -70,12 +70,12 @@
 **Branch:** `feature/help-center-errors`
 **Depends on:** Sub-project 2 (admin layout)
 
-- [ ] HelpCenter domain (Category, Article, ContactRequest)
-- [ ] PostgreSQL full-text search (tsvector + GIN)
-- [ ] Public help pages (/help/*)
-- [ ] In-app `help_link` component
-- [ ] Contact support form
-- [ ] Admin help CRUD
-- [ ] Enhanced error pages (404, 500)
-- [ ] New error pages (429, 402, 503)
-- [ ] Maintenance mode plug + feature flag
+- [x] HelpCenter domain (Category, Article, ContactRequest)
+- [x] PostgreSQL full-text search (tsvector + GIN)
+- [x] Public help pages (/help/*)
+- [x] In-app `help_link` component
+- [x] Contact support form
+- [x] Admin help CRUD
+- [x] Enhanced error pages (404, 500)
+- [x] New error pages (429, 402, 503)
+- [x] Maintenance mode plug + feature flag

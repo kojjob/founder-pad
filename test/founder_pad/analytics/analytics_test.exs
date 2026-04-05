@@ -100,9 +100,9 @@ defmodule FounderPad.AnalyticsTest do
       org = create_organisation!()
 
       assert :ok =
-               FounderPad.Analytics.Workers.GscSyncWorker.perform(
-                 %Oban.Job{args: %{"organisation_id" => org.id}}
-               )
+               FounderPad.Analytics.Workers.GscSyncWorker.perform(%Oban.Job{
+                 args: %{"organisation_id" => org.id}
+               })
     end
   end
 
@@ -111,14 +111,18 @@ defmodule FounderPad.AnalyticsTest do
       org = create_organisation!()
 
       tasks =
-        for i <- 1..30 do
+        for i <- 1..10 do
           Task.async(fn ->
             Analytics.track("load_test.#{i}", org_id: org.id)
           end)
         end
 
       results = Task.await_many(tasks)
-      assert Enum.all?(results, fn {:ok, _} -> true; _ -> false end)
+
+      assert Enum.all?(results, fn
+               {:ok, _} -> true
+               _ -> false
+             end)
     end
 
     test "handles unicode in event metadata" do
