@@ -4,44 +4,44 @@ defmodule FounderPad.Billing.Invoice do
     data_layer: AshPostgres.DataLayer
 
   postgres do
-    table "invoices"
-    repo FounderPad.Repo
+    table("invoices")
+    repo(FounderPad.Repo)
   end
 
   attributes do
-    uuid_primary_key :id
+    uuid_primary_key(:id)
 
     attribute :invoice_number, :string do
-      allow_nil? false
-      public? true
+      allow_nil?(false)
+      public?(true)
     end
 
     attribute :amount_cents, :integer do
-      allow_nil? false
-      default 0
-      public? true
+      allow_nil?(false)
+      default(0)
+      public?(true)
     end
 
     attribute :status, :atom do
-      constraints one_of: [:paid, :pending, :failed, :refunded]
-      default :pending
-      allow_nil? false
-      public? true
+      constraints(one_of: [:paid, :pending, :failed, :refunded])
+      default(:pending)
+      allow_nil?(false)
+      public?(true)
     end
 
     attribute :stripe_invoice_id, :string do
-      allow_nil? true
-      public? true
+      allow_nil?(true)
+      public?(true)
     end
 
     attribute :period_start, :date do
-      allow_nil? false
-      public? true
+      allow_nil?(false)
+      public?(true)
     end
 
     attribute :period_end, :date do
-      allow_nil? false
-      public? true
+      allow_nil?(false)
+      public?(true)
     end
 
     timestamps()
@@ -49,26 +49,26 @@ defmodule FounderPad.Billing.Invoice do
 
   relationships do
     belongs_to :organisation, FounderPad.Accounts.Organisation do
-      allow_nil? false
-      public? true
+      allow_nil?(false)
+      public?(true)
     end
   end
 
   actions do
-    defaults [:read, :destroy]
+    defaults([:read, :destroy])
 
     create :create do
-      accept [
+      accept([
         :invoice_number,
         :amount_cents,
         :status,
         :stripe_invoice_id,
         :period_start,
         :period_end
-      ]
+      ])
 
-      argument :organisation_id, :uuid, allow_nil?: false
-      change manage_relationship(:organisation_id, :organisation, type: :append)
+      argument(:organisation_id, :uuid, allow_nil?: false)
+      change(manage_relationship(:organisation_id, :organisation, type: :append))
     end
   end
 end

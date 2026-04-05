@@ -65,23 +65,33 @@ defmodule FounderPadWeb.Docs.DocsLive do
               <div class="space-y-6">
                 <div class="bg-surface-container rounded-xl p-6">
                   <div class="flex items-center gap-3 mb-4">
-                    <span class="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center text-xs font-bold text-primary font-mono">1</span>
-                    <h3 class="text-base font-semibold font-headline">Clone and install dependencies</h3>
+                    <span class="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center text-xs font-bold text-primary font-mono">
+                      1
+                    </span>
+                    <h3 class="text-base font-semibold font-headline">
+                      Clone and install dependencies
+                    </h3>
                   </div>
                   <.code_block code="git clone https://github.com/founderpad/founderpad.git\ncd founderpad\nmix deps.get && mix deps.compile" />
                 </div>
 
                 <div class="bg-surface-container rounded-xl p-6">
                   <div class="flex items-center gap-3 mb-4">
-                    <span class="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center text-xs font-bold text-primary font-mono">2</span>
-                    <h3 class="text-base font-semibold font-headline">Setup database and environment</h3>
+                    <span class="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center text-xs font-bold text-primary font-mono">
+                      2
+                    </span>
+                    <h3 class="text-base font-semibold font-headline">
+                      Setup database and environment
+                    </h3>
                   </div>
                   <.code_block code="cp .env.example .env            # configure API keys\nmix ecto.setup                  # create & migrate DB\nmix run priv/repo/seeds.exs     # seed demo data" />
                 </div>
 
                 <div class="bg-surface-container rounded-xl p-6">
                   <div class="flex items-center gap-3 mb-4">
-                    <span class="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center text-xs font-bold text-primary font-mono">3</span>
+                    <span class="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center text-xs font-bold text-primary font-mono">
+                      3
+                    </span>
                     <h3 class="text-base font-semibold font-headline">Start the server</h3>
                   </div>
                   <.code_block code="mix phx.server\n\n# Visit http://localhost:4000\n# Login with demo@founderpad.io / password123" />
@@ -91,7 +101,9 @@ defmodule FounderPadWeb.Docs.DocsLive do
 
             <%!-- ════════ Authentication ════════ --%>
             <section id="authentication" class="mb-24">
-              <h2 class="text-3xl font-extrabold font-headline tracking-tight mb-3">Authentication</h2>
+              <h2 class="text-3xl font-extrabold font-headline tracking-tight mb-3">
+                Authentication
+              </h2>
               <p class="text-on-surface-variant text-lg leading-relaxed mb-8 max-w-2xl">
                 FounderPad ships with AshAuthentication supporting multiple strategies
                 out of the box. Password, magic link, and OAuth2 are all pre-configured.
@@ -104,7 +116,7 @@ defmodule FounderPadWeb.Docs.DocsLive do
                     Secure password-based auth with bcrypt hashing, configurable password
                     policies, and built-in reset flows via email.
                   </p>
-                  <.code_block code={"defmodule FounderPad.Accounts.User do\n  use Ash.Resource,\n    extensions: [AshAuthentication]\n\n  authentication do\n    strategies do\n      password :password do\n        identity_field :email\n        sign_in_tokens_enabled? true\n        resettable do\n          sender FounderPad.Accounts.Senders.SendResetEmail\n        end\n      end\n    end\n  end\nend"} />
+                  <.code_block code="defmodule FounderPad.Accounts.User do\n  use Ash.Resource,\n    extensions: [AshAuthentication]\n\n  authentication do\n    strategies do\n      password :password do\n        identity_field :email\n        sign_in_tokens_enabled? true\n        resettable do\n          sender FounderPad.Accounts.Senders.SendResetEmail\n        end\n      end\n    end\n  end\nend" />
                 </div>
 
                 <div>
@@ -113,7 +125,7 @@ defmodule FounderPadWeb.Docs.DocsLive do
                     Passwordless authentication via email. Users receive a secure, time-limited
                     link that signs them in instantly.
                   </p>
-                  <.code_block code={"authentication do\n  strategies do\n    magic_link do\n      identity_field :email\n      sender FounderPad.Accounts.Senders.SendMagicLink\n    end\n  end\nend"} />
+                  <.code_block code="authentication do\n  strategies do\n    magic_link do\n      identity_field :email\n      sender FounderPad.Accounts.Senders.SendMagicLink\n    end\n  end\nend" />
                 </div>
 
                 <div>
@@ -160,7 +172,7 @@ defmodule FounderPadWeb.Docs.DocsLive do
                     Switch between providers seamlessly. Each provider is configured via
                     environment variables.
                   </p>
-                  <.code_block code={"# .env\nANTHROPIC_API_KEY=sk-ant-...\nOPENAI_API_KEY=sk-...\n\n# Supported providers & models:\n# :anthropic  -> claude-sonnet-4-20250514, claude-3-haiku\n# :openai     -> gpt-4o, gpt-4o-mini, gpt-3.5-turbo"} />
+                  <.code_block code="# .env\nANTHROPIC_API_KEY=sk-ant-...\nOPENAI_API_KEY=sk-...\n\n# Supported providers & models:\n# :anthropic  -> claude-sonnet-4-20250514, claude-3-haiku\n# :openai     -> gpt-4o, gpt-4o-mini, gpt-3.5-turbo" />
                 </div>
               </div>
             </section>
@@ -189,7 +201,7 @@ defmodule FounderPadWeb.Docs.DocsLive do
                     Track API calls, token usage, and agent runs per billing period.
                     Usage data syncs to Stripe for metered billing.
                   </p>
-                  <.code_block code={"FounderPad.Billing.record_usage(subscription, %{\n  metric: :api_calls,\n  quantity: 1,\n  timestamp: DateTime.utc_now()\n})\n\n# Check remaining quota\nFounderPad.Billing.remaining_quota(subscription, :api_calls)\n# => {:ok, 8234}"} />
+                  <.code_block code="FounderPad.Billing.record_usage(subscription, %{\n  metric: :api_calls,\n  quantity: 1,\n  timestamp: DateTime.utc_now()\n})\n\n# Check remaining quota\nFounderPad.Billing.remaining_quota(subscription, :api_calls)\n# => {:ok, 8234}" />
                 </div>
 
                 <div>
@@ -198,7 +210,7 @@ defmodule FounderPadWeb.Docs.DocsLive do
                     Stripe webhooks are verified and processed automatically. Handles
                     subscription lifecycle events, payment failures, and invoice updates.
                   </p>
-                  <.code_block code={"# Handled automatically:\n# checkout.session.completed\n# customer.subscription.updated\n# customer.subscription.deleted\n# invoice.payment_succeeded\n# invoice.payment_failed\n\n# POST /webhooks/stripe\n# Signature verified via STRIPE_WEBHOOK_SECRET"} />
+                  <.code_block code="# Handled automatically:\n# checkout.session.completed\n# customer.subscription.updated\n# customer.subscription.deleted\n# invoice.payment_succeeded\n# invoice.payment_failed\n\n# POST /webhooks/stripe\n# Signature verified via STRIPE_WEBHOOK_SECRET" />
                 </div>
               </div>
             </section>
@@ -215,10 +227,9 @@ defmodule FounderPadWeb.Docs.DocsLive do
                 <div>
                   <h3 class="text-xl font-bold font-headline mb-3">REST Endpoints</h3>
                   <p class="text-on-surface-variant leading-relaxed mb-4">
-                    All resources expose JSON:API-compliant endpoints under
-                    <code class="text-primary font-mono text-sm">/api/v1</code>.
+                    All resources expose JSON:API-compliant endpoints under <code class="text-primary font-mono text-sm">/api/v1</code>.
                   </p>
-                  <.code_block code={"GET    /api/v1/agents          # List agents\nGET    /api/v1/agents/:id      # Get agent by ID\nGET    /api/v1/plans           # List billing plans\nGET    /api/v1/plans/:id       # Get plan details\nGET    /api/v1/open_api        # OpenAPI specification"} />
+                  <.code_block code="GET    /api/v1/agents          # List agents\nGET    /api/v1/agents/:id      # Get agent by ID\nGET    /api/v1/plans           # List billing plans\nGET    /api/v1/plans/:id       # Get plan details\nGET    /api/v1/open_api        # OpenAPI specification" />
                 </div>
 
                 <div>
@@ -227,7 +238,7 @@ defmodule FounderPadWeb.Docs.DocsLive do
                     A full GraphQL schema is auto-generated from your Ash resources.
                     Use the built-in GraphiQL explorer in development.
                   </p>
-                  <.code_block code={"# POST /api/graphql\n{\n  agents {\n    id\n    name\n    provider\n    model\n    status\n    messages {\n      role\n      content\n    }\n  }\n}"} />
+                  <.code_block code="# POST /api/graphql\n{\n  agents {\n    id\n    name\n    provider\n    model\n    status\n    messages {\n      role\n      content\n    }\n  }\n}" />
                 </div>
 
                 <div>
@@ -236,7 +247,7 @@ defmodule FounderPadWeb.Docs.DocsLive do
                     Built-in rate limiting protects your API. Configurable per-endpoint
                     with sliding window counters.
                   </p>
-                  <.code_block code={"# Default: 100 requests per minute\nplug FounderPadWeb.Plugs.RateLimiter,\n  limit: 100,\n  window_ms: 60_000\n\n# Response headers:\n# X-RateLimit-Limit: 100\n# X-RateLimit-Remaining: 87\n# X-RateLimit-Reset: 1711234567"} />
+                  <.code_block code="# Default: 100 requests per minute\nplug FounderPadWeb.Plugs.RateLimiter,\n  limit: 100,\n  window_ms: 60_000\n\n# Response headers:\n# X-RateLimit-Limit: 100\n# X-RateLimit-Remaining: 87\n# X-RateLimit-Reset: 1711234567" />
                 </div>
               </div>
             </section>
@@ -254,9 +265,10 @@ defmodule FounderPadWeb.Docs.DocsLive do
                   <h3 class="text-xl font-bold font-headline mb-3">Fly.io</h3>
                   <p class="text-on-surface-variant leading-relaxed mb-4">
                     The fastest path to production. FounderPad includes a complete
-                    <code class="text-primary font-mono text-sm">fly.toml</code> configuration.
+                    <code class="text-primary font-mono text-sm">fly.toml</code>
+                    configuration.
                   </p>
-                  <.code_block code={"fly launch --name my-saas\nfly secrets set ANTHROPIC_API_KEY=sk-ant-...\nfly secrets set STRIPE_SECRET_KEY=sk_live_...\nfly deploy"} />
+                  <.code_block code="fly launch --name my-saas\nfly secrets set ANTHROPIC_API_KEY=sk-ant-...\nfly secrets set STRIPE_SECRET_KEY=sk_live_...\nfly deploy" />
                 </div>
 
                 <div>
@@ -264,7 +276,7 @@ defmodule FounderPadWeb.Docs.DocsLive do
                   <p class="text-on-surface-variant leading-relaxed mb-4">
                     Multi-stage Dockerfile optimized for small image size and fast builds.
                   </p>
-                  <.code_block code={"docker build -t founderpad .\ndocker run -p 4000:4000 \\\n  -e DATABASE_URL=postgres://... \\\n  -e SECRET_KEY_BASE=... \\\n  -e ANTHROPIC_API_KEY=... \\\n  founderpad"} />
+                  <.code_block code="docker build -t founderpad .\ndocker run -p 4000:4000 \\\n  -e DATABASE_URL=postgres://... \\\n  -e SECRET_KEY_BASE=... \\\n  -e ANTHROPIC_API_KEY=... \\\n  founderpad" />
                 </div>
 
                 <div>
@@ -272,7 +284,7 @@ defmodule FounderPadWeb.Docs.DocsLive do
                   <p class="text-on-surface-variant leading-relaxed mb-4">
                     All secrets and configuration are managed via environment variables.
                   </p>
-                  <.code_block code={"# Required\nDATABASE_URL=postgres://user:pass@host/db\nSECRET_KEY_BASE=super-secret-64-char-key\nPHX_HOST=yourapp.com\n\n# AI Providers\nANTHROPIC_API_KEY=sk-ant-...\nOPENAI_API_KEY=sk-...\n\n# Billing\nSTRIPE_SECRET_KEY=sk_live_...\nSTRIPE_WEBHOOK_SECRET=whsec_..."} />
+                  <.code_block code="# Required\nDATABASE_URL=postgres://user:pass@host/db\nSECRET_KEY_BASE=super-secret-64-char-key\nPHX_HOST=yourapp.com\n\n# AI Providers\nANTHROPIC_API_KEY=sk-ant-...\nOPENAI_API_KEY=sk-...\n\n# Billing\nSTRIPE_SECRET_KEY=sk_live_...\nSTRIPE_WEBHOOK_SECRET=whsec_..." />
                 </div>
               </div>
             </section>
@@ -300,7 +312,7 @@ defmodule FounderPadWeb.Docs.DocsLive do
                     Toggle features on and off without deployments. Built on the
                     FeatureFlags Ash domain.
                   </p>
-                  <.code_block code={"# Check a feature flag\nFounderPad.FeatureFlags.enabled?(:beta_agents)\n# => true\n\n# Toggle via admin\nFounderPad.FeatureFlags.toggle(:beta_agents, false)"} />
+                  <.code_block code="# Check a feature flag\nFounderPad.FeatureFlags.enabled?(:beta_agents)\n# => true\n\n# Toggle via admin\nFounderPad.FeatureFlags.toggle(:beta_agents, false)" />
                 </div>
 
                 <div>
@@ -309,7 +321,7 @@ defmodule FounderPadWeb.Docs.DocsLive do
                     Enable demo mode for showcasing the app without real API keys or
                     payment processing.
                   </p>
-                  <.code_block code={"# config/dev.exs\nconfig :founder_pad,\n  demo_mode: true,\n  mock_ai_responses: true,\n  mock_stripe: true\n\n# Demo mode provides:\n# - Simulated AI responses with realistic delays\n# - Mock Stripe checkout flows\n# - Pre-populated dashboard data"} />
+                  <.code_block code="# config/dev.exs\nconfig :founder_pad,\n  demo_mode: true,\n  mock_ai_responses: true,\n  mock_stripe: true\n\n# Demo mode provides:\n# - Simulated AI responses with realistic delays\n# - Mock Stripe checkout flows\n# - Pre-populated dashboard data" />
                 </div>
               </div>
             </section>
@@ -427,13 +439,22 @@ defmodule FounderPadWeb.Docs.DocsLive do
         </a>
 
         <div class="hidden md:flex items-center gap-8 text-sm font-medium text-on-surface-variant">
-          <a href="/docs" class={"hover:text-on-surface transition-colors " <> if(@active == "docs", do: "text-primary", else: "")}>
+          <a
+            href="/docs"
+            class={"hover:text-on-surface transition-colors " <> if(@active == "docs", do: "text-primary", else: "")}
+          >
             Docs
           </a>
-          <a href="/docs/api" class={"hover:text-on-surface transition-colors " <> if(@active == "api", do: "text-primary", else: "")}>
+          <a
+            href="/docs/api"
+            class={"hover:text-on-surface transition-colors " <> if(@active == "api", do: "text-primary", else: "")}
+          >
             API
           </a>
-          <a href="/docs/changelog" class={"hover:text-on-surface transition-colors " <> if(@active == "changelog", do: "text-primary", else: "")}>
+          <a
+            href="/docs/changelog"
+            class={"hover:text-on-surface transition-colors " <> if(@active == "changelog", do: "text-primary", else: "")}
+          >
             Changelog
           </a>
           <a href="/auth/login" class="hover:text-on-surface transition-colors">Login</a>

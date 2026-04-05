@@ -7,14 +7,16 @@ defmodule FounderPad.Content.PostTest do
       admin = create_admin_user!()
 
       assert {:ok, post} =
-        FounderPad.Content.Post
-        |> Ash.Changeset.for_create(:create, %{
-          title: "My First Blog Post",
-          body: "<p>Hello world</p>",
-          excerpt: "A test",
-          author_id: admin.id
-        }, actor: admin)
-        |> Ash.create()
+               FounderPad.Content.Post
+               |> Ash.Changeset.for_create(
+                 :create,
+                 %{
+                   title: "My First Blog Post",
+                   body: "<p>Hello world</p>",
+                   excerpt: "A test",
+                   author_id: admin.id
+                 }, actor: admin)
+               |> Ash.create()
 
       assert post.slug == "my-first-blog-post"
       assert post.status == :draft
@@ -25,13 +27,15 @@ defmodule FounderPad.Content.PostTest do
       user = create_user!()
 
       assert {:error, %Ash.Error.Forbidden{}} =
-        FounderPad.Content.Post
-        |> Ash.Changeset.for_create(:create, %{
-          title: "Should Fail",
-          body: "<p>No</p>",
-          author_id: user.id
-        }, actor: user)
-        |> Ash.create()
+               FounderPad.Content.Post
+               |> Ash.Changeset.for_create(
+                 :create,
+                 %{
+                   title: "Should Fail",
+                   body: "<p>No</p>",
+                   author_id: user.id
+                 }, actor: user)
+               |> Ash.create()
     end
   end
 

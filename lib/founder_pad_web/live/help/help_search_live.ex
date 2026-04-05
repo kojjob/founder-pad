@@ -67,7 +67,9 @@ defmodule FounderPadWeb.Help.HelpSearchLive do
         <div :if={@results == [] && @query != ""} class="text-center py-16 text-on-surface-variant">
           <span class="material-symbols-outlined text-5xl mb-4 block">search_off</span>
           <p class="text-lg">No articles found matching your search.</p>
-          <p class="text-sm mt-2">Try different keywords or <a href="/help/contact" class="text-primary hover:underline">contact support</a>.</p>
+          <p class="text-sm mt-2">
+            Try different keywords or <a href="/help/contact" class="text-primary hover:underline">contact support</a>.
+          </p>
         </div>
 
         <div class="space-y-4">

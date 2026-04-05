@@ -140,12 +140,14 @@ defmodule FounderPadWeb.WebhookLogsLiveTest do
 
       # Delivered
       delivered = create_delivery!(webhook, %{event_type: "test.delivered"})
+
       delivered
       |> Ash.Changeset.for_update(:mark_delivered, %{response_status: 200, attempts: 1})
       |> Ash.update!()
 
       # Failed
       failed = create_delivery!(webhook, %{event_type: "test.failed"})
+
       failed
       |> Ash.Changeset.for_update(:mark_failed, %{error: "err", attempts: 1})
       |> Ash.update!()

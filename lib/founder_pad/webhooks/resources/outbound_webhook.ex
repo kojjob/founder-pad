@@ -4,63 +4,63 @@ defmodule FounderPad.Webhooks.OutboundWebhook do
     data_layer: AshPostgres.DataLayer
 
   postgres do
-    table "outbound_webhooks"
-    repo FounderPad.Repo
+    table("outbound_webhooks")
+    repo(FounderPad.Repo)
   end
 
   attributes do
-    uuid_primary_key :id
+    uuid_primary_key(:id)
 
     attribute :url, :string do
-      allow_nil? false
-      public? true
+      allow_nil?(false)
+      public?(true)
     end
 
     attribute :secret, :string do
-      allow_nil? false
-      sensitive? true
-      public? true
+      allow_nil?(false)
+      sensitive?(true)
+      public?(true)
     end
 
     attribute :events, {:array, :string} do
-      default []
-      allow_nil? false
-      public? true
+      default([])
+      allow_nil?(false)
+      public?(true)
     end
 
-    attribute :active, :boolean, default: true, public?: true
-    attribute :description, :string, public?: true
-    attribute :metadata, :map, default: %{}, public?: true
+    attribute(:active, :boolean, default: true, public?: true)
+    attribute(:description, :string, public?: true)
+    attribute(:metadata, :map, default: %{}, public?: true)
 
     timestamps()
   end
 
   relationships do
     belongs_to :organisation, FounderPad.Accounts.Organisation do
-      allow_nil? false
-      public? true
+      allow_nil?(false)
+      public?(true)
     end
 
     has_many :deliveries, FounderPad.Webhooks.WebhookDelivery do
-      destination_attribute :webhook_id
+      destination_attribute(:webhook_id)
     end
   end
 
   actions do
-    defaults [:read, :destroy]
+    defaults([:read, :destroy])
 
     create :create do
-      accept [:url, :secret, :events, :active, :description, :metadata]
-      argument :organisation_id, :uuid, allow_nil?: false
-      change manage_relationship(:organisation_id, :organisation, type: :append)
+      accept([:url, :secret, :events, :active, :description, :metadata])
+      argument(:organisation_id, :uuid, allow_nil?: false)
+      change(manage_relationship(:organisation_id, :organisation, type: :append))
     end
 
     update :update do
-      accept [:url, :events, :active, :description]
+      accept([:url, :events, :active, :description])
     end
 
     update :rotate_secret do
-      accept [:secret]
+      accept([:secret])
     end
   end
 end

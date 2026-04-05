@@ -42,6 +42,7 @@ defmodule FounderPadWeb.ActivityLive do
 
   def handle_event("refresh", _, socket) do
     events = load_events(socket.assigns.filter)
+
     {:noreply,
      socket
      |> assign(events: events, stats: compute_stats(events))
@@ -56,11 +57,12 @@ defmodule FounderPadWeb.ActivityLive do
       <section class="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
           <div class="flex items-center gap-2 text-xs font-mono text-on-surface-variant/60 uppercase tracking-widest mb-2">
-            <span class="material-symbols-outlined text-sm text-primary">stream</span>
-            Live Stream
+            <span class="material-symbols-outlined text-sm text-primary">stream</span> Live Stream
           </div>
           <h1 class="text-4xl font-extrabold font-headline tracking-tight">Organization Activity</h1>
-          <p class="text-on-surface-variant mt-1">A technical audit log of every system operation across your workspace.</p>
+          <p class="text-on-surface-variant mt-1">
+            A technical audit log of every system operation across your workspace.
+          </p>
         </div>
         <div class="flex items-center gap-4">
           <div class="flex items-center gap-6 text-sm">
@@ -69,11 +71,17 @@ defmodule FounderPadWeb.ActivityLive do
               <p class="font-mono text-primary font-medium">{@stats.success_rate}%</p>
             </div>
             <div class="text-right">
-              <p class="text-[10px] font-mono text-on-surface-variant uppercase">Total Events (24h)</p>
+              <p class="text-[10px] font-mono text-on-surface-variant uppercase">
+                Total Events (24h)
+              </p>
               <p class="font-mono text-on-surface font-medium">{@stats.total}</p>
             </div>
           </div>
-          <button phx-click="refresh" class="p-2 text-on-surface-variant hover:text-primary rounded-lg hover:bg-surface-container-high transition-colors" title="Refresh">
+          <button
+            phx-click="refresh"
+            class="p-2 text-on-surface-variant hover:text-primary rounded-lg hover:bg-surface-container-high transition-colors"
+            title="Refresh"
+          >
             <span class="material-symbols-outlined">refresh</span>
           </button>
         </div>
@@ -83,12 +91,23 @@ defmodule FounderPadWeb.ActivityLive do
       <div class="flex items-center justify-between">
         <div class="flex gap-2">
           <button
-            :for={{label, key} <- [{"All Events", :all}, {"Agent Activity", :agents}, {"Security", :security}, {"Billing", :billing}, {"Team", :team}]}
+            :for={
+              {label, key} <- [
+                {"All Events", :all},
+                {"Agent Activity", :agents},
+                {"Security", :security},
+                {"Billing", :billing},
+                {"Team", :team}
+              ]
+            }
             phx-click="filter"
             phx-value-filter={key}
             class={[
               "px-3 py-1.5 text-sm font-medium rounded-md transition-colors",
-              if(@filter == key, do: "bg-surface-container-high text-on-surface", else: "text-on-surface-variant hover:text-on-surface")
+              if(@filter == key,
+                do: "bg-surface-container-high text-on-surface",
+                else: "text-on-surface-variant hover:text-on-surface"
+              )
             ]}
           >
             {label}
@@ -101,7 +120,9 @@ defmodule FounderPadWeb.ActivityLive do
 
       <%!-- Empty state --%>
       <div :if={@events == []} class="text-center py-16">
-        <span class="material-symbols-outlined text-6xl text-on-surface-variant/30 mb-4 block">stream</span>
+        <span class="material-symbols-outlined text-6xl text-on-surface-variant/30 mb-4 block">
+          stream
+        </span>
         <h3 class="text-xl font-bold font-headline text-on-surface mb-2">No activity yet</h3>
         <p class="text-on-surface-variant">Events will appear here as you use the platform.</p>
       </div>
@@ -119,14 +140,19 @@ defmodule FounderPadWeb.ActivityLive do
             <div class="flex items-center gap-2 mb-1">
               <span class="font-semibold text-sm text-on-surface">{event.actor}</span>
               <span class="text-on-surface-variant text-sm">{event.action}</span>
-              <span class={["px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider", event_type_class(event.type)]}>
+              <span class={[
+                "px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider",
+                event_type_class(event.type)
+              ]}>
                 {event.type}
               </span>
             </div>
             <p :if={event.detail} class="text-sm text-on-surface-variant">{event.detail}</p>
             <span class="text-xs font-mono text-on-surface-variant/60 mt-1 block">{event.time}</span>
           </div>
-          <span class="text-xs font-mono text-on-surface-variant/40 hidden md:block shrink-0">{event.raw_time}</span>
+          <span class="text-xs font-mono text-on-surface-variant/40 hidden md:block shrink-0">
+            {event.raw_time}
+          </span>
         </div>
       </div>
     </div>
@@ -151,17 +177,19 @@ defmodule FounderPadWeb.ActivityLive do
   end
 
   defp load_audit_events(filter) do
-    query = FounderPad.Audit.AuditLog
-            |> Ash.Query.sort(inserted_at: :desc)
-            |> Ash.Query.limit(@page_size)
+    query =
+      FounderPad.Audit.AuditLog
+      |> Ash.Query.sort(inserted_at: :desc)
+      |> Ash.Query.limit(@page_size)
 
-    query = case filter do
-      :agents -> Ash.Query.filter(query, resource_type: "Agent")
-      :security -> Ash.Query.filter(query, action: :login)
-      :team -> Ash.Query.filter(query, resource_type: "User")
-      :billing -> Ash.Query.filter(query, resource_type: "Subscription")
-      _ -> query
-    end
+    query =
+      case filter do
+        :agents -> Ash.Query.filter(query, resource_type: "Agent")
+        :security -> Ash.Query.filter(query, action: :login)
+        :team -> Ash.Query.filter(query, resource_type: "User")
+        :billing -> Ash.Query.filter(query, resource_type: "Subscription")
+        _ -> query
+      end
 
     case Ash.read(query) do
       {:ok, logs} -> Enum.map(logs, &format_audit_event/1)
@@ -184,22 +212,36 @@ defmodule FounderPadWeb.ActivityLive do
   end
 
   defp format_audit_event(log) do
-    {actor, action, detail, type, icon, color} = case log.action do
-      :login ->
-        {"User", "signed in", "IP: #{log.ip_address || "unknown"}", "security", "login", "primary"}
-      :create ->
-        {"System", "created #{log.resource_type}", inspect_changes(log.changes), categorize(log.resource_type), "add_circle", "primary"}
-      :update ->
-        {"System", "updated #{log.resource_type}", inspect_changes(log.changes), categorize(log.resource_type), "edit", "secondary"}
-      :delete ->
-        {"System", "deleted #{log.resource_type}", nil, categorize(log.resource_type), "delete", "error"}
-      :settings_changed ->
-        {"User", "changed settings", inspect_changes(log.changes), "security", "settings", "secondary"}
-      :role_change ->
-        {"Admin", "changed role", inspect_changes(log.changes), "team", "manage_accounts", "tertiary"}
-      _ ->
-        {"System", "#{log.action}", inspect_changes(log.changes), "system", "info", "on-surface-variant"}
-    end
+    {actor, action, detail, type, icon, color} =
+      case log.action do
+        :login ->
+          {"User", "signed in", "IP: #{log.ip_address || "unknown"}", "security", "login",
+           "primary"}
+
+        :create ->
+          {"System", "created #{log.resource_type}", inspect_changes(log.changes),
+           categorize(log.resource_type), "add_circle", "primary"}
+
+        :update ->
+          {"System", "updated #{log.resource_type}", inspect_changes(log.changes),
+           categorize(log.resource_type), "edit", "secondary"}
+
+        :delete ->
+          {"System", "deleted #{log.resource_type}", nil, categorize(log.resource_type), "delete",
+           "error"}
+
+        :settings_changed ->
+          {"User", "changed settings", inspect_changes(log.changes), "security", "settings",
+           "secondary"}
+
+        :role_change ->
+          {"Admin", "changed role", inspect_changes(log.changes), "team", "manage_accounts",
+           "tertiary"}
+
+        _ ->
+          {"System", "#{log.action}", inspect_changes(log.changes), "system", "info",
+           "on-surface-variant"}
+      end
 
     %{
       actor: actor,
@@ -218,7 +260,8 @@ defmodule FounderPadWeb.ActivityLive do
     %{
       actor: event.event_name |> String.split(".") |> List.first() |> String.capitalize(),
       action: event.event_name |> String.split(".") |> List.last(),
-      detail: if(event.metadata != %{}, do: inspect(event.metadata, pretty: true, limit: 50), else: nil),
+      detail:
+        if(event.metadata != %{}, do: inspect(event.metadata, pretty: true, limit: 50), else: nil),
       type: "agent",
       icon: "monitoring",
       color: "primary",
@@ -236,15 +279,16 @@ defmodule FounderPadWeb.ActivityLive do
 
   defp inspect_changes(nil), do: nil
   defp inspect_changes(changes) when changes == %{}, do: nil
+
   defp inspect_changes(changes) do
     changes
-    |> Enum.map(fn {k, v} -> "#{k}: #{inspect(v)}" end)
-    |> Enum.join(", ")
+    |> Enum.map_join(", ", fn {k, v} -> "#{k}: #{inspect(v)}" end)
     |> String.slice(0..100)
   end
 
   defp compute_stats(events) do
     total = length(events)
+
     %{
       total: total,
       shown: total,
@@ -254,10 +298,11 @@ defmodule FounderPadWeb.ActivityLive do
 
   defp time_ago(dt) do
     diff = DateTime.diff(DateTime.utc_now(), dt, :second)
+
     cond do
       diff < 60 -> "#{diff}s ago"
       diff < 3600 -> "#{div(diff, 60)}m ago"
-      diff < 86400 -> "#{div(diff, 3600)}h ago"
+      diff < 86_400 -> "#{div(diff, 3600)}h ago"
       diff < 172_800 -> "Yesterday"
       true -> Calendar.strftime(dt, "%b %d")
     end

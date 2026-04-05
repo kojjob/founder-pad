@@ -8,12 +8,24 @@ defmodule FounderPad.Billing.Workers.StripeHandler do
   @impl Oban.Worker
   def perform(%Oban.Job{args: %{"type" => type, "data" => data}}) do
     case type do
-      "checkout.session.completed" -> handle_checkout_completed(data)
-      "customer.subscription.created" -> handle_subscription_created(data)
-      "customer.subscription.updated" -> handle_subscription_updated(data)
-      "customer.subscription.deleted" -> handle_subscription_deleted(data)
-      "invoice.payment_succeeded" -> handle_payment_succeeded(data)
-      "invoice.payment_failed" -> handle_payment_failed(data)
+      "checkout.session.completed" ->
+        handle_checkout_completed(data)
+
+      "customer.subscription.created" ->
+        handle_subscription_created(data)
+
+      "customer.subscription.updated" ->
+        handle_subscription_updated(data)
+
+      "customer.subscription.deleted" ->
+        handle_subscription_deleted(data)
+
+      "invoice.payment_succeeded" ->
+        handle_payment_succeeded(data)
+
+      "invoice.payment_failed" ->
+        handle_payment_failed(data)
+
       _ ->
         Logger.info("Unhandled Stripe event: #{type}")
         :ok
@@ -235,7 +247,8 @@ defmodule FounderPad.Billing.Workers.StripeHandler do
           |> Ash.Changeset.for_create(:create, %{
             type: :billing_warning,
             title: "Payment Failed",
-            body: "Your latest payment could not be processed. Please update your payment method to avoid service interruption.",
+            body:
+              "Your latest payment could not be processed. Please update your payment method to avoid service interruption.",
             action_url: "/billing",
             user_id: membership.user_id
           })

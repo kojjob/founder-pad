@@ -39,11 +39,13 @@ defmodule FounderPadWeb.Admin.SeoDashboardLive do
       <div class="flex items-center justify-between">
         <div>
           <h1 class="font-heading text-2xl font-bold text-on-surface">SEO Dashboard</h1>
-          <p class="text-on-surface-variant mt-1">Monitor and improve your content's search visibility.</p>
+          <p class="text-on-surface-variant mt-1">
+            Monitor and improve your content's search visibility.
+          </p>
         </div>
       </div>
-
-      <!-- Overview cards -->
+      
+    <!-- Overview cards -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div class="bg-white rounded-2xl border border-neutral-200/60 p-6">
           <p class="text-sm text-on-surface-variant mb-1">Total Posts</p>
@@ -60,8 +62,8 @@ defmodule FounderPadWeb.Admin.SeoDashboardLive do
           </p>
         </div>
       </div>
-
-      <!-- Posts SEO table -->
+      
+    <!-- Posts SEO table -->
       <div class="bg-white rounded-2xl border border-neutral-200/60 overflow-hidden">
         <div class="px-6 py-4 border-b border-neutral-200/60">
           <h2 class="font-heading font-semibold text-on-surface">Post SEO Scores</h2>
@@ -69,10 +71,18 @@ defmodule FounderPadWeb.Admin.SeoDashboardLive do
         <table class="w-full">
           <thead class="bg-neutral-50/50">
             <tr>
-              <th class="px-6 py-3 text-left text-xs font-medium text-on-surface-variant uppercase">Post</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-on-surface-variant uppercase">Score</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-on-surface-variant uppercase">Issues</th>
-              <th class="px-6 py-3 text-right text-xs font-medium text-on-surface-variant uppercase">Actions</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-on-surface-variant uppercase">
+                Post
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-on-surface-variant uppercase">
+                Score
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-on-surface-variant uppercase">
+                Issues
+              </th>
+              <th class="px-6 py-3 text-right text-xs font-medium text-on-surface-variant uppercase">
+                Actions
+              </th>
             </tr>
           </thead>
           <tbody class="divide-y divide-neutral-200/60">
@@ -88,14 +98,19 @@ defmodule FounderPadWeb.Admin.SeoDashboardLive do
               </td>
               <td class="px-6 py-4">
                 <div class="flex flex-wrap gap-1">
-                  <span :for={{check, false} <- ps.seo.checks}
-                    class="text-xs px-1.5 py-0.5 rounded bg-red-50 text-red-600">
+                  <span
+                    :for={{check, false} <- ps.seo.checks}
+                    class="text-xs px-1.5 py-0.5 rounded bg-red-50 text-red-600"
+                  >
                     {check |> Atom.to_string() |> String.replace("_", " ")}
                   </span>
                 </div>
               </td>
               <td class="px-6 py-4 text-right">
-                <a href={"/admin/blog/#{ps.post.id}/edit"} class="text-primary text-sm hover:underline">
+                <a
+                  href={"/admin/blog/#{ps.post.id}/edit"}
+                  class="text-primary text-sm hover:underline"
+                >
                   Edit
                 </a>
               </td>

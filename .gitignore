@@ -39,3 +39,16 @@ stitch/
 
 # Override global gitignore that blocks lib/ (Python pattern)
 !lib/
+
+# macOS duplicate artifacts
+*\ 2.*
+*\ 3.*
+*\ 4.*
+
+# IDE / tool directories
+.sfdx/
+.claude/
+.superpowers/
+
+# Uploaded files (user-generated)
+/priv/static/uploads/

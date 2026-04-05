@@ -40,7 +40,10 @@ defmodule FounderPad.Content.SeoScorer do
 
   defp check_body_length(post) do
     body = access(post, :body) || ""
-    word_count = body |> String.replace(~r/<[^>]+>/, " ") |> String.split(~r/\s+/, trim: true) |> length()
+
+    word_count =
+      body |> String.replace(~r/<[^>]+>/, " ") |> String.split(~r/\s+/, trim: true) |> length()
+
     word_count >= 50
   end
 

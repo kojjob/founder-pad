@@ -83,7 +83,9 @@ defmodule FounderPadWeb.Docs.ChangelogLive do
                       <h2 class="text-lg font-bold font-headline">{entry.title}</h2>
                       <.type_badge type={entry.type} />
                       <span class="text-sm text-on-surface-variant/50">
-                        {if entry.published_at, do: Calendar.strftime(entry.published_at, "%B %d, %Y"), else: ""}
+                        {if entry.published_at,
+                          do: Calendar.strftime(entry.published_at, "%B %d, %Y"),
+                          else: ""}
                       </span>
                     </div>
                     <span class={"material-symbols-outlined text-on-surface-variant/40 text-lg transition-transform mt-1 " <>
@@ -155,13 +157,22 @@ defmodule FounderPadWeb.Docs.ChangelogLive do
         </a>
 
         <div class="hidden md:flex items-center gap-8 text-sm font-medium text-on-surface-variant">
-          <a href="/docs" class={"hover:text-on-surface transition-colors " <> if(@active == "docs", do: "text-primary", else: "")}>
+          <a
+            href="/docs"
+            class={"hover:text-on-surface transition-colors " <> if(@active == "docs", do: "text-primary", else: "")}
+          >
             Docs
           </a>
-          <a href="/docs/api" class={"hover:text-on-surface transition-colors " <> if(@active == "api", do: "text-primary", else: "")}>
+          <a
+            href="/docs/api"
+            class={"hover:text-on-surface transition-colors " <> if(@active == "api", do: "text-primary", else: "")}
+          >
             API
           </a>
-          <a href="/docs/changelog" class={"hover:text-on-surface transition-colors " <> if(@active == "changelog", do: "text-primary", else: "")}>
+          <a
+            href="/docs/changelog"
+            class={"hover:text-on-surface transition-colors " <> if(@active == "changelog", do: "text-primary", else: "")}
+          >
             Changelog
           </a>
           <a href="/auth/login" class="hover:text-on-surface transition-colors">Login</a>

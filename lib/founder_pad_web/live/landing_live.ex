@@ -43,7 +43,6 @@ defmodule FounderPadWeb.LandingLive do
             <a href="#pricing" class="hover:text-on-surface transition-colors">Pricing</a>
             <a
               href="/docs"
-              
               class="hover:text-on-surface transition-colors"
             >
               Docs

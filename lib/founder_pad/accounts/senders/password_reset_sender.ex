@@ -5,10 +5,11 @@ defmodule FounderPad.Accounts.Senders.PasswordResetSender do
 
   @impl true
   def send(user, token, _opts) do
-    email = case user do
-      %{email: email} -> to_string(email)
-      email -> to_string(email)
-    end
+    email =
+      case user do
+        %{email: email} -> to_string(email)
+        email -> to_string(email)
+      end
 
     Logger.info("Sending password reset to #{email}")
 

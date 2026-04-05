@@ -22,12 +22,14 @@ defmodule FounderPadWeb.StatusLiveTest do
       admin = create_admin_user!()
 
       Incident
-      |> Ash.Changeset.for_create(:create, %{
-        title: "API Latency Spike",
-        severity: :major,
-        status: :investigating,
-        affected_components: ["API"]
-      }, actor: admin)
+      |> Ash.Changeset.for_create(
+        :create,
+        %{
+          title: "API Latency Spike",
+          severity: :major,
+          status: :investigating,
+          affected_components: ["API"]
+        }, actor: admin)
       |> Ash.create!()
 
       {:ok, _view, html} = live(conn, ~p"/status")
@@ -42,10 +44,12 @@ defmodule FounderPadWeb.StatusLiveTest do
       # Create and resolve an incident
       incident =
         Incident
-        |> Ash.Changeset.for_create(:create, %{
-          title: "Past Database Issue",
-          severity: :minor
-        }, actor: admin)
+        |> Ash.Changeset.for_create(
+          :create,
+          %{
+            title: "Past Database Issue",
+            severity: :minor
+          }, actor: admin)
         |> Ash.create!()
 
       incident

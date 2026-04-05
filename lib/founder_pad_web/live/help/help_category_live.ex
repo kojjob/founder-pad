@@ -48,7 +48,9 @@ defmodule FounderPadWeb.Help.HelpCategoryLive do
 
           <div class="flex items-center gap-4 mb-4">
             <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
-              <span class="material-symbols-outlined text-primary text-2xl">{@category.icon || "help"}</span>
+              <span class="material-symbols-outlined text-primary text-2xl">
+                {@category.icon || "help"}
+              </span>
             </div>
             <div>
               <h1 class="font-heading text-3xl font-extrabold tracking-tight text-on-surface">

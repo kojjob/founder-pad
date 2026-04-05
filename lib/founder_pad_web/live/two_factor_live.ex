@@ -70,13 +70,11 @@ defmodule FounderPadWeb.TwoFactorLive do
               <h2 class="text-lg font-bold text-on-surface">Status</h2>
               <%= if @totp && @totp.enabled do %>
                 <span class="inline-flex items-center gap-1.5 text-green-400 font-medium mt-1">
-                  <span class="w-2 h-2 bg-green-400 rounded-full"></span>
-                  Enabled
+                  <span class="w-2 h-2 bg-green-400 rounded-full"></span> Enabled
                 </span>
               <% else %>
                 <span class="inline-flex items-center gap-1.5 text-on-surface-variant font-medium mt-1">
-                  <span class="w-2 h-2 bg-on-surface-variant rounded-full"></span>
-                  Disabled
+                  <span class="w-2 h-2 bg-on-surface-variant rounded-full"></span> Disabled
                 </span>
               <% end %>
             </div>

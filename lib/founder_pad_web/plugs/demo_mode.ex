@@ -8,10 +8,13 @@ defmodule FounderPadWeb.Plugs.DemoMode do
     if FounderPad.Demo.enabled?() and mutation_request?(conn) do
       conn
       |> put_resp_header("content-type", "application/json")
-      |> send_resp(403, Jason.encode!(%{
-        error: "demo_mode",
-        message: "This action is disabled in demo mode."
-      }))
+      |> send_resp(
+        403,
+        Jason.encode!(%{
+          error: "demo_mode",
+          message: "This action is disabled in demo mode."
+        })
+      )
       |> halt()
     else
       conn

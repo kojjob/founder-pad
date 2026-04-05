@@ -15,14 +15,18 @@ defmodule FounderPad.Billing.UsageTracker do
 
   def get_usage_count(org_id, period_start) do
     FounderPad.Billing.UsageRecord
-    |> Ash.Query.filter(organisation_id == ^org_id and event_type == "api_call" and inserted_at >= ^period_start)
+    |> Ash.Query.filter(
+      organisation_id == ^org_id and event_type == "api_call" and inserted_at >= ^period_start
+    )
     |> Ash.read!()
     |> length()
   end
 
   def within_limits?(org_id) do
     case get_org_plan(org_id) do
-      nil -> true
+      nil ->
+        true
+
       plan ->
         period_start = beginning_of_month()
         current = get_usage_count(org_id, period_start)

@@ -60,8 +60,8 @@ defmodule FounderPadWeb.SearchControllerTest do
       body = json_response(conn, 200)
 
       assert Enum.any?(body["results"], fn r ->
-        r["title"] == "Getting Started Guide" && r["type"] == "blog"
-      end)
+               r["title"] == "Getting Started Guide" && r["type"] == "blog"
+             end)
     end
 
     test "does not return draft blog posts", %{conn: conn} do
@@ -83,8 +83,8 @@ defmodule FounderPadWeb.SearchControllerTest do
       body = json_response(conn, 200)
 
       assert Enum.any?(body["results"], fn r ->
-        r["title"] == "How to Reset Password" && r["type"] == "help"
-      end)
+               r["title"] == "How to Reset Password" && r["type"] == "help"
+             end)
     end
 
     test "results are grouped by type in order: page, blog, help", %{conn: conn} do

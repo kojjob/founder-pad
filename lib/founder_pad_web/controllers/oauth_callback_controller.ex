@@ -12,7 +12,10 @@ defmodule FounderPadWeb.OAuthCallbackController do
   """
   def callback(conn, %{"provider" => provider} = _params) do
     conn
-    |> put_flash(:error, "OAuth for #{provider} requires configuration. Set #{String.upcase(provider)}_CLIENT_ID and #{String.upcase(provider)}_CLIENT_SECRET env vars.")
+    |> put_flash(
+      :error,
+      "OAuth for #{provider} requires configuration. Set #{String.upcase(provider)}_CLIENT_ID and #{String.upcase(provider)}_CLIENT_SECRET env vars."
+    )
     |> redirect(to: "/auth/login")
   end
 end

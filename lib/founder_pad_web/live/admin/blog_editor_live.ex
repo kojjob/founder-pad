@@ -487,7 +487,10 @@ defmodule FounderPadWeb.Admin.BlogEditorLive do
         {:ok, _post} ->
           {:noreply,
            socket
-           |> put_flash(:info, if(socket.assigns.editing, do: "Post updated.", else: "Post created."))
+           |> put_flash(
+             :info,
+             if(socket.assigns.editing, do: "Post updated.", else: "Post created.")
+           )
            |> push_navigate(to: "/admin/blog")}
 
         {:error, changeset} ->

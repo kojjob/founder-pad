@@ -92,10 +92,16 @@ defmodule FounderPadWeb.Admin.UserDetailLive do
 
       <div class="bg-white rounded-2xl border border-neutral-200/60 p-8">
         <h3 class="text-lg font-bold font-heading text-on-surface mb-4">Memberships</h3>
-        <div :if={@user.memberships == [] || !Ash.Resource.loaded?(@user, :memberships)} class="text-on-surface-variant">
+        <div
+          :if={@user.memberships == [] || !Ash.Resource.loaded?(@user, :memberships)}
+          class="text-on-surface-variant"
+        >
           No memberships found.
         </div>
-        <table :if={@user.memberships != [] && Ash.Resource.loaded?(@user, :memberships)} class="w-full">
+        <table
+          :if={@user.memberships != [] && Ash.Resource.loaded?(@user, :memberships)}
+          class="w-full"
+        >
           <thead>
             <tr class="border-b border-outline-variant/30">
               <th class="text-left px-4 py-3 text-xs font-semibold text-on-surface-variant uppercase tracking-wider">

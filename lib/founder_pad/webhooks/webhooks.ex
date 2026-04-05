@@ -3,14 +3,14 @@ defmodule FounderPad.Webhooks do
 
   resources do
     resource FounderPad.Webhooks.OutboundWebhook do
-      define :create_webhook, action: :create
-      define :list_webhooks, action: :read
-      define :get_webhook, action: :read, get_by: [:id]
+      define(:create_webhook, action: :create)
+      define(:list_webhooks, action: :read)
+      define(:get_webhook, action: :read, get_by: [:id])
     end
 
     resource FounderPad.Webhooks.WebhookDelivery do
-      define :create_delivery, action: :create
-      define :list_deliveries, action: :read
+      define(:create_delivery, action: :create)
+      define(:list_deliveries, action: :read)
     end
   end
 

@@ -47,14 +47,27 @@ defmodule FounderPadWeb.DashboardLive do
 
   defp assign_defaults(socket) do
     assign(socket,
-      user_name: "", last_sync: "—", system_status: :nominal,
-      agents_count: 0, agents_limit: 3, agents_pct: 0,
-      total_inference: "0", inference_chart: [30, 30, 30, 30, 30, 30],
-      token_usage: "0", token_quota_pct: 0, token_chart: [{30, 0.3}, {30, 0.3}, {30, 0.3}, {30, 0.3}, {30, 0.3}, {30, 0.3}],
-      success_rate: 0.0, avg_latency: "—", error_rate: "—",
+      user_name: "",
+      last_sync: "—",
+      system_status: :nominal,
+      agents_count: 0,
+      agents_limit: 3,
+      agents_pct: 0,
+      total_inference: "0",
+      inference_chart: [30, 30, 30, 30, 30, 30],
+      token_usage: "0",
+      token_quota_pct: 0,
+      token_chart: [{30, 0.3}, {30, 0.3}, {30, 0.3}, {30, 0.3}, {30, 0.3}, {30, 0.3}],
+      success_rate: 0.0,
+      avg_latency: "—",
+      error_rate: "—",
       success_chart: [50, 50, 50, 50, 50, 50, 50, 50, 50],
-      current_plan_name: "Free", members_count: 0, notifications_count: 0,
-      flags_enabled: 0, cost_grade: "—", api_uptime: "99.99%",
+      current_plan_name: "Free",
+      members_count: 0,
+      notifications_count: 0,
+      flags_enabled: 0,
+      cost_grade: "—",
+      api_uptime: "99.99%",
       recent_activity: []
     )
   end
@@ -87,14 +100,17 @@ defmodule FounderPadWeb.DashboardLive do
     plan_limit = if current_plan, do: current_plan.max_api_calls_per_month, else: 1000
     usage_pct = if plan_limit > 0, do: min(round(usage_count / plan_limit * 100), 100), else: 0
     agents_limit = if current_plan, do: current_plan.max_agents, else: 3
-    agents_pct = if agents_limit > 0, do: min(round(agents_count / agents_limit * 100), 100), else: 0
+
+    agents_pct =
+      if agents_limit > 0, do: min(round(agents_count / agents_limit * 100), 100), else: 0
 
     # Generate chart data from real daily counts (last 7 days)
     chart_data = generate_chart_data()
 
     assign(socket,
       # Header
-      user_name: if(user, do: user.name |> to_string() |> String.split() |> List.first(), else: ""),
+      user_name:
+        if(user, do: user.name |> to_string() |> String.split() |> List.first(), else: ""),
       last_sync: Calendar.strftime(DateTime.utc_now(), "%H:%M:%S UTC"),
       system_status: if(usage_pct < 90, do: :nominal, else: :warning),
 
@@ -144,7 +160,11 @@ defmodule FounderPadWeb.DashboardLive do
           </p>
         </div>
         <div class="flex items-center gap-3">
-          <button phx-click="refresh_data" class="p-2 text-on-surface-variant hover:text-primary transition-colors rounded-lg hover:bg-surface-container-high" title="Refresh">
+          <button
+            phx-click="refresh_data"
+            class="p-2 text-on-surface-variant hover:text-primary transition-colors rounded-lg hover:bg-surface-container-high"
+            title="Refresh"
+          >
             <span class="material-symbols-outlined text-lg">refresh</span>
           </button>
           <div class="flex items-center gap-2 text-sm font-mono text-on-surface-variant bg-surface-container-low px-3 py-1.5 rounded-sm">
@@ -167,9 +187,15 @@ defmodule FounderPadWeb.DashboardLive do
             <span class="text-xs font-mono text-on-surface-variant">/ {@agents_limit} max</span>
           </div>
           <div class="mt-6 h-1.5 w-full bg-surface-container-highest rounded-full overflow-hidden">
-            <div class="h-full bg-primary rounded-full transition-all duration-500" style={"width: #{@agents_pct}%"}></div>
+            <div
+              class="h-full bg-primary rounded-full transition-all duration-500"
+              style={"width: #{@agents_pct}%"}
+            >
+            </div>
           </div>
-          <p class="text-[10px] text-on-surface-variant mt-2 font-mono">{@agents_pct}% of plan limit</p>
+          <p class="text-[10px] text-on-surface-variant mt-2 font-mono">
+            {@agents_pct}% of plan limit
+          </p>
         </div>
 
         <%!-- Total Inference Card --%>
@@ -194,7 +220,10 @@ defmodule FounderPadWeb.DashboardLive do
             <p class="text-sm font-medium text-on-surface-variant">API Usage</p>
             <span class={[
               "text-[10px] font-mono px-2 py-0.5 rounded-full",
-              if(@token_quota_pct >= 80, do: "bg-error/10 text-error", else: "bg-secondary/10 text-secondary")
+              if(@token_quota_pct >= 80,
+                do: "bg-error/10 text-error",
+                else: "bg-secondary/10 text-secondary"
+              )
             ]}>
               {if @token_quota_pct >= 80, do: "LIMIT NEAR", else: "ON TRACK"} {@token_quota_pct}%
             </span>
@@ -267,8 +296,13 @@ defmodule FounderPadWeb.DashboardLive do
               </div>
               <div class="flex items-center justify-between">
                 <span class="text-sm">Notifications</span>
-                <span class={["font-mono", if(@notifications_count > 0, do: "text-secondary", else: "text-on-surface-variant")]}>
-                  {if @notifications_count > 0, do: "#{@notifications_count} unread", else: "All clear"}
+                <span class={[
+                  "font-mono",
+                  if(@notifications_count > 0, do: "text-secondary", else: "text-on-surface-variant")
+                ]}>
+                  {if @notifications_count > 0,
+                    do: "#{@notifications_count} unread",
+                    else: "All clear"}
                 </span>
               </div>
             </div>
@@ -279,18 +313,30 @@ defmodule FounderPadWeb.DashboardLive do
             <p class="text-xs font-mono text-primary mb-2">// SYSTEM_STATUS</p>
             <p class="text-sm leading-relaxed text-on-surface-variant">
               {cond do
-                @agents_count == 0 -> "No agents configured yet. Create your first AI agent to get started."
-                @token_quota_pct >= 80 -> "API usage approaching limit. Consider upgrading your plan for uninterrupted service."
-                @agents_pct >= 80 -> "Agent slots nearly full. Upgrade to add more agents."
-                true -> "All systems operational. Your agents are running within normal parameters."
+                @agents_count == 0 ->
+                  "No agents configured yet. Create your first AI agent to get started."
+
+                @token_quota_pct >= 80 ->
+                  "API usage approaching limit. Consider upgrading your plan for uninterrupted service."
+
+                @agents_pct >= 80 ->
+                  "Agent slots nearly full. Upgrade to add more agents."
+
+                true ->
+                  "All systems operational. Your agents are running within normal parameters."
               end}
             </p>
-            <a href={cond do
-              @agents_count == 0 -> "/agents"
-              @token_quota_pct >= 80 -> "/billing"
-              @agents_pct >= 80 -> "/billing"
-              true -> "/agents"
-            end} class="mt-4 text-primary font-semibold text-sm hover:underline flex items-center gap-1">
+            <a
+              href={
+                cond do
+                  @agents_count == 0 -> "/agents"
+                  @token_quota_pct >= 80 -> "/billing"
+                  @agents_pct >= 80 -> "/billing"
+                  true -> "/agents"
+                end
+              }
+              class="mt-4 text-primary font-semibold text-sm hover:underline flex items-center gap-1"
+            >
               {cond do
                 @agents_count == 0 -> "Create Agent"
                 @token_quota_pct >= 80 or @agents_pct >= 80 -> "Upgrade Plan"
@@ -331,7 +377,9 @@ defmodule FounderPadWeb.DashboardLive do
             >
               <div class="col-span-4 flex items-center gap-3">
                 <div class="w-8 h-8 rounded bg-surface-container-highest flex items-center justify-center">
-                  <span class={"material-symbols-outlined text-lg text-#{row.icon_color}"}>{row.icon}</span>
+                  <span class={"material-symbols-outlined text-lg text-#{row.icon_color}"}>
+                    {row.icon}
+                  </span>
                 </div>
                 <div>
                   <p class="text-sm font-semibold">{row.name}</p>
@@ -446,7 +494,8 @@ defmodule FounderPadWeb.DashboardLive do
         id: agent.id,
         name: agent.name,
         short_id: "0x" <> String.slice(agent.id, 0..5),
-        activity: "#{agent.provider |> to_string() |> String.capitalize()} • #{agent.model |> String.split("-") |> Enum.take(2) |> Enum.join("-")}",
+        activity:
+          "#{agent.provider |> to_string() |> String.capitalize()} • #{agent.model |> String.split("-") |> Enum.take(2) |> Enum.join("-")}",
         latency: "—",
         status: if(agent.active, do: :running, else: :paused),
         icon: agent_icon(agent.provider),
@@ -470,18 +519,23 @@ defmodule FounderPadWeb.DashboardLive do
   defp format_number(n), do: "#{n}"
 
   defp calculate_success_rate([]), do: 99.8
+
   defp calculate_success_rate(events) do
     total = length(events)
     # Count events that don't have "error" or "fail" in metadata
-    successes = Enum.count(events, fn e ->
-      not String.contains?(to_string(e.event_name), "fail")
-    end)
+    successes =
+      Enum.count(events, fn e ->
+        not String.contains?(to_string(e.event_name), "fail")
+      end)
+
     Float.round(successes / total * 100, 1)
   end
 
   defp calculate_cost_grade(_usage, agents) when agents == 0, do: "—"
+
   defp calculate_cost_grade(usage, agents) do
     ratio = usage / agents
+
     cond do
       ratio < 50 -> "A+"
       ratio < 100 -> "A"

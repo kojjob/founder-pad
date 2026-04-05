@@ -46,7 +46,8 @@ defmodule FounderPadWeb.StatusLive do
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"
           rel="stylesheet"
         />
-        <script defer src="/assets/js/app.js"></script>
+        <script defer src="/assets/js/app.js">
+        </script>
       </head>
       <body class="bg-background text-on-surface font-body min-h-screen">
         <div class="max-w-3xl mx-auto px-4 py-12 space-y-10">
@@ -82,18 +83,18 @@ defmodule FounderPadWeb.StatusLive do
             <div class="divide-y divide-outline-variant/10">
               <div :for={component <- @components} class="flex items-center justify-between px-6 py-4">
                 <div class="flex items-center gap-3">
-                  <span class="material-symbols-outlined text-on-surface-variant">{component.icon}</span>
+                  <span class="material-symbols-outlined text-on-surface-variant">
+                    {component.icon}
+                  </span>
                   <span class="font-medium text-on-surface">{component.name}</span>
                 </div>
                 <%= if MapSet.member?(@affected_components, component.name) do %>
                   <span class="inline-flex items-center gap-1.5 text-amber-400 text-sm font-medium">
-                    <span class="w-2 h-2 bg-amber-400 rounded-full"></span>
-                    Degraded
+                    <span class="w-2 h-2 bg-amber-400 rounded-full"></span> Degraded
                   </span>
                 <% else %>
                   <span class="inline-flex items-center gap-1.5 text-green-400 text-sm font-medium">
-                    <span class="w-2 h-2 bg-green-400 rounded-full"></span>
-                    Operational
+                    <span class="w-2 h-2 bg-green-400 rounded-full"></span> Operational
                   </span>
                 <% end %>
               </div>
@@ -104,7 +105,10 @@ defmodule FounderPadWeb.StatusLive do
           <div class="bg-surface-container rounded-xl p-6 space-y-3">
             <h2 class="text-lg font-bold text-on-surface">Uptime - Last 30 Days</h2>
             <div class="flex gap-0.5">
-              <div :for={_day <- 1..30} class="flex-1 h-8 bg-green-500/80 rounded-sm first:rounded-l-md last:rounded-r-md">
+              <div
+                :for={_day <- 1..30}
+                class="flex-1 h-8 bg-green-500/80 rounded-sm first:rounded-l-md last:rounded-r-md"
+              >
               </div>
             </div>
             <div class="flex justify-between text-xs text-on-surface-variant">

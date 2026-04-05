@@ -7,21 +7,24 @@ defmodule FounderPadWeb.OnboardingLive do
     "research" => %{
       name: "Research Assistant",
       description: "Deep research across documents and web sources.",
-      system_prompt: "You are a meticulous research assistant. Analyze topics thoroughly, cite sources when possible, and present findings in a clear, structured format.",
+      system_prompt:
+        "You are a meticulous research assistant. Analyze topics thoroughly, cite sources when possible, and present findings in a clear, structured format.",
       temperature: 0.5,
       max_tokens: 4096
     },
     "code_review" => %{
       name: "Code Reviewer",
       description: "Automated PR reviews with security vulnerability detection.",
-      system_prompt: "You are an expert code reviewer. Review code for bugs, security vulnerabilities, performance issues, and adherence to best practices.",
+      system_prompt:
+        "You are an expert code reviewer. Review code for bugs, security vulnerabilities, performance issues, and adherence to best practices.",
       temperature: 0.3,
       max_tokens: 8192
     },
     "writing" => %{
       name: "Content Writer",
       description: "Generate blog posts, documentation, and marketing copy.",
-      system_prompt: "You are a skilled content writer. Create engaging, well-structured content tailored to the audience.",
+      system_prompt:
+        "You are a skilled content writer. Create engaging, well-structured content tailored to the audience.",
       temperature: 0.8,
       max_tokens: 4096
     },
@@ -37,7 +40,9 @@ defmodule FounderPadWeb.OnboardingLive do
   def mount(_params, session, socket) do
     current_user =
       case session["user_token"] do
-        nil -> nil
+        nil ->
+          nil
+
         token ->
           case AshAuthentication.subject_to_user(token, FounderPad.Accounts.User) do
             {:ok, user} -> user
@@ -80,7 +85,10 @@ defmodule FounderPadWeb.OnboardingLive do
         </p>
 
         <%!-- Error display --%>
-        <div :if={@error} class="bg-error/10 text-error text-sm font-medium p-4 rounded-xl text-center">
+        <div
+          :if={@error}
+          class="bg-error/10 text-error text-sm font-medium p-4 rounded-xl text-center"
+        >
           {@error}
         </div>
 
@@ -117,7 +125,10 @@ defmodule FounderPadWeb.OnboardingLive do
               placeholder="teammate@company.com"
               class="flex-1 bg-surface-container-highest border-none rounded-lg px-4 py-3 text-sm text-on-surface text-center focus:ring-2 focus:ring-primary"
             />
-            <button type="submit" class="primary-gradient px-4 py-2.5 rounded-lg text-sm font-semibold">
+            <button
+              type="submit"
+              class="primary-gradient px-4 py-2.5 rounded-lg text-sm font-semibold"
+            >
               Add
             </button>
           </form>
@@ -172,8 +183,13 @@ defmodule FounderPadWeb.OnboardingLive do
             Your workspace is ready. Let's see your agent in action.
           </p>
           <div class="space-y-3 text-sm text-on-surface-variant">
-            <p :if={@org_name != ""}>Organisation: <strong class="text-on-surface">{@org_name}</strong></p>
-            <p :if={@invite_emails != []}>Invites: <strong class="text-on-surface">{length(@invite_emails)} team member(s)</strong></p>
+            <p :if={@org_name != ""}>
+              Organisation: <strong class="text-on-surface">{@org_name}</strong>
+            </p>
+            <p :if={@invite_emails != []}>
+              Invites:
+              <strong class="text-on-surface">{length(@invite_emails)} team member(s)</strong>
+            </p>
             <p :if={@selected_template}>
               Agent: <strong class="text-on-surface">{@templates[@selected_template].name}</strong>
             </p>
@@ -220,7 +236,8 @@ defmodule FounderPadWeb.OnboardingLive do
     email = String.trim(email)
 
     if email != "" and email not in socket.assigns.invite_emails do
-      {:noreply, assign(socket, invite_emails: socket.assigns.invite_emails ++ [email], invite_input: "")}
+      {:noreply,
+       assign(socket, invite_emails: socket.assigns.invite_emails ++ [email], invite_input: "")}
     else
       {:noreply, assign(socket, invite_input: "")}
     end

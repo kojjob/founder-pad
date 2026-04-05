@@ -71,8 +71,12 @@ defmodule FounderPadWeb.AgentTemplatesLive do
     ~H"""
     <div class="space-y-8 max-w-7xl mx-auto">
       <div>
-        <h1 class="text-3xl font-extrabold font-headline tracking-tight text-on-surface">Agent Templates</h1>
-        <p class="text-on-surface-variant mt-1">Pre-built agent templates to get you started quickly</p>
+        <h1 class="text-3xl font-extrabold font-headline tracking-tight text-on-surface">
+          Agent Templates
+        </h1>
+        <p class="text-on-surface-variant mt-1">
+          Pre-built agent templates to get you started quickly
+        </p>
       </div>
 
       <%!-- Category Tabs --%>
@@ -82,7 +86,10 @@ defmodule FounderPadWeb.AgentTemplatesLive do
           phx-value-category="all"
           class={[
             "px-4 py-2 rounded-lg text-sm font-semibold transition-colors",
-            if(@active_category == "all", do: "bg-primary text-on-primary", else: "bg-surface-container text-on-surface hover:bg-surface-container-high")
+            if(@active_category == "all",
+              do: "bg-primary text-on-primary",
+              else: "bg-surface-container text-on-surface hover:bg-surface-container-high"
+            )
           ]}
         >
           All
@@ -93,7 +100,10 @@ defmodule FounderPadWeb.AgentTemplatesLive do
           phx-value-category={cat}
           class={[
             "px-4 py-2 rounded-lg text-sm font-semibold transition-colors",
-            if(@active_category == cat, do: "bg-primary text-on-primary", else: "bg-surface-container text-on-surface hover:bg-surface-container-high")
+            if(@active_category == cat,
+              do: "bg-primary text-on-primary",
+              else: "bg-surface-container text-on-surface hover:bg-surface-container-high"
+            )
           ]}
         >
           {cat}
@@ -103,12 +113,17 @@ defmodule FounderPadWeb.AgentTemplatesLive do
       <%!-- Templates Grid --%>
       <%= if @templates == [] do %>
         <div class="bg-surface-container rounded-2xl p-12 text-center">
-          <span class="material-symbols-outlined text-5xl text-on-surface-variant mb-4">smart_toy</span>
+          <span class="material-symbols-outlined text-5xl text-on-surface-variant mb-4">
+            smart_toy
+          </span>
           <p class="text-on-surface-variant">No templates available yet</p>
         </div>
       <% else %>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div :for={template <- @templates} class="bg-surface-container rounded-2xl p-6 hover:bg-surface-container-high transition-colors group">
+          <div
+            :for={template <- @templates}
+            class="bg-surface-container rounded-2xl p-6 hover:bg-surface-container-high transition-colors group"
+          >
             <div class="flex items-start gap-4 mb-4">
               <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
                 <span class="material-symbols-outlined text-2xl text-primary">{template.icon}</span>
@@ -116,12 +131,16 @@ defmodule FounderPadWeb.AgentTemplatesLive do
               <div class="flex-1 min-w-0">
                 <h3 class="font-bold text-on-surface truncate">{template.name}</h3>
                 <%= if template.category do %>
-                  <span class="text-xs font-semibold text-on-surface-variant bg-surface-container-high px-2 py-0.5 rounded-full">{template.category}</span>
+                  <span class="text-xs font-semibold text-on-surface-variant bg-surface-container-high px-2 py-0.5 rounded-full">
+                    {template.category}
+                  </span>
                 <% end %>
               </div>
             </div>
 
-            <p class="text-sm text-on-surface-variant mb-4 line-clamp-2">{template.description || "No description"}</p>
+            <p class="text-sm text-on-surface-variant mb-4 line-clamp-2">
+              {template.description || "No description"}
+            </p>
 
             <div class="flex items-center justify-between">
               <span class="text-xs text-on-surface-variant font-mono">{template.use_count} uses</span>
@@ -147,6 +166,7 @@ defmodule FounderPadWeb.AgentTemplatesLive do
   end
 
   defp get_user_org_id(nil), do: nil
+
   defp get_user_org_id(user) do
     case user |> Ash.load!(:organisations) |> Map.get(:organisations) do
       [org | _] -> org.id

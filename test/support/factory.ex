@@ -94,7 +94,7 @@ defmodule FounderPad.Factory do
   def create_invoice!(org, attrs \\ %{}) do
     default = %{
       invoice_number: "INV-#{System.unique_integer([:positive])}",
-      amount_cents: 14900,
+      amount_cents: 14_900,
       status: :paid,
       period_start: Date.utc_today() |> Date.beginning_of_month(),
       period_end: Date.utc_today() |> Date.end_of_month(),
@@ -110,11 +110,13 @@ defmodule FounderPad.Factory do
     admin = Map.get_lazy(attrs, :actor, fn -> create_admin_user!() end)
 
     FounderPad.Content.Category
-    |> Ash.Changeset.for_create(:create, %{
-      name: Map.get(attrs, :name, "Category #{System.unique_integer([:positive])}"),
-      slug: Map.get(attrs, :slug, nil),
-      description: Map.get(attrs, :description, "A test category")
-    }, actor: admin)
+    |> Ash.Changeset.for_create(
+      :create,
+      %{
+        name: Map.get(attrs, :name, "Category #{System.unique_integer([:positive])}"),
+        slug: Map.get(attrs, :slug, nil),
+        description: Map.get(attrs, :description, "A test category")
+      }, actor: admin)
     |> Ash.create!()
   end
 
@@ -122,10 +124,12 @@ defmodule FounderPad.Factory do
     admin = Map.get_lazy(attrs, :actor, fn -> create_admin_user!() end)
 
     FounderPad.Content.Tag
-    |> Ash.Changeset.for_create(:create, %{
-      name: Map.get(attrs, :name, "Tag #{System.unique_integer([:positive])}"),
-      slug: Map.get(attrs, :slug, nil)
-    }, actor: admin)
+    |> Ash.Changeset.for_create(
+      :create,
+      %{
+        name: Map.get(attrs, :name, "Tag #{System.unique_integer([:positive])}"),
+        slug: Map.get(attrs, :slug, nil)
+      }, actor: admin)
     |> Ash.create!()
   end
 
@@ -133,15 +137,22 @@ defmodule FounderPad.Factory do
     admin = Map.get_lazy(attrs, :actor, fn -> create_admin_user!() end)
 
     FounderPad.Content.Post
-    |> Ash.Changeset.for_create(:create, %{
-      title: Map.get(attrs, :title, "Test Post #{System.unique_integer([:positive])}"),
-      slug: Map.get(attrs, :slug, nil),
-      body: Map.get(attrs, :body, "<p>Test post content with enough words to make this realistic for a blog post.</p>"),
-      excerpt: Map.get(attrs, :excerpt, "Test excerpt"),
-      status: Map.get(attrs, :status, :draft),
-      published_at: Map.get(attrs, :published_at, nil),
-      author_id: admin.id
-    }, actor: admin)
+    |> Ash.Changeset.for_create(
+      :create,
+      %{
+        title: Map.get(attrs, :title, "Test Post #{System.unique_integer([:positive])}"),
+        slug: Map.get(attrs, :slug, nil),
+        body:
+          Map.get(
+            attrs,
+            :body,
+            "<p>Test post content with enough words to make this realistic for a blog post.</p>"
+          ),
+        excerpt: Map.get(attrs, :excerpt, "Test excerpt"),
+        status: Map.get(attrs, :status, :draft),
+        published_at: Map.get(attrs, :published_at, nil),
+        author_id: admin.id
+      }, actor: admin)
     |> Ash.create!()
   end
 
@@ -158,13 +169,15 @@ defmodule FounderPad.Factory do
     admin = Map.get_lazy(attrs, :actor, fn -> create_admin_user!() end)
 
     FounderPad.Content.ChangelogEntry
-    |> Ash.Changeset.for_create(:create, %{
-      version: Map.get(attrs, :version, "v#{System.unique_integer([:positive])}.0.0"),
-      title: Map.get(attrs, :title, "Release #{System.unique_integer([:positive])}"),
-      body: Map.get(attrs, :body, "<p>Release notes</p>"),
-      type: Map.get(attrs, :type, :feature),
-      author_id: admin.id
-    }, actor: admin)
+    |> Ash.Changeset.for_create(
+      :create,
+      %{
+        version: Map.get(attrs, :version, "v#{System.unique_integer([:positive])}.0.0"),
+        title: Map.get(attrs, :title, "Release #{System.unique_integer([:positive])}"),
+        body: Map.get(attrs, :body, "<p>Release notes</p>"),
+        type: Map.get(attrs, :type, :feature),
+        author_id: admin.id
+      }, actor: admin)
     |> Ash.create!()
   end
 
@@ -183,13 +196,15 @@ defmodule FounderPad.Factory do
     admin = Map.get_lazy(attrs, :actor, fn -> create_admin_user!() end)
 
     FounderPad.HelpCenter.Category
-    |> Ash.Changeset.for_create(:create, %{
-      name: Map.get(attrs, :name, "Category #{System.unique_integer([:positive])}"),
-      slug: Map.get(attrs, :slug, nil),
-      description: Map.get(attrs, :description, "Help category"),
-      icon: Map.get(attrs, :icon, "help"),
-      position: Map.get(attrs, :position, 0)
-    }, actor: admin)
+    |> Ash.Changeset.for_create(
+      :create,
+      %{
+        name: Map.get(attrs, :name, "Category #{System.unique_integer([:positive])}"),
+        slug: Map.get(attrs, :slug, nil),
+        description: Map.get(attrs, :description, "Help category"),
+        icon: Map.get(attrs, :icon, "help"),
+        position: Map.get(attrs, :position, 0)
+      }, actor: admin)
     |> Ash.create!()
   end
 
@@ -197,15 +212,17 @@ defmodule FounderPad.Factory do
     admin = Map.get_lazy(attrs, :actor, fn -> create_admin_user!() end)
 
     FounderPad.HelpCenter.Article
-    |> Ash.Changeset.for_create(:create, %{
-      title: Map.get(attrs, :title, "Article #{System.unique_integer([:positive])}"),
-      slug: Map.get(attrs, :slug, nil),
-      body: Map.get(attrs, :body, "This is help article content about billing and payments."),
-      excerpt: Map.get(attrs, :excerpt, "Help article excerpt"),
-      status: Map.get(attrs, :status, :draft),
-      position: Map.get(attrs, :position, 0),
-      category_id: category.id
-    }, actor: admin)
+    |> Ash.Changeset.for_create(
+      :create,
+      %{
+        title: Map.get(attrs, :title, "Article #{System.unique_integer([:positive])}"),
+        slug: Map.get(attrs, :slug, nil),
+        body: Map.get(attrs, :body, "This is help article content about billing and payments."),
+        excerpt: Map.get(attrs, :excerpt, "Help article excerpt"),
+        status: Map.get(attrs, :status, :draft),
+        position: Map.get(attrs, :position, 0),
+        category_id: category.id
+      }, actor: admin)
     |> Ash.create!()
   end
 

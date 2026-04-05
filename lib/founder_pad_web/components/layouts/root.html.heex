@@ -18,7 +18,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="csrf-token" content={get_csrf_token()} />
-    <meta :if={Application.get_env(:founder_pad, :push, [])[:vapid_public_key]} name="vapid-public-key" content={Application.get_env(:founder_pad, :push)[:vapid_public_key]} />
+    <meta
+      :if={Application.get_env(:founder_pad, :push, [])[:vapid_public_key]}
+      name="vapid-public-key"
+      content={Application.get_env(:founder_pad, :push)[:vapid_public_key]}
+    />
     <meta :if={assigns[:current_user]} name="user-id" content={@current_user.id} />
     <meta :if={assigns[:page_description]} name="description" content={@page_description} />
     <FounderPadWeb.SEO.meta_tags

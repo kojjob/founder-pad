@@ -33,15 +33,21 @@ defmodule FounderPadWeb.UsageLive do
     ~H"""
     <div class="space-y-8 max-w-5xl mx-auto">
       <div>
-        <h1 class="text-3xl font-extrabold font-headline tracking-tight text-on-surface">API Usage</h1>
-        <p class="text-on-surface-variant mt-1">Current billing period usage for your <span class="font-semibold">{@plan_name}</span> plan</p>
+        <h1 class="text-3xl font-extrabold font-headline tracking-tight text-on-surface">
+          API Usage
+        </h1>
+        <p class="text-on-surface-variant mt-1">
+          Current billing period usage for your <span class="font-semibold">{@plan_name}</span> plan
+        </p>
       </div>
 
       <%!-- Usage Bar Chart --%>
       <div class="bg-surface-container rounded-2xl p-6 space-y-4">
         <div class="flex items-center justify-between">
           <h2 class="text-lg font-bold text-on-surface">API Calls This Period</h2>
-          <span class="text-sm text-on-surface-variant font-mono">{@usage_count} / {format_limit(@limit)}</span>
+          <span class="text-sm text-on-surface-variant font-mono">
+            {@usage_count} / {format_limit(@limit)}
+          </span>
         </div>
 
         <div class="w-full bg-surface-container-high rounded-full h-6 overflow-hidden">
@@ -66,16 +72,26 @@ defmodule FounderPadWeb.UsageLive do
         <h2 class="text-lg font-bold text-on-surface mb-4">Plan Limits</h2>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div class="bg-surface-container-high rounded-xl p-4">
-            <p class="text-[10px] font-bold tracking-wider uppercase text-on-surface-variant mb-1">API Calls / Month</p>
+            <p class="text-[10px] font-bold tracking-wider uppercase text-on-surface-variant mb-1">
+              API Calls / Month
+            </p>
             <p class="text-2xl font-mono font-medium text-on-surface">{format_limit(@limit)}</p>
           </div>
           <div class="bg-surface-container-high rounded-xl p-4">
-            <p class="text-[10px] font-bold tracking-wider uppercase text-on-surface-variant mb-1">Max Agents</p>
-            <p class="text-2xl font-mono font-medium text-on-surface">{if @plan, do: @plan.max_agents, else: "Unlimited"}</p>
+            <p class="text-[10px] font-bold tracking-wider uppercase text-on-surface-variant mb-1">
+              Max Agents
+            </p>
+            <p class="text-2xl font-mono font-medium text-on-surface">
+              {if @plan, do: @plan.max_agents, else: "Unlimited"}
+            </p>
           </div>
           <div class="bg-surface-container-high rounded-xl p-4">
-            <p class="text-[10px] font-bold tracking-wider uppercase text-on-surface-variant mb-1">Max Seats</p>
-            <p class="text-2xl font-mono font-medium text-on-surface">{if @plan, do: @plan.max_seats, else: "Unlimited"}</p>
+            <p class="text-[10px] font-bold tracking-wider uppercase text-on-surface-variant mb-1">
+              Max Seats
+            </p>
+            <p class="text-2xl font-mono font-medium text-on-surface">
+              {if @plan, do: @plan.max_seats, else: "Unlimited"}
+            </p>
           </div>
         </div>
       </div>
@@ -90,16 +106,27 @@ defmodule FounderPadWeb.UsageLive do
             <table class="w-full text-sm">
               <thead>
                 <tr class="border-b border-outline-variant text-left">
-                  <th class="py-3 px-4 text-[10px] font-bold tracking-wider uppercase text-on-surface-variant">Event Type</th>
-                  <th class="py-3 px-4 text-[10px] font-bold tracking-wider uppercase text-on-surface-variant">Quantity</th>
-                  <th class="py-3 px-4 text-[10px] font-bold tracking-wider uppercase text-on-surface-variant">Date</th>
+                  <th class="py-3 px-4 text-[10px] font-bold tracking-wider uppercase text-on-surface-variant">
+                    Event Type
+                  </th>
+                  <th class="py-3 px-4 text-[10px] font-bold tracking-wider uppercase text-on-surface-variant">
+                    Quantity
+                  </th>
+                  <th class="py-3 px-4 text-[10px] font-bold tracking-wider uppercase text-on-surface-variant">
+                    Date
+                  </th>
                 </tr>
               </thead>
               <tbody>
-                <tr :for={record <- @history} class="border-b border-outline-variant/50 hover:bg-surface-container-high transition-colors">
+                <tr
+                  :for={record <- @history}
+                  class="border-b border-outline-variant/50 hover:bg-surface-container-high transition-colors"
+                >
                   <td class="py-3 px-4 font-mono text-on-surface">{record.event_type}</td>
                   <td class="py-3 px-4 font-mono text-on-surface">{record.quantity}</td>
-                  <td class="py-3 px-4 text-on-surface-variant">{Calendar.strftime(record.inserted_at, "%b %d, %Y %H:%M")}</td>
+                  <td class="py-3 px-4 text-on-surface-variant">
+                    {Calendar.strftime(record.inserted_at, "%b %d, %Y %H:%M")}
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -128,6 +155,7 @@ defmodule FounderPadWeb.UsageLive do
   end
 
   defp get_user_org_id(nil), do: nil
+
   defp get_user_org_id(user) do
     case user |> Ash.load!(:organisations) |> Map.get(:organisations) do
       [org | _] -> org.id
@@ -136,6 +164,7 @@ defmodule FounderPadWeb.UsageLive do
   end
 
   defp get_org_plan(nil), do: nil
+
   defp get_org_plan(org_id) do
     case FounderPad.Billing.Subscription
          |> Ash.Query.filter(organisation_id == ^org_id and status == :active)
@@ -147,6 +176,7 @@ defmodule FounderPadWeb.UsageLive do
   end
 
   defp load_usage_history(nil), do: []
+
   defp load_usage_history(org_id) do
     FounderPad.Billing.UsageRecord
     |> Ash.Query.filter(organisation_id == ^org_id)

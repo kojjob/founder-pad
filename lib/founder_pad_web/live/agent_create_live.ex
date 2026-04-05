@@ -7,21 +7,25 @@ defmodule FounderPadWeb.AgentCreateLive do
     "research" => %{
       name: "Research Assistant",
       description: "Deep research across documents and web sources with citation tracking.",
-      system_prompt: "You are a meticulous research assistant. Analyze topics thoroughly, cite sources when possible, and present findings in a clear, structured format. Always distinguish between established facts and your analysis.",
+      system_prompt:
+        "You are a meticulous research assistant. Analyze topics thoroughly, cite sources when possible, and present findings in a clear, structured format. Always distinguish between established facts and your analysis.",
       temperature: 0.5,
       max_tokens: 4096
     },
     "code_review" => %{
       name: "Code Reviewer",
-      description: "Automated PR reviews with security vulnerability detection and best practices.",
-      system_prompt: "You are an expert code reviewer. Review code for bugs, security vulnerabilities, performance issues, and adherence to best practices. Provide specific, actionable feedback with code examples.",
+      description:
+        "Automated PR reviews with security vulnerability detection and best practices.",
+      system_prompt:
+        "You are an expert code reviewer. Review code for bugs, security vulnerabilities, performance issues, and adherence to best practices. Provide specific, actionable feedback with code examples.",
       temperature: 0.3,
       max_tokens: 8192
     },
     "content" => %{
       name: "Content Writer",
       description: "Generate high-quality blog posts, documentation, and marketing copy.",
-      system_prompt: "You are a skilled content writer. Create engaging, well-structured content tailored to the audience. Focus on clarity, proper tone, and SEO best practices when applicable.",
+      system_prompt:
+        "You are a skilled content writer. Create engaging, well-structured content tailored to the audience. Focus on clarity, proper tone, and SEO best practices when applicable.",
       temperature: 0.8,
       max_tokens: 4096
     },
@@ -81,13 +85,19 @@ defmodule FounderPadWeb.AgentCreateLive do
           <span class="material-symbols-outlined text-[14px]">chevron_right</span>
           <span class="text-on-surface">Create New Agent</span>
         </div>
-        <h1 class="text-4xl font-extrabold font-headline tracking-tight text-on-surface">Create New Agent</h1>
-        <p class="text-on-surface-variant mt-2">Configure and deploy a new AI agent for your workspace.</p>
+        <h1 class="text-4xl font-extrabold font-headline tracking-tight text-on-surface">
+          Create New Agent
+        </h1>
+        <p class="text-on-surface-variant mt-2">
+          Configure and deploy a new AI agent for your workspace.
+        </p>
       </section>
 
       <%!-- Template Selector --%>
       <section>
-        <h2 class="text-sm font-bold uppercase tracking-wider text-on-surface-variant mb-4">Start from a Template</h2>
+        <h2 class="text-sm font-bold uppercase tracking-wider text-on-surface-variant mb-4">
+          Start from a Template
+        </h2>
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <button
             :for={{key, tmpl} <- templates()}
@@ -95,15 +105,22 @@ defmodule FounderPadWeb.AgentCreateLive do
             phx-value-template={key}
             class={[
               "bg-surface-container p-5 rounded-xl text-left transition-all hover:shadow-md group border-2",
-              if(@selected_template == key, do: "border-primary shadow-md", else: "border-transparent hover:border-primary/20")
+              if(@selected_template == key,
+                do: "border-primary shadow-md",
+                else: "border-transparent hover:border-primary/20"
+              )
             ]}
           >
             <span class="material-symbols-outlined text-primary text-2xl mb-3 block group-hover:scale-110 transition-transform">
               {template_icon(key)}
             </span>
-            <p class="text-sm font-bold text-on-surface">{if(tmpl.name != "", do: tmpl.name, else: "Custom")}</p>
+            <p class="text-sm font-bold text-on-surface">
+              {if(tmpl.name != "", do: tmpl.name, else: "Custom")}
+            </p>
             <p class="text-xs text-on-surface-variant mt-1 line-clamp-2">
-              {if key == "custom", do: "Start from scratch with your own configuration", else: tmpl.description}
+              {if key == "custom",
+                do: "Start from scratch with your own configuration",
+                else: tmpl.description}
             </p>
           </button>
         </div>
@@ -118,7 +135,9 @@ defmodule FounderPadWeb.AgentCreateLive do
               <h3 class="font-bold text-lg text-on-surface">Agent Details</h3>
 
               <div>
-                <label class="text-[10px] font-bold tracking-wider uppercase text-on-surface-variant mb-2 block">Agent Name <span class="text-error">*</span></label>
+                <label class="text-[10px] font-bold tracking-wider uppercase text-on-surface-variant mb-2 block">
+                  Agent Name <span class="text-error">*</span>
+                </label>
                 <input
                   type="text"
                   name="agent[name]"
@@ -132,7 +151,9 @@ defmodule FounderPadWeb.AgentCreateLive do
               </div>
 
               <div>
-                <label class="text-[10px] font-bold tracking-wider uppercase text-on-surface-variant mb-2 block">Description</label>
+                <label class="text-[10px] font-bold tracking-wider uppercase text-on-surface-variant mb-2 block">
+                  Description
+                </label>
                 <input
                   type="text"
                   name="agent[description]"
@@ -143,7 +164,9 @@ defmodule FounderPadWeb.AgentCreateLive do
               </div>
 
               <div>
-                <label class="text-[10px] font-bold tracking-wider uppercase text-on-surface-variant mb-2 block">System Prompt <span class="text-error">*</span></label>
+                <label class="text-[10px] font-bold tracking-wider uppercase text-on-surface-variant mb-2 block">
+                  System Prompt <span class="text-error">*</span>
+                </label>
                 <textarea
                   name="agent[system_prompt]"
                   rows="5"
@@ -161,24 +184,34 @@ defmodule FounderPadWeb.AgentCreateLive do
               <h3 class="font-bold text-lg text-on-surface">Configuration</h3>
 
               <div>
-                <label class="text-[10px] font-bold tracking-wider uppercase text-on-surface-variant mb-2 block">Provider</label>
+                <label class="text-[10px] font-bold tracking-wider uppercase text-on-surface-variant mb-2 block">
+                  Provider
+                </label>
                 <select
                   name="agent[provider]"
                   phx-change="change_provider"
                   class="w-full bg-surface-container-highest border-none rounded-lg px-4 py-3 text-sm text-on-surface focus:ring-2 focus:ring-primary"
                 >
-                  <option value="anthropic" selected={@form_data["provider"] == "anthropic"}>Anthropic</option>
+                  <option value="anthropic" selected={@form_data["provider"] == "anthropic"}>
+                    Anthropic
+                  </option>
                   <option value="openai" selected={@form_data["provider"] == "openai"}>OpenAI</option>
                 </select>
               </div>
 
               <div>
-                <label class="text-[10px] font-bold tracking-wider uppercase text-on-surface-variant mb-2 block">Model</label>
+                <label class="text-[10px] font-bold tracking-wider uppercase text-on-surface-variant mb-2 block">
+                  Model
+                </label>
                 <select
                   name="agent[model]"
                   class="w-full bg-surface-container-highest border-none rounded-lg px-4 py-3 text-sm text-on-surface focus:ring-2 focus:ring-primary"
                 >
-                  <option :for={{label, value} <- @models} value={value} selected={@form_data["model"] == value}>
+                  <option
+                    :for={{label, value} <- @models}
+                    value={value}
+                    selected={@form_data["model"] == value}
+                  >
                     {label}
                   </option>
                 </select>
@@ -186,8 +219,12 @@ defmodule FounderPadWeb.AgentCreateLive do
 
               <div>
                 <div class="flex justify-between items-center mb-2">
-                  <label class="text-[10px] font-bold tracking-wider uppercase text-on-surface-variant">Temperature</label>
-                  <span class="text-sm font-mono text-primary font-bold">{@form_data["temperature"]}</span>
+                  <label class="text-[10px] font-bold tracking-wider uppercase text-on-surface-variant">
+                    Temperature
+                  </label>
+                  <span class="text-sm font-mono text-primary font-bold">
+                    {@form_data["temperature"]}
+                  </span>
                 </div>
                 <input
                   type="range"
@@ -206,7 +243,9 @@ defmodule FounderPadWeb.AgentCreateLive do
               </div>
 
               <div>
-                <label class="text-[10px] font-bold tracking-wider uppercase text-on-surface-variant mb-2 block">Max Tokens</label>
+                <label class="text-[10px] font-bold tracking-wider uppercase text-on-surface-variant mb-2 block">
+                  Max Tokens
+                </label>
                 <div class="grid grid-cols-4 gap-2 bg-surface-container-high p-1 rounded-lg text-xs font-mono font-medium">
                   <button
                     :for={t <- [1024, 2048, 4096, 8192]}
@@ -237,12 +276,17 @@ defmodule FounderPadWeb.AgentCreateLive do
 
         <%!-- Submit --%>
         <div class="flex items-center justify-between pt-4">
-          <.link navigate="/agents" class="text-sm font-medium text-on-surface-variant hover:text-on-surface transition-colors">
+          <.link
+            navigate="/agents"
+            class="text-sm font-medium text-on-surface-variant hover:text-on-surface transition-colors"
+          >
             Cancel
           </.link>
-          <button type="submit" class="primary-gradient px-8 py-3 rounded-lg text-sm font-bold transition-transform hover:scale-[1.02] active:scale-95 flex items-center gap-2">
-            <span class="material-symbols-outlined text-lg">rocket_launch</span>
-            Deploy Agent
+          <button
+            type="submit"
+            class="primary-gradient px-8 py-3 rounded-lg text-sm font-bold transition-transform hover:scale-[1.02] active:scale-95 flex items-center gap-2"
+          >
+            <span class="material-symbols-outlined text-lg">rocket_launch</span> Deploy Agent
           </button>
         </div>
       </form>
@@ -301,7 +345,8 @@ defmodule FounderPadWeb.AgentCreateLive do
     org = socket.assigns.org
 
     if is_nil(org) do
-      {:noreply, assign(socket, error: "No organisation found. Please complete onboarding first.")}
+      {:noreply,
+       assign(socket, error: "No organisation found. Please complete onboarding first.")}
     else
       {temperature, _} = Float.parse(params["temperature"] || "0.7")
       {max_tokens, _} = Integer.parse(params["max_tokens"] || "4096")
@@ -331,8 +376,7 @@ defmodule FounderPadWeb.AgentCreateLive do
             case changeset do
               %Ash.Error.Invalid{} = err ->
                 err.errors
-                |> Enum.map(fn e -> Exception.message(e) end)
-                |> Enum.join(", ")
+                |> Enum.map_join(", ", fn e -> Exception.message(e) end)
 
               _ ->
                 "Failed to create agent. Please check all required fields."

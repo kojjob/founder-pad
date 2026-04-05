@@ -10,10 +10,12 @@ defmodule FounderPadWeb.Admin.IncidentsLiveTest do
       {conn, admin, _org} = setup_authenticated_admin(conn)
 
       Incident
-      |> Ash.Changeset.for_create(:create, %{
-        title: "Test Incident",
-        severity: :major
-      }, actor: admin)
+      |> Ash.Changeset.for_create(
+        :create,
+        %{
+          title: "Test Incident",
+          severity: :major
+        }, actor: admin)
       |> Ash.create!()
 
       {:ok, _view, html} = live(conn, ~p"/admin/incidents")
@@ -50,10 +52,12 @@ defmodule FounderPadWeb.Admin.IncidentsLiveTest do
 
       incident =
         Incident
-        |> Ash.Changeset.for_create(:create, %{
-          title: "Resolve Me",
-          severity: :minor
-        }, actor: admin)
+        |> Ash.Changeset.for_create(
+          :create,
+          %{
+            title: "Resolve Me",
+            severity: :minor
+          }, actor: admin)
         |> Ash.create!()
 
       {:ok, view, _html} = live(conn, ~p"/admin/incidents")
