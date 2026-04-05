@@ -80,22 +80,29 @@ defmodule FounderPadWeb.WebhookLogsLive do
       <section class="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
           <div class="flex items-center gap-2 text-xs font-mono text-on-surface-variant/60 uppercase tracking-widest mb-2">
-            <span class="material-symbols-outlined text-sm text-primary">webhook</span>
-            Webhook Logs
+            <span class="material-symbols-outlined text-sm text-primary">webhook</span> Webhook Logs
           </div>
           <h1 class="text-4xl font-extrabold font-headline tracking-tight">Outbound Webhooks</h1>
           <p class="text-on-surface-variant mt-1">Monitor webhook deliveries and inspect payloads.</p>
         </div>
-        <button phx-click="refresh" class="p-2 text-on-surface-variant hover:text-primary rounded-lg hover:bg-surface-container-high transition-colors" title="Refresh">
+        <button
+          phx-click="refresh"
+          class="p-2 text-on-surface-variant hover:text-primary rounded-lg hover:bg-surface-container-high transition-colors"
+          title="Refresh"
+        >
           <span class="material-symbols-outlined">refresh</span>
         </button>
       </section>
 
       <%!-- Empty State --%>
       <div :if={@webhooks == []} class="text-center py-16">
-        <span class="material-symbols-outlined text-6xl text-on-surface-variant/30 mb-4 block">webhook</span>
+        <span class="material-symbols-outlined text-6xl text-on-surface-variant/30 mb-4 block">
+          webhook
+        </span>
         <h3 class="text-xl font-bold font-headline text-on-surface mb-2">No webhooks configured</h3>
-        <p class="text-on-surface-variant">Webhooks will appear here once configured for your organisation.</p>
+        <p class="text-on-surface-variant">
+          Webhooks will appear here once configured for your organisation.
+        </p>
       </div>
 
       <%!-- Webhooks List --%>
@@ -109,7 +116,9 @@ defmodule FounderPadWeb.WebhookLogsLive do
           >
             <div class="flex items-center gap-4">
               <div class={"w-10 h-10 rounded-lg flex items-center justify-center #{if webhook.active, do: "bg-primary/10", else: "bg-on-surface-variant/10"}"}>
-                <span class={"material-symbols-outlined #{if webhook.active, do: "text-primary", else: "text-on-surface-variant"}"}>webhook</span>
+                <span class={"material-symbols-outlined #{if webhook.active, do: "text-primary", else: "text-on-surface-variant"}"}>
+                  webhook
+                </span>
               </div>
               <div class="text-left">
                 <p class="font-mono text-sm font-medium">{webhook.url}</p>
@@ -121,7 +130,10 @@ defmodule FounderPadWeb.WebhookLogsLive do
             <div class="flex items-center gap-3">
               <span class={[
                 "px-2 py-0.5 rounded text-[10px] font-bold uppercase",
-                if(webhook.active, do: "bg-primary/10 text-primary", else: "bg-on-surface-variant/10 text-on-surface-variant")
+                if(webhook.active,
+                  do: "bg-primary/10 text-primary",
+                  else: "bg-on-surface-variant/10 text-on-surface-variant"
+                )
               ]}>
                 {if webhook.active, do: "Active", else: "Inactive"}
               </span>
@@ -152,7 +164,9 @@ defmodule FounderPadWeb.WebhookLogsLive do
               >
                 <div class="col-span-3">
                   <p class="text-sm font-mono">{delivery.event_type}</p>
-                  <p class="text-xs text-on-surface-variant mt-0.5">{format_time(delivery.inserted_at)}</p>
+                  <p class="text-xs text-on-surface-variant mt-0.5">
+                    {format_time(delivery.inserted_at)}
+                  </p>
                 </div>
                 <div class="col-span-2">
                   <.delivery_status_badge status={delivery.status} />

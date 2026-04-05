@@ -36,8 +36,7 @@ defmodule FounderPadWeb.Admin.IncidentsLive do
           phx-click="show_form"
           class="inline-flex items-center gap-2 px-4 py-2 bg-primary text-on-primary rounded-lg font-medium hover:bg-primary/90 transition-colors"
         >
-          <span class="material-symbols-outlined text-lg">add</span>
-          New Incident
+          <span class="material-symbols-outlined text-lg">add</span> New Incident
         </button>
       </div>
 
@@ -51,7 +50,7 @@ defmodule FounderPadWeb.Admin.IncidentsLive do
       <%= if @show_form do %>
         <div class="bg-surface-container rounded-xl p-6">
           <h2 class="text-lg font-bold text-on-surface mb-4">
-            <%= if @editing, do: "Edit Incident", else: "Create Incident" %>
+            {if @editing, do: "Edit Incident", else: "Create Incident"}
           </h2>
           <.form
             for={%{}}
@@ -86,7 +85,10 @@ defmodule FounderPadWeb.Admin.IncidentsLive do
                   name="incident[status]"
                   class="w-full px-4 py-2 bg-surface-container-highest text-on-surface rounded-lg border border-outline-variant/30 focus:border-primary focus:ring-1 focus:ring-primary"
                 >
-                  <option value="investigating" selected={@editing && @editing.status == :investigating}>
+                  <option
+                    value="investigating"
+                    selected={@editing && @editing.status == :investigating}
+                  >
                     Investigating
                   </option>
                   <option value="identified" selected={@editing && @editing.status == :identified}>
@@ -125,7 +127,7 @@ defmodule FounderPadWeb.Admin.IncidentsLive do
                 type="submit"
                 class="px-4 py-2 bg-primary text-on-primary rounded-lg font-medium hover:bg-primary/90 transition-colors"
               >
-                <%= if @editing, do: "Update", else: "Create" %>
+                {if @editing, do: "Update", else: "Create"}
               </button>
               <button
                 type="button"
@@ -255,7 +257,8 @@ defmodule FounderPadWeb.Admin.IncidentsLive do
            incidents: incidents,
            show_form: false,
            editing: nil,
-           flash_message: if(socket.assigns.editing, do: "Incident updated", else: "Incident created")
+           flash_message:
+             if(socket.assigns.editing, do: "Incident updated", else: "Incident created")
          )}
 
       {:error, _} ->

@@ -27,13 +27,15 @@ defmodule FounderPadWeb.AgentTemplatesLiveTest do
       admin = Factory.create_admin_user!()
 
       FounderPad.AI.AgentTemplate
-      |> Ash.Changeset.for_create(:create, %{
-        name: "Sales Assistant",
-        description: "Helps with sales outreach",
-        category: "Sales",
-        system_prompt: "You are a sales assistant.",
-        icon: "storefront"
-      }, actor: admin)
+      |> Ash.Changeset.for_create(
+        :create,
+        %{
+          name: "Sales Assistant",
+          description: "Helps with sales outreach",
+          category: "Sales",
+          system_prompt: "You are a sales assistant.",
+          icon: "storefront"
+        }, actor: admin)
       |> Ash.create!()
 
       {:ok, _view, html} = live(conn, ~p"/agents/templates")
@@ -49,15 +51,23 @@ defmodule FounderPadWeb.AgentTemplatesLiveTest do
       admin = Factory.create_admin_user!()
 
       FounderPad.AI.AgentTemplate
-      |> Ash.Changeset.for_create(:create, %{
-        name: "Sales Bot", category: "Sales", system_prompt: "Sales assistant"
-      }, actor: admin)
+      |> Ash.Changeset.for_create(
+        :create,
+        %{
+          name: "Sales Bot",
+          category: "Sales",
+          system_prompt: "Sales assistant"
+        }, actor: admin)
       |> Ash.create!()
 
       FounderPad.AI.AgentTemplate
-      |> Ash.Changeset.for_create(:create, %{
-        name: "Support Bot", category: "Support", system_prompt: "Support assistant"
-      }, actor: admin)
+      |> Ash.Changeset.for_create(
+        :create,
+        %{
+          name: "Support Bot",
+          category: "Support",
+          system_prompt: "Support assistant"
+        }, actor: admin)
       |> Ash.create!()
 
       {:ok, view, _html} = live(conn, ~p"/agents/templates")
@@ -74,12 +84,14 @@ defmodule FounderPadWeb.AgentTemplatesLiveTest do
 
       {:ok, template} =
         FounderPad.AI.AgentTemplate
-        |> Ash.Changeset.for_create(:create, %{
-          name: "Research Helper",
-          description: "Helps with research",
-          category: "Research",
-          system_prompt: "You are a research assistant."
-        }, actor: admin)
+        |> Ash.Changeset.for_create(
+          :create,
+          %{
+            name: "Research Helper",
+            description: "Helps with research",
+            category: "Research",
+            system_prompt: "You are a research assistant."
+          }, actor: admin)
         |> Ash.create()
 
       {:ok, view, _html} = live(conn, ~p"/agents/templates")

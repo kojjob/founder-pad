@@ -32,7 +32,9 @@ defmodule FounderPadWeb.Help.HelpContactLive do
         </p>
 
         <div :if={@submitted} class="bg-green-50 border border-green-200 rounded-xl p-6 text-center">
-          <span class="material-symbols-outlined text-green-600 text-4xl mb-2 block">check_circle</span>
+          <span class="material-symbols-outlined text-green-600 text-4xl mb-2 block">
+            check_circle
+          </span>
           <h2 class="text-lg font-bold text-green-800 mb-1">Message sent!</h2>
           <p class="text-sm text-green-700">
             We've received your message and will get back to you as soon as possible.
@@ -82,7 +84,9 @@ defmodule FounderPadWeb.Help.HelpContactLive do
               placeholder="What can we help with?"
               class={"w-full rounded-lg border px-4 py-3 text-on-surface bg-surface-container-highest focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors #{if @form_errors[:subject], do: "border-red-400", else: "border-outline-variant/30"}"}
             />
-            <p :if={@form_errors[:subject]} class="text-red-500 text-xs mt-1">{@form_errors[:subject]}</p>
+            <p :if={@form_errors[:subject]} class="text-red-500 text-xs mt-1">
+              {@form_errors[:subject]}
+            </p>
           </div>
 
           <div>
@@ -94,7 +98,9 @@ defmodule FounderPadWeb.Help.HelpContactLive do
               placeholder="Describe your issue or question..."
               class={"w-full rounded-lg border px-4 py-3 text-on-surface bg-surface-container-highest focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors resize-none #{if @form_errors[:message], do: "border-red-400", else: "border-outline-variant/30"}"}
             >{@form_data.message}</textarea>
-            <p :if={@form_errors[:message]} class="text-red-500 text-xs mt-1">{@form_errors[:message]}</p>
+            <p :if={@form_errors[:message]} class="text-red-500 text-xs mt-1">
+              {@form_errors[:message]}
+            </p>
           </div>
 
           <button

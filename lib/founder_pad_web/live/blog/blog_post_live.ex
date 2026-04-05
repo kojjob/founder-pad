@@ -45,7 +45,7 @@ defmodule FounderPadWeb.Blog.BlogPostLive do
       <article class="pt-20">
         <header class="max-w-3xl mx-auto px-6 py-16">
           <div class="flex items-center gap-2 mb-4">
-            <.category_badge :for={cat <- (@post.categories || [])} category={cat} />
+            <.category_badge :for={cat <- @post.categories || []} category={cat} />
           </div>
           <h1 class="font-heading text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tight text-on-surface mb-6">
             {@post.title}

@@ -7,10 +7,12 @@ defmodule FounderPad.Content.CategoryTest do
 
     {:ok, cat} =
       FounderPad.Content.Category
-      |> Ash.Changeset.for_create(:create, %{
-        name: "Getting Started",
-        description: "Beginner guides"
-      }, actor: admin)
+      |> Ash.Changeset.for_create(
+        :create,
+        %{
+          name: "Getting Started",
+          description: "Beginner guides"
+        }, actor: admin)
       |> Ash.create()
 
     assert cat.slug == "getting-started"
@@ -21,8 +23,10 @@ defmodule FounderPad.Content.CategoryTest do
     create_category!(%{slug: "unique-slug", actor: admin})
 
     assert {:error, _} =
-      FounderPad.Content.Category
-      |> Ash.Changeset.for_create(:create, %{name: "Another", slug: "unique-slug"}, actor: admin)
-      |> Ash.create()
+             FounderPad.Content.Category
+             |> Ash.Changeset.for_create(:create, %{name: "Another", slug: "unique-slug"},
+               actor: admin
+             )
+             |> Ash.create()
   end
 end

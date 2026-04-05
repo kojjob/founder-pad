@@ -15,12 +15,15 @@ defmodule FounderPadWeb.BlogComponents do
             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           />
         </div>
-        <div :if={!@post.featured_image_url} class="aspect-[16/9] bg-gradient-to-br from-primary/5 to-primary/10 flex items-center justify-center">
+        <div
+          :if={!@post.featured_image_url}
+          class="aspect-[16/9] bg-gradient-to-br from-primary/5 to-primary/10 flex items-center justify-center"
+        >
           <span class="material-symbols-outlined text-4xl text-primary/30">article</span>
         </div>
         <div class="p-6">
           <div class="flex items-center gap-2 mb-3">
-            <.category_badge :for={cat <- (@post.categories || [])} category={cat} />
+            <.category_badge :for={cat <- @post.categories || []} category={cat} />
           </div>
           <h3 class="font-heading text-lg font-semibold text-on-surface mb-2 group-hover:text-primary transition-colors">
             {@post.title}

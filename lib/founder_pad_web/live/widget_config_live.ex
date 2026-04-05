@@ -39,20 +39,31 @@ defmodule FounderPadWeb.WidgetConfigLive do
         <div class="flex items-center gap-2 text-sm text-on-surface-variant font-medium mb-3">
           <.link navigate="/agents" class="hover:text-on-surface transition-colors">Agents</.link>
           <span class="material-symbols-outlined text-[14px]">chevron_right</span>
-          <.link navigate={"/agents/#{@agent.id}"} class="hover:text-on-surface transition-colors">{@agent.name}</.link>
+          <.link navigate={"/agents/#{@agent.id}"} class="hover:text-on-surface transition-colors">
+            {@agent.name}
+          </.link>
           <span class="material-symbols-outlined text-[14px]">chevron_right</span>
           <span class="text-on-surface">Widget</span>
         </div>
-        <h1 class="text-3xl font-extrabold font-headline tracking-tight text-on-surface">Embed Chat Widget</h1>
-        <p class="text-on-surface-variant mt-1">Add a chat widget to your website powered by {@agent.name}</p>
+        <h1 class="text-3xl font-extrabold font-headline tracking-tight text-on-surface">
+          Embed Chat Widget
+        </h1>
+        <p class="text-on-surface-variant mt-1">
+          Add a chat widget to your website powered by {@agent.name}
+        </p>
       </div>
 
       <%!-- Embed Code --%>
       <div class="bg-surface-container rounded-2xl p-6 space-y-4">
         <h2 class="text-lg font-bold text-on-surface">Embed Code</h2>
-        <p class="text-sm text-on-surface-variant">Copy and paste this snippet into your website's HTML, just before the closing &lt;/body&gt; tag:</p>
+        <p class="text-sm text-on-surface-variant">
+          Copy and paste this snippet into your website's HTML, just before the closing &lt;/body&gt; tag:
+        </p>
         <div class="relative">
-          <pre class="bg-surface-container-high rounded-xl p-4 font-mono text-sm text-on-surface overflow-x-auto" id="embed-code">{@embed_code}</pre>
+          <pre
+            class="bg-surface-container-high rounded-xl p-4 font-mono text-sm text-on-surface overflow-x-auto"
+            id="embed-code"
+          >{@embed_code}</pre>
           <button
             phx-click={JS.dispatch("phx:copy", to: "#embed-code")}
             class="absolute top-2 right-2 px-3 py-1.5 bg-primary text-on-primary rounded-lg text-xs font-semibold hover:bg-primary/90 transition-colors"
@@ -87,7 +98,10 @@ defmodule FounderPadWeb.WidgetConfigLive do
                 phx-value-position="bottom-right"
                 class={[
                   "px-4 py-2 rounded-lg text-sm font-semibold transition-colors",
-                  if(@widget_position == "bottom-right", do: "bg-primary text-on-primary", else: "bg-surface-container-high text-on-surface")
+                  if(@widget_position == "bottom-right",
+                    do: "bg-primary text-on-primary",
+                    else: "bg-surface-container-high text-on-surface"
+                  )
                 ]}
               >
                 Bottom Right
@@ -97,7 +111,10 @@ defmodule FounderPadWeb.WidgetConfigLive do
                 phx-value-position="bottom-left"
                 class={[
                   "px-4 py-2 rounded-lg text-sm font-semibold transition-colors",
-                  if(@widget_position == "bottom-left", do: "bg-primary text-on-primary", else: "bg-surface-container-high text-on-surface")
+                  if(@widget_position == "bottom-left",
+                    do: "bg-primary text-on-primary",
+                    else: "bg-surface-container-high text-on-surface"
+                  )
                 ]}
               >
                 Bottom Left
@@ -110,8 +127,12 @@ defmodule FounderPadWeb.WidgetConfigLive do
       <%!-- Preview --%>
       <div class="bg-surface-container rounded-2xl p-6 space-y-4">
         <h2 class="text-lg font-bold text-on-surface">Preview</h2>
-        <div class="relative bg-surface-container-high rounded-xl overflow-hidden" style="height: 400px;">
-          <iframe src={"/widget/chat/#{@agent.id}"} class="w-full h-full border-none rounded-xl"></iframe>
+        <div
+          class="relative bg-surface-container-high rounded-xl overflow-hidden"
+          style="height: 400px;"
+        >
+          <iframe src={"/widget/chat/#{@agent.id}"} class="w-full h-full border-none rounded-xl">
+          </iframe>
         </div>
       </div>
     </div>

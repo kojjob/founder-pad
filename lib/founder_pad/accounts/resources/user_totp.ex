@@ -6,77 +6,77 @@ defmodule FounderPad.Accounts.UserTotp do
     data_layer: AshPostgres.DataLayer
 
   postgres do
-    table "user_totps"
-    repo FounderPad.Repo
+    table("user_totps")
+    repo(FounderPad.Repo)
   end
 
   attributes do
-    uuid_primary_key :id
+    uuid_primary_key(:id)
 
     attribute :secret, :string do
-      allow_nil? false
-      sensitive? true
+      allow_nil?(false)
+      sensitive?(true)
     end
 
     attribute :enabled, :boolean do
-      default false
-      allow_nil? false
-      public? true
+      default(false)
+      allow_nil?(false)
+      public?(true)
     end
 
     attribute :backup_codes, {:array, :string} do
-      default []
-      sensitive? true
+      default([])
+      sensitive?(true)
     end
 
     attribute :last_used_at, :utc_datetime_usec do
-      public? true
+      public?(true)
     end
 
-    create_timestamp :inserted_at
-    update_timestamp :updated_at
+    create_timestamp(:inserted_at)
+    update_timestamp(:updated_at)
   end
 
   relationships do
     belongs_to :user, FounderPad.Accounts.User do
-      allow_nil? false
-      attribute_type :uuid
+      allow_nil?(false)
+      attribute_type(:uuid)
     end
   end
 
   identities do
-    identity :unique_user, [:user_id]
+    identity(:unique_user, [:user_id])
   end
 
   actions do
-    defaults [:read, :destroy]
+    defaults([:read, :destroy])
 
     create :create do
-      accept [:user_id]
+      accept([:user_id])
 
-      change fn changeset, _context ->
+      change(fn changeset, _context ->
         secret = generate_secret()
         backup = generate_backup_codes()
 
         changeset
         |> Ash.Changeset.force_change_attribute(:secret, secret)
         |> Ash.Changeset.force_change_attribute(:backup_codes, backup)
-      end
+      end)
     end
 
     update :enable do
-      accept []
-      change set_attribute(:enabled, true)
+      accept([])
+      change(set_attribute(:enabled, true))
     end
 
     update :disable do
-      accept []
-      change set_attribute(:enabled, false)
+      accept([])
+      change(set_attribute(:enabled, false))
     end
 
     read :by_user do
-      argument :user_id, :uuid, allow_nil?: false
-      filter expr(user_id == ^arg(:user_id))
+      argument(:user_id, :uuid, allow_nil?: false)
+      filter(expr(user_id == ^arg(:user_id)))
     end
   end
 

@@ -21,6 +21,7 @@ defmodule FounderPad.Content.ChangelogEntryTest do
     _draft = create_changelog_entry!(%{actor: admin})
 
     published_entry = create_changelog_entry!(%{actor: admin})
+
     published_entry
     |> Ash.Changeset.for_update(:publish, %{}, actor: admin)
     |> Ash.update!()

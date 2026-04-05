@@ -126,9 +126,7 @@ defmodule FounderPad.Notifications.MailerDeliveryTest do
     test "sends welcome email when a new user registers" do
       _user = create_user!(email: "newuser@example.com", password: "Password123!")
 
-      assert_email_sent(
-        subject: "Welcome to FounderPad!"
-      )
+      assert_email_sent(subject: "Welcome to FounderPad!")
     end
   end
 end

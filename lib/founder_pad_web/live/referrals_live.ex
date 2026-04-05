@@ -38,7 +38,9 @@ defmodule FounderPadWeb.ReferralsLive do
     ~H"""
     <div class="space-y-8 max-w-5xl mx-auto">
       <div>
-        <h1 class="text-3xl font-extrabold font-headline tracking-tight text-on-surface">Referrals</h1>
+        <h1 class="text-3xl font-extrabold font-headline tracking-tight text-on-surface">
+          Referrals
+        </h1>
         <p class="text-on-surface-variant mt-1">Invite others and earn rewards</p>
       </div>
 
@@ -73,16 +75,26 @@ defmodule FounderPadWeb.ReferralsLive do
       <%!-- Stats --%>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div class="bg-surface-container p-6 rounded-2xl">
-          <p class="text-[10px] font-bold tracking-wider uppercase text-on-surface-variant mb-2">Total Referrals</p>
+          <p class="text-[10px] font-bold tracking-wider uppercase text-on-surface-variant mb-2">
+            Total Referrals
+          </p>
           <p class="text-3xl font-mono font-medium text-on-surface">{length(@referrals)}</p>
         </div>
         <div class="bg-surface-container p-6 rounded-2xl">
-          <p class="text-[10px] font-bold tracking-wider uppercase text-on-surface-variant mb-2">Completed</p>
-          <p class="text-3xl font-mono font-medium text-secondary">{Enum.count(@referrals, &(&1.status == :completed))}</p>
+          <p class="text-[10px] font-bold tracking-wider uppercase text-on-surface-variant mb-2">
+            Completed
+          </p>
+          <p class="text-3xl font-mono font-medium text-secondary">
+            {Enum.count(@referrals, &(&1.status == :completed))}
+          </p>
         </div>
         <div class="bg-surface-container p-6 rounded-2xl">
-          <p class="text-[10px] font-bold tracking-wider uppercase text-on-surface-variant mb-2">Total Earned</p>
-          <p class="text-3xl font-mono font-medium text-primary">{"$#{format_cents(@total_earned)}"}</p>
+          <p class="text-[10px] font-bold tracking-wider uppercase text-on-surface-variant mb-2">
+            Total Earned
+          </p>
+          <p class="text-3xl font-mono font-medium text-primary">
+            {"$#{format_cents(@total_earned)}"}
+          </p>
         </div>
       </div>
 
@@ -90,20 +102,33 @@ defmodule FounderPadWeb.ReferralsLive do
       <div class="bg-surface-container rounded-2xl p-6">
         <h2 class="text-lg font-bold text-on-surface mb-4">Referral History</h2>
         <%= if @referrals == [] do %>
-          <p class="text-on-surface-variant text-sm">No referrals yet. Share your code to get started!</p>
+          <p class="text-on-surface-variant text-sm">
+            No referrals yet. Share your code to get started!
+          </p>
         <% else %>
           <div class="overflow-x-auto">
             <table class="w-full text-sm">
               <thead>
                 <tr class="border-b border-outline-variant text-left">
-                  <th class="py-3 px-4 text-[10px] font-bold tracking-wider uppercase text-on-surface-variant">Code</th>
-                  <th class="py-3 px-4 text-[10px] font-bold tracking-wider uppercase text-on-surface-variant">Status</th>
-                  <th class="py-3 px-4 text-[10px] font-bold tracking-wider uppercase text-on-surface-variant">Reward</th>
-                  <th class="py-3 px-4 text-[10px] font-bold tracking-wider uppercase text-on-surface-variant">Date</th>
+                  <th class="py-3 px-4 text-[10px] font-bold tracking-wider uppercase text-on-surface-variant">
+                    Code
+                  </th>
+                  <th class="py-3 px-4 text-[10px] font-bold tracking-wider uppercase text-on-surface-variant">
+                    Status
+                  </th>
+                  <th class="py-3 px-4 text-[10px] font-bold tracking-wider uppercase text-on-surface-variant">
+                    Reward
+                  </th>
+                  <th class="py-3 px-4 text-[10px] font-bold tracking-wider uppercase text-on-surface-variant">
+                    Date
+                  </th>
                 </tr>
               </thead>
               <tbody>
-                <tr :for={referral <- @referrals} class="border-b border-outline-variant/50 hover:bg-surface-container-high transition-colors">
+                <tr
+                  :for={referral <- @referrals}
+                  class="border-b border-outline-variant/50 hover:bg-surface-container-high transition-colors"
+                >
                   <td class="py-3 px-4 font-mono text-on-surface">{referral.code}</td>
                   <td class="py-3 px-4">
                     <span class={[
@@ -113,8 +138,12 @@ defmodule FounderPadWeb.ReferralsLive do
                       {referral.status |> to_string() |> String.capitalize()}
                     </span>
                   </td>
-                  <td class="py-3 px-4 font-mono text-on-surface">{"$#{format_cents(referral.reward_amount_cents)}"}</td>
-                  <td class="py-3 px-4 text-on-surface-variant">{Calendar.strftime(referral.inserted_at, "%b %d, %Y")}</td>
+                  <td class="py-3 px-4 font-mono text-on-surface">
+                    {"$#{format_cents(referral.reward_amount_cents)}"}
+                  </td>
+                  <td class="py-3 px-4 text-on-surface-variant">
+                    {Calendar.strftime(referral.inserted_at, "%b %d, %Y")}
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -126,6 +155,7 @@ defmodule FounderPadWeb.ReferralsLive do
   end
 
   defp load_referrals(nil), do: []
+
   defp load_referrals(user) do
     FounderPad.Referrals.Referral
     |> Ash.Query.filter(referrer_id == ^user.id)
@@ -134,6 +164,7 @@ defmodule FounderPadWeb.ReferralsLive do
   end
 
   defp get_or_create_referral_code(nil), do: nil
+
   defp get_or_create_referral_code(user) do
     case FounderPad.Referrals.Referral
          |> Ash.Query.filter(referrer_id == ^user.id and status == :pending)

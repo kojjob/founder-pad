@@ -39,14 +39,22 @@ defmodule FounderPadWeb.AgentAnalyticsLive do
             Agent Analytics
           </div>
           <h1 class="text-4xl font-extrabold font-headline tracking-tight">{@agent.name}</h1>
-          <p class="text-on-surface-variant mt-1">Usage metrics and performance data for this agent.</p>
+          <p class="text-on-surface-variant mt-1">
+            Usage metrics and performance data for this agent.
+          </p>
         </div>
         <div class="flex items-center gap-3">
-          <a href={~p"/agents/#{@agent.id}"} class="text-sm text-primary hover:underline flex items-center gap-1">
-            <span class="material-symbols-outlined text-sm">arrow_back</span>
-            Back to Agent
+          <a
+            href={~p"/agents/#{@agent.id}"}
+            class="text-sm text-primary hover:underline flex items-center gap-1"
+          >
+            <span class="material-symbols-outlined text-sm">arrow_back</span> Back to Agent
           </a>
-          <button phx-click="refresh" class="p-2 text-on-surface-variant hover:text-primary rounded-lg hover:bg-surface-container-high transition-colors" title="Refresh">
+          <button
+            phx-click="refresh"
+            class="p-2 text-on-surface-variant hover:text-primary rounded-lg hover:bg-surface-container-high transition-colors"
+            title="Refresh"
+          >
             <span class="material-symbols-outlined">refresh</span>
           </button>
         </div>
@@ -101,7 +109,9 @@ defmodule FounderPadWeb.AgentAnalyticsLive do
         <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
           <div>
             <p class="text-xs font-mono text-on-surface-variant uppercase mb-1">Success Rate</p>
-            <p class="text-2xl font-mono font-medium text-primary">{format_percent(@metrics.success_rate)}</p>
+            <p class="text-2xl font-mono font-medium text-primary">
+              {format_percent(@metrics.success_rate)}
+            </p>
           </div>
           <div>
             <p class="text-xs font-mono text-on-surface-variant uppercase mb-1">Completed</p>
@@ -113,7 +123,9 @@ defmodule FounderPadWeb.AgentAnalyticsLive do
           </div>
           <div>
             <p class="text-xs font-mono text-on-surface-variant uppercase mb-1">Pending</p>
-            <p class="text-2xl font-mono font-medium text-on-surface-variant">{@metrics.pending_count}</p>
+            <p class="text-2xl font-mono font-medium text-on-surface-variant">
+              {@metrics.pending_count}
+            </p>
           </div>
         </div>
       </section>
@@ -139,16 +151,23 @@ defmodule FounderPadWeb.AgentAnalyticsLive do
               class="grid grid-cols-12 gap-4 px-6 py-4 items-center hover:bg-surface-container-high/50 transition-colors"
             >
               <div class="col-span-5 text-sm font-medium truncate">{conv.title || "Untitled"}</div>
-              <div class="col-span-2 text-sm font-mono text-on-surface-variant">{conv.message_count}</div>
+              <div class="col-span-2 text-sm font-mono text-on-surface-variant">
+                {conv.message_count}
+              </div>
               <div class="col-span-2">
                 <span class={[
                   "px-2 py-0.5 rounded text-[10px] font-bold uppercase",
-                  if(conv.status == :active, do: "bg-primary/10 text-primary", else: "bg-on-surface-variant/10 text-on-surface-variant")
+                  if(conv.status == :active,
+                    do: "bg-primary/10 text-primary",
+                    else: "bg-on-surface-variant/10 text-on-surface-variant"
+                  )
                 ]}>
                   {conv.status}
                 </span>
               </div>
-              <div class="col-span-3 text-xs font-mono text-on-surface-variant">{Calendar.strftime(conv.inserted_at, "%Y-%m-%d %H:%M")}</div>
+              <div class="col-span-3 text-xs font-mono text-on-surface-variant">
+                {Calendar.strftime(conv.inserted_at, "%Y-%m-%d %H:%M")}
+              </div>
             </div>
           <% end %>
         </div>

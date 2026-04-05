@@ -23,13 +23,16 @@ defmodule FounderPad.Notifications.Workers.WeeklyDigestWorker do
 
     unsub_url = EmailLayout.unsubscribe_url(user.id, "weekly_digest")
 
-    body = EmailLayout.wrap("Your Weekly Summary", """
-    <h2>Your Weekly Summary</h2>
-    <p>Hi #{user.name || "there"},</p>
-    <p>Here's a quick look at your FounderPad activity this week.</p>
-    <p>Visit your dashboard for detailed analytics.</p>
-    <p><a href="#{FounderPadWeb.Endpoint.url()}/dashboard" class="btn">View Dashboard</a></p>
-    """, unsubscribe_url: unsub_url)
+    body =
+      EmailLayout.wrap(
+        "Your Weekly Summary",
+        """
+        <h2>Your Weekly Summary</h2>
+        <p>Hi #{user.name || "there"},</p>
+        <p>Here's a quick look at your FounderPad activity this week.</p>
+        <p>Visit your dashboard for detailed analytics.</p>
+        <p><a href="#{FounderPadWeb.Endpoint.url()}/dashboard" class="btn">View Dashboard</a></p>
+        """, unsubscribe_url: unsub_url)
 
     new()
     |> to({user.name || "User", to_string(user.email)})

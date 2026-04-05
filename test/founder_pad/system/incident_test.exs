@@ -10,12 +10,14 @@ defmodule FounderPad.System.IncidentTest do
 
       assert {:ok, incident} =
                Incident
-               |> Ash.Changeset.for_create(:create, %{
-                 title: "API Degradation",
-                 description: "API response times elevated",
-                 severity: :major,
-                 affected_components: ["API", "Dashboard"]
-               }, actor: admin)
+               |> Ash.Changeset.for_create(
+                 :create,
+                 %{
+                   title: "API Degradation",
+                   description: "API response times elevated",
+                   severity: :major,
+                   affected_components: ["API", "Dashboard"]
+                 }, actor: admin)
                |> Ash.create()
 
       assert incident.title == "API Degradation"
@@ -62,7 +64,9 @@ defmodule FounderPad.System.IncidentTest do
 
       incident =
         Incident
-        |> Ash.Changeset.for_create(:create, %{title: "API Down", severity: :critical}, actor: admin)
+        |> Ash.Changeset.for_create(:create, %{title: "API Down", severity: :critical},
+          actor: admin
+        )
         |> Ash.create!()
 
       {:ok, updated} =
@@ -158,7 +162,7 @@ defmodule FounderPad.System.IncidentTest do
         |> Ash.Query.for_read(:recent)
         |> Ash.read(actor: user)
 
-      assert length(incidents) >= 1
+      assert incidents != []
     end
   end
 end

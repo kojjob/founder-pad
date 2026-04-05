@@ -11,11 +11,11 @@ defmodule FounderPad.Audit do
 
   resources do
     resource FounderPad.Audit.AuditLog do
-      define :create_log, action: :create
-      define :list_logs, action: :read
-      define :list_by_resource, action: :by_resource, args: [:resource_type, :resource_id]
-      define :list_by_actor, action: :by_actor, args: [:actor_id]
-      define :list_by_organisation, action: :by_organisation, args: [:organisation_id]
+      define(:create_log, action: :create)
+      define(:list_logs, action: :read)
+      define(:list_by_resource, action: :by_resource, args: [:resource_type, :resource_id])
+      define(:list_by_actor, action: :by_actor, args: [:actor_id])
+      define(:list_by_organisation, action: :by_organisation, args: [:organisation_id])
     end
   end
 

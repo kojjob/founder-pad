@@ -19,7 +19,12 @@ defmodule FounderPadWeb.Help.HelpIndexLiveTest do
   test "search returns results", %{conn: conn} do
     admin = create_admin_user!()
     cat = create_help_category!(%{actor: admin})
-    create_published_help_article!(cat, %{title: "Billing Help", body: "How to manage billing.", actor: admin})
+
+    create_published_help_article!(cat, %{
+      title: "Billing Help",
+      body: "How to manage billing.",
+      actor: admin
+    })
 
     {:ok, _view, html} = live(conn, ~p"/help/search?q=billing")
     assert html =~ "Billing Help"

@@ -104,7 +104,9 @@ defmodule FounderPadWeb.ApiKeysLive do
                   checked={scope == :read}
                   class="rounded border-outline-variant/30 text-primary focus:ring-primary/20"
                 />
-                <span class="text-sm text-on-surface">{scope |> Atom.to_string() |> String.capitalize()}</span>
+                <span class="text-sm text-on-surface">
+                  {scope |> Atom.to_string() |> String.capitalize()}
+                </span>
               </label>
             </div>
           </div>

@@ -213,7 +213,10 @@ defmodule FounderPadWeb.SettingsLive do
 
             <%!-- Action Buttons --%>
             <div class="space-y-3 mb-6">
-              <button phx-click="show_password_form" class="w-full flex items-center justify-between bg-surface-container-low rounded-lg px-4 py-3 hover:bg-surface-container-highest transition-colors group">
+              <button
+                phx-click="show_password_form"
+                class="w-full flex items-center justify-between bg-surface-container-low rounded-lg px-4 py-3 hover:bg-surface-container-highest transition-colors group"
+              >
                 <div class="flex items-center gap-3">
                   <span class="material-symbols-outlined text-on-surface-variant text-xl">
                     lock
@@ -227,9 +230,17 @@ defmodule FounderPadWeb.SettingsLive do
 
               <%!-- Password Change Form --%>
               <div :if={@show_password_form} class="bg-surface-container-low rounded-lg p-4 space-y-3">
-                <.form for={%{}} as={:password} phx-submit="submit_password_change" id="password-form" class="space-y-3">
+                <.form
+                  for={%{}}
+                  as={:password}
+                  phx-submit="submit_password_change"
+                  id="password-form"
+                  class="space-y-3"
+                >
                   <div>
-                    <label class="block text-xs font-medium text-on-surface-variant mb-1">Current Password</label>
+                    <label class="block text-xs font-medium text-on-surface-variant mb-1">
+                      Current Password
+                    </label>
                     <input
                       type="password"
                       name="password[current_password]"
@@ -238,7 +249,9 @@ defmodule FounderPadWeb.SettingsLive do
                     />
                   </div>
                   <div>
-                    <label class="block text-xs font-medium text-on-surface-variant mb-1">New Password</label>
+                    <label class="block text-xs font-medium text-on-surface-variant mb-1">
+                      New Password
+                    </label>
                     <input
                       type="password"
                       name="password[password]"
@@ -247,7 +260,9 @@ defmodule FounderPadWeb.SettingsLive do
                     />
                   </div>
                   <div>
-                    <label class="block text-xs font-medium text-on-surface-variant mb-1">Confirm New Password</label>
+                    <label class="block text-xs font-medium text-on-surface-variant mb-1">
+                      Confirm New Password
+                    </label>
                     <input
                       type="password"
                       name="password[password_confirmation]"
@@ -259,16 +274,26 @@ defmodule FounderPadWeb.SettingsLive do
                     <p class="text-xs text-error">{@password_error}</p>
                   <% end %>
                   <div class="flex items-center gap-2 pt-1">
-                    <button type="submit" class="px-4 py-2 bg-primary text-on-primary text-xs font-semibold rounded-lg hover:opacity-90 transition-opacity">
+                    <button
+                      type="submit"
+                      class="px-4 py-2 bg-primary text-on-primary text-xs font-semibold rounded-lg hover:opacity-90 transition-opacity"
+                    >
                       Update Password
                     </button>
-                    <button type="button" phx-click="hide_password_form" class="px-4 py-2 text-on-surface-variant text-xs font-medium hover:text-on-surface transition-colors">
+                    <button
+                      type="button"
+                      phx-click="hide_password_form"
+                      class="px-4 py-2 text-on-surface-variant text-xs font-medium hover:text-on-surface transition-colors"
+                    >
                       Cancel
                     </button>
                   </div>
                 </.form>
               </div>
-              <button phx-click="view_sessions" class="w-full flex items-center justify-between bg-surface-container-low rounded-lg px-4 py-3 hover:bg-surface-container-highest transition-colors group">
+              <button
+                phx-click="view_sessions"
+                class="w-full flex items-center justify-between bg-surface-container-low rounded-lg px-4 py-3 hover:bg-surface-container-highest transition-colors group"
+              >
                 <div class="flex items-center gap-3">
                   <span class="material-symbols-outlined text-on-surface-variant text-xl">
                     devices
@@ -285,13 +310,25 @@ defmodule FounderPadWeb.SettingsLive do
             <div>
               <h3 class="text-sm font-medium text-on-surface-variant mb-3">Login History</h3>
               <div class="space-y-2">
-                <div :if={@login_history == []} class="text-xs text-on-surface-variant">No login history yet</div>
-                <div :for={{entry, idx} <- Enum.with_index(@login_history)} class="flex items-center justify-between text-xs">
+                <div :if={@login_history == []} class="text-xs text-on-surface-variant">
+                  No login history yet
+                </div>
+                <div
+                  :for={{entry, idx} <- Enum.with_index(@login_history)}
+                  class="flex items-center justify-between text-xs"
+                >
                   <div class="flex items-center gap-2">
-                    <span class={["w-2 h-2 rounded-full", if(idx == 0, do: "bg-tertiary", else: "bg-on-surface-variant/30")]}></span>
+                    <span class={[
+                      "w-2 h-2 rounded-full",
+                      if(idx == 0, do: "bg-tertiary", else: "bg-on-surface-variant/30")
+                    ]}>
+                    </span>
                     <span class="text-on-surface">{entry.device}</span>
                   </div>
-                  <span class={["text-on-surface-variant font-mono", if(idx == 0, do: "text-primary", else: "")]}>
+                  <span class={[
+                    "text-on-surface-variant font-mono",
+                    if(idx == 0, do: "text-primary", else: "")
+                  ]}>
                     {entry.time_ago}
                   </span>
                 </div>
@@ -303,7 +340,11 @@ defmodule FounderPadWeb.SettingsLive do
         <%!-- Right Column --%>
         <div class="lg:col-span-4 space-y-6">
           <%!-- Theme Preference Card --%>
-          <div id="theme-settings" phx-hook="ThemeSettings" class="bg-surface-container-low rounded-xl p-6">
+          <div
+            id="theme-settings"
+            phx-hook="ThemeSettings"
+            class="bg-surface-container-low rounded-xl p-6"
+          >
             <h2 class="text-lg font-bold text-on-surface mb-4">Theme Preference</h2>
 
             <%!-- Theme preview buttons --%>
@@ -417,7 +458,10 @@ defmodule FounderPadWeb.SettingsLive do
               </div>
             </div>
 
-            <a href="/billing" class="block w-full mt-5 text-sm font-semibold text-primary border border-primary/30 rounded-lg py-2 hover:bg-primary/10 transition-colors text-center">
+            <a
+              href="/billing"
+              class="block w-full mt-5 text-sm font-semibold text-primary border border-primary/30 rounded-lg py-2 hover:bg-primary/10 transition-colors text-center"
+            >
               Upgrade Tier
             </a>
           </div>
@@ -428,13 +472,27 @@ defmodule FounderPadWeb.SettingsLive do
             <p class="text-xs text-on-surface-variant mb-4">
               Permanently delete your account and all associated data. This action cannot be undone.
             </p>
-            <button :if={!@show_delete_confirm} phx-click="toggle_delete_confirm" class="bg-error text-on-error px-4 py-2 rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity">
+            <button
+              :if={!@show_delete_confirm}
+              phx-click="toggle_delete_confirm"
+              class="bg-error text-on-error px-4 py-2 rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity"
+            >
               Delete Account
             </button>
             <div :if={@show_delete_confirm} class="flex items-center gap-3">
               <span class="text-xs text-error font-medium">This cannot be undone. Are you sure?</span>
-              <button phx-click="confirm_delete_account" class="bg-error text-on-error px-4 py-2 rounded-lg text-xs font-bold uppercase">Yes, Delete</button>
-              <button phx-click="toggle_delete_confirm" class="bg-surface-container-highest text-on-surface-variant px-4 py-2 rounded-lg text-xs font-bold">Cancel</button>
+              <button
+                phx-click="confirm_delete_account"
+                class="bg-error text-on-error px-4 py-2 rounded-lg text-xs font-bold uppercase"
+              >
+                Yes, Delete
+              </button>
+              <button
+                phx-click="toggle_delete_confirm"
+                class="bg-surface-container-highest text-on-surface-variant px-4 py-2 rounded-lg text-xs font-bold"
+              >
+                Cancel
+              </button>
             </div>
           </div>
         </div>
@@ -442,10 +500,16 @@ defmodule FounderPadWeb.SettingsLive do
 
       <%!-- Footer Action Bar --%>
       <div class="flex items-center justify-end gap-3 pt-2">
-        <button phx-click="discard_changes" class="text-sm font-medium text-on-surface-variant hover:text-on-surface transition-colors px-4 py-2.5">
+        <button
+          phx-click="discard_changes"
+          class="text-sm font-medium text-on-surface-variant hover:text-on-surface transition-colors px-4 py-2.5"
+        >
           Discard Changes
         </button>
-        <button phx-click="save_preferences" class="primary-gradient font-semibold px-6 py-2.5 rounded-lg text-sm">
+        <button
+          phx-click="save_preferences"
+          class="primary-gradient font-semibold px-6 py-2.5 rounded-lg text-sm"
+        >
           Save Preferences
         </button>
       </div>
@@ -544,7 +608,8 @@ defmodule FounderPadWeb.SettingsLive do
 
     message =
       if new_val,
-        do: "Two-factor authentication enabled. You'll need an authenticator app for future logins.",
+        do:
+          "Two-factor authentication enabled. You'll need an authenticator app for future logins.",
         else: "Two-factor authentication disabled. Your account is less secure."
 
     {:noreply,
@@ -682,7 +747,9 @@ defmodule FounderPadWeb.SettingsLive do
       "high_contrast" => socket.assigns.high_contrast
     }
 
-    case user |> Ash.Changeset.for_update(:update_profile, %{preferences: prefs}) |> Ash.update() do
+    case user
+         |> Ash.Changeset.for_update(:update_profile, %{preferences: prefs})
+         |> Ash.update() do
       {:ok, _} -> {:noreply, put_flash(socket, :info, "Preferences saved successfully")}
       {:error, _} -> {:noreply, put_flash(socket, :error, "Failed to save preferences")}
     end
@@ -705,7 +772,7 @@ defmodule FounderPadWeb.SettingsLive do
       %{message: msg} -> msg
       err -> inspect(err)
     end)
-    |> Enum.join(", ")
+    |> Enum.map_join(", ", & &1)
     |> case do
       "" -> "Failed to change password"
       msg -> msg
@@ -780,7 +847,7 @@ defmodule FounderPadWeb.SettingsLive do
     cond do
       diff < 60 -> "Just now"
       diff < 3600 -> "#{div(diff, 60)} min ago"
-      diff < 86400 -> "#{div(diff, 3600)} hours ago"
+      diff < 86_400 -> "#{div(diff, 3600)} hours ago"
       diff < 172_800 -> "Yesterday"
       true -> Calendar.strftime(dt, "%b %d")
     end

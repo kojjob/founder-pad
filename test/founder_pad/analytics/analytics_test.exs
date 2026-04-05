@@ -109,12 +109,17 @@ defmodule FounderPad.AnalyticsTest do
   describe "edge cases" do
     test "handles high-frequency event tracking" do
       org = create_organisation!()
+      test_pid = self()
 
       tasks =
         for i <- 1..10 do
-          Task.async(fn ->
-            Analytics.track("load_test.#{i}", org_id: org.id)
-          end)
+          task =
+            Task.async(fn ->
+              Analytics.track("load_test.#{i}", org_id: org.id)
+            end)
+
+          Ecto.Adapters.SQL.Sandbox.allow(FounderPad.Repo, test_pid, task.pid)
+          task
         end
 
       results = Task.await_many(tasks)

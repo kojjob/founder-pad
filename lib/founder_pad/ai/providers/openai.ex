@@ -132,7 +132,8 @@ defmodule FounderPad.AI.Providers.OpenAI do
     |> Enum.reject(&(&1 == "data: [DONE]"))
     |> Enum.map(fn "data: " <> json ->
       case Jason.decode(json) do
-        {:ok, %{"choices" => [%{"delta" => %{"content" => content}} | _]}} when is_binary(content) ->
+        {:ok, %{"choices" => [%{"delta" => %{"content" => content}} | _]}}
+        when is_binary(content) ->
           %{type: :text, content: content}
 
         _ ->

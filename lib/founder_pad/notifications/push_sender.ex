@@ -45,9 +45,14 @@ defmodule FounderPad.Notifications.PushSender do
                json: payload,
                headers: [{"authorization", "Bearer #{get_fcm_access_token(config)}"}]
              ) do
-          {:ok, %{status: 200}} -> :ok
-          {:ok, %{status: status, body: body}} -> {:error, "FCM error #{status}: #{inspect(body)}"}
-          {:error, reason} -> {:error, inspect(reason)}
+          {:ok, %{status: 200}} ->
+            :ok
+
+          {:ok, %{status: status, body: body}} ->
+            {:error, "FCM error #{status}: #{inspect(body)}"}
+
+          {:error, reason} ->
+            {:error, inspect(reason)}
         end
     end
   end

@@ -2,7 +2,7 @@ defmodule FounderPadWeb.UnsubscribeController do
   use FounderPadWeb, :controller
 
   def unsubscribe(conn, %{"token" => token}) do
-    case Phoenix.Token.verify(FounderPadWeb.Endpoint, "unsubscribe", token, max_age: 30 * 86400) do
+    case Phoenix.Token.verify(FounderPadWeb.Endpoint, "unsubscribe", token, max_age: 30 * 86_400) do
       {:ok, {user_id, category}} ->
         user = Ash.get!(FounderPad.Accounts.User, user_id)
         prefs = user.email_preferences || %{}

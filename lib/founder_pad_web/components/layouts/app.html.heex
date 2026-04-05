@@ -15,7 +15,7 @@
         </span>
       </div>
     </div>
-
+    
 <!-- Navigation -->
     <nav class="flex flex-col gap-1 flex-1">
       <.nav_link
@@ -52,19 +52,61 @@
 
       <%= if @current_user && @current_user.is_admin do %>
         <div class="mt-6 pt-4 border-t border-neutral-200/60">
-          <p class="px-3 mb-2 text-[10px] font-semibold uppercase tracking-wider text-on-surface-variant/50">Admin</p>
-          <.nav_link href="/admin" icon="admin_panel_settings" label="Admin" active={@active_nav == :admin_dashboard} />
-          <.nav_link href="/admin/users" icon="group" label="Users" active={@active_nav == :admin_users} />
-          <.nav_link href="/admin/organisations" icon="corporate_fare" label="Orgs" active={@active_nav == :admin_orgs} />
-          <.nav_link href="/admin/feature-flags" icon="toggle_on" label="Flags" active={@active_nav == :admin_flags} />
-          <.nav_link href="/admin/blog" icon="edit_note" label="Blog" active={@active_nav == :admin_blog} />
-          <.nav_link href="/admin/changelog" icon="new_releases" label="Changelog" active={@active_nav == :admin_changelog} />
-          <.nav_link href="/admin/seo" icon="search" label="SEO" active={@active_nav == :admin_seo} />
-          <.nav_link href="/admin/help" icon="support_agent" label="Help" active={@active_nav == :admin_help} />
+          <p class="px-3 mb-2 text-[10px] font-semibold uppercase tracking-wider text-on-surface-variant/50">
+            Admin
+          </p>
+          <.nav_link
+            href="/admin"
+            icon="admin_panel_settings"
+            label="Admin"
+            active={@active_nav == :admin_dashboard}
+          />
+          <.nav_link
+            href="/admin/users"
+            icon="group"
+            label="Users"
+            active={@active_nav == :admin_users}
+          />
+          <.nav_link
+            href="/admin/organisations"
+            icon="corporate_fare"
+            label="Orgs"
+            active={@active_nav == :admin_orgs}
+          />
+          <.nav_link
+            href="/admin/feature-flags"
+            icon="toggle_on"
+            label="Flags"
+            active={@active_nav == :admin_flags}
+          />
+          <.nav_link
+            href="/admin/blog"
+            icon="edit_note"
+            label="Blog"
+            active={@active_nav == :admin_blog}
+          />
+          <.nav_link
+            href="/admin/changelog"
+            icon="new_releases"
+            label="Changelog"
+            active={@active_nav == :admin_changelog}
+          />
+          <.nav_link
+            href="/admin/seo"
+            icon="search"
+            label="SEO"
+            active={@active_nav == :admin_seo}
+          />
+          <.nav_link
+            href="/admin/help"
+            icon="support_agent"
+            label="Help"
+            active={@active_nav == :admin_help}
+          />
         </div>
       <% end %>
     </nav>
-
+    
 <!-- Help + Docs -->
     <div class="space-y-1">
       <a
@@ -76,7 +118,6 @@
       </a>
       <a
         href="/docs"
-
         class="flex items-center gap-3 px-3 py-2 text-on-surface/40 text-sm hover:text-on-surface hover:bg-surface-container-high rounded-md transition-colors"
       >
         <span class="material-symbols-outlined text-lg">menu_book</span>
@@ -84,7 +125,6 @@
       </a>
       <a
         href="/docs/changelog"
-
         class="flex items-center gap-3 px-3 py-2 text-on-surface/40 text-sm hover:text-on-surface hover:bg-surface-container-high rounded-md transition-colors"
       >
         <span class="material-symbols-outlined text-lg">new_releases</span>
@@ -98,7 +138,7 @@
         <span>Privacy</span>
       </a>
     </div>
-
+    
 <!-- Workspace Switcher -->
     <div class="mt-auto pt-2">
       <button class="w-full flex items-center justify-between px-3 py-2 rounded-md hover:bg-surface-container-high text-on-surface/70 text-sm font-medium transition-colors">
@@ -109,7 +149,13 @@
   </aside>
 
   <%!-- Mobile drawer overlay --%>
-  <div id="mobile-nav" class="fixed inset-0 z-50 hidden md:hidden" role="dialog" aria-modal="true" aria-label="Navigation menu">
+  <div
+    id="mobile-nav"
+    class="fixed inset-0 z-50 hidden md:hidden"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Navigation menu"
+  >
     <div
       class="absolute inset-0 bg-background/80 backdrop-blur-sm"
       phx-click={JS.hide(to: "#mobile-nav")}
@@ -181,15 +227,57 @@
 
         <%= if @current_user && @current_user.is_admin do %>
           <div class="mt-6 pt-4 border-t border-neutral-200/60">
-            <p class="px-3 mb-2 text-[10px] font-semibold uppercase tracking-wider text-on-surface-variant/50">Admin</p>
-            <.nav_link href="/admin" icon="admin_panel_settings" label="Admin" active={@active_nav == :admin_dashboard} />
-            <.nav_link href="/admin/users" icon="group" label="Users" active={@active_nav == :admin_users} />
-            <.nav_link href="/admin/organisations" icon="corporate_fare" label="Orgs" active={@active_nav == :admin_orgs} />
-            <.nav_link href="/admin/feature-flags" icon="toggle_on" label="Flags" active={@active_nav == :admin_flags} />
-            <.nav_link href="/admin/blog" icon="edit_note" label="Blog" active={@active_nav == :admin_blog} />
-            <.nav_link href="/admin/changelog" icon="new_releases" label="Changelog" active={@active_nav == :admin_changelog} />
-            <.nav_link href="/admin/seo" icon="search" label="SEO" active={@active_nav == :admin_seo} />
-            <.nav_link href="/admin/help" icon="support_agent" label="Help" active={@active_nav == :admin_help} />
+            <p class="px-3 mb-2 text-[10px] font-semibold uppercase tracking-wider text-on-surface-variant/50">
+              Admin
+            </p>
+            <.nav_link
+              href="/admin"
+              icon="admin_panel_settings"
+              label="Admin"
+              active={@active_nav == :admin_dashboard}
+            />
+            <.nav_link
+              href="/admin/users"
+              icon="group"
+              label="Users"
+              active={@active_nav == :admin_users}
+            />
+            <.nav_link
+              href="/admin/organisations"
+              icon="corporate_fare"
+              label="Orgs"
+              active={@active_nav == :admin_orgs}
+            />
+            <.nav_link
+              href="/admin/feature-flags"
+              icon="toggle_on"
+              label="Flags"
+              active={@active_nav == :admin_flags}
+            />
+            <.nav_link
+              href="/admin/blog"
+              icon="edit_note"
+              label="Blog"
+              active={@active_nav == :admin_blog}
+            />
+            <.nav_link
+              href="/admin/changelog"
+              icon="new_releases"
+              label="Changelog"
+              active={@active_nav == :admin_changelog}
+            />
+            <.nav_link
+              href="/admin/seo"
+              icon="search"
+              label="SEO"
+              active={@active_nav == :admin_seo}
+            />
+            <.nav_link
+              href="/admin/help"
+              icon="support_agent"
+              label="Help"
+              active={@active_nav == :admin_help}
+            />
           </div>
         <% end %>
       </nav>
@@ -205,7 +293,6 @@
         </a>
         <a
           href="/docs"
-
           class="flex items-center gap-3 px-3 py-2 text-on-surface/40 text-sm hover:text-on-surface hover:bg-surface-container-high rounded-md transition-colors"
         >
           <span class="material-symbols-outlined text-lg">menu_book</span>
@@ -213,7 +300,6 @@
         </a>
         <a
           href="/docs/changelog"
-
           class="flex items-center gap-3 px-3 py-2 text-on-surface/40 text-sm hover:text-on-surface hover:bg-surface-container-high rounded-md transition-colors"
         >
           <span class="material-symbols-outlined text-lg">new_releases</span>
@@ -237,7 +323,7 @@
       </div>
     </aside>
   </div>
-
+  
 <!-- Main Content -->
   <div class="flex-1 flex flex-col min-w-0">
     <!-- TopNavBar -->
@@ -255,7 +341,11 @@
           <span class="text-lg font-black font-headline md:hidden text-on-surface">
             FounderPad
           </span>
-          <form id="global-search-form" phx-submit="global_search" class="relative max-w-md w-full hidden md:block">
+          <form
+            id="global-search-form"
+            phx-submit="global_search"
+            class="relative max-w-md w-full hidden md:block"
+          >
             <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">
               search
             </span>
@@ -421,7 +511,9 @@
               </div>
               <div class="hidden md:block text-left">
                 <p class="text-sm font-semibold text-on-surface leading-none">
-                  {if @current_user && @current_user.name, do: @current_user.name |> String.split() |> List.first(), else: "User"}
+                  {if @current_user && @current_user.name,
+                    do: @current_user.name |> String.split() |> List.first(),
+                    else: "User"}
                 </p>
                 <p class="text-[10px] text-on-surface-variant/60 leading-none mt-1 font-medium">
                   Pro Plan
@@ -457,7 +549,9 @@
                   </div>
                   <div class="min-w-0 flex-1">
                     <p class="text-sm font-bold text-on-surface truncate font-headline">
-                      {if @current_user && @current_user.name, do: @current_user.name, else: "User"}
+                      {if @current_user && @current_user.name,
+                        do: @current_user.name,
+                        else: "User"}
                     </p>
                     <p class="text-xs text-on-surface-variant/60 truncate">
                       {if @current_user, do: @current_user.email, else: "user@founderpad.io"}
@@ -545,7 +639,6 @@
               <div class="py-1.5">
                 <a
                   href="/docs"
-
                   class="flex items-center gap-3 px-4 py-2 text-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/40 transition-colors group/item"
                 >
                   <span class="material-symbols-outlined text-lg opacity-60 group-hover/item:opacity-100 transition-opacity">
@@ -565,7 +658,6 @@
                 </a>
                 <a
                   href="/docs/changelog"
-
                   class="flex items-center gap-3 px-4 py-2 text-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/40 transition-colors group/item"
                 >
                   <span class="material-symbols-outlined text-lg opacity-60 group-hover/item:opacity-100 transition-opacity">
@@ -600,7 +692,7 @@
           </div>
 
           <div class="w-px h-6 bg-outline-variant/30"></div>
-
+          
 <!-- Theme Toggle (rightmost) -->
           <button
             id="theme-toggle"
@@ -613,9 +705,12 @@
         </div>
       </div>
     </header>
-
+    
 <!-- Impersonation Banner -->
-    <div :if={assigns[:impersonating]} class="bg-amber-500 text-white px-4 py-2 flex items-center justify-between text-sm">
+    <div
+      :if={assigns[:impersonating]}
+      class="bg-amber-500 text-white px-4 py-2 flex items-center justify-between text-sm"
+    >
       <span>
         <span class="font-semibold">Impersonating:</span>
         {@current_user.name || @current_user.email}
@@ -624,13 +719,13 @@
         End Impersonation
       </a>
     </div>
-
+    
 <!-- Page Content -->
     <main class="flex-1 p-6 md:p-8 max-w-[1280px] mx-auto w-full space-y-8">
       <.flash_group flash={@flash} />
       {@inner_content}
     </main>
-
+    
 <!-- Footer -->
     <footer class="mt-auto p-8">
       <div class="max-w-[1280px] mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
@@ -640,7 +735,6 @@
           <a
             class="text-xs text-on-surface-variant hover:text-primary transition-colors"
             href="/docs"
-
           >
             Documentation
           </a>
@@ -653,7 +747,6 @@
           <a
             class="text-xs text-on-surface-variant hover:text-primary transition-colors"
             href="/docs/changelog"
-
           >
             Changelog
           </a>

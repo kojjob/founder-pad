@@ -10,7 +10,12 @@ defmodule FounderPadWeb.Admin.ChangelogListLiveTest do
 
       Factory.create_changelog_entry!(%{title: "Draft Release", version: "v0.1.0", actor: admin})
 
-      entry = Factory.create_changelog_entry!(%{title: "Published Release", version: "v1.0.0", actor: admin})
+      entry =
+        Factory.create_changelog_entry!(%{
+          title: "Published Release",
+          version: "v1.0.0",
+          actor: admin
+        })
 
       entry
       |> Ash.Changeset.for_update(:publish, %{}, actor: admin)
@@ -80,8 +85,19 @@ defmodule FounderPadWeb.Admin.ChangelogListLiveTest do
     test "displays type badges correctly", %{conn: conn} do
       {conn, admin, _org} = setup_authenticated_admin(conn)
 
-      Factory.create_changelog_entry!(%{title: "A Feature", type: :feature, version: "v1.0.0", actor: admin})
-      Factory.create_changelog_entry!(%{title: "A Fix", type: :fix, version: "v1.0.1", actor: admin})
+      Factory.create_changelog_entry!(%{
+        title: "A Feature",
+        type: :feature,
+        version: "v1.0.0",
+        actor: admin
+      })
+
+      Factory.create_changelog_entry!(%{
+        title: "A Fix",
+        type: :fix,
+        version: "v1.0.1",
+        actor: admin
+      })
 
       {:ok, _view, html} = live(conn, ~p"/admin/changelog")
 

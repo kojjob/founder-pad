@@ -138,6 +138,7 @@ defmodule FounderPadWeb.TeamLiveTest do
 
     test "pagination prev/next buttons work", %{conn: conn} do
       {conn, _user, org} = setup_authenticated_user(conn)
+
       for i <- 1..8 do
         u = create_user!(email: "pager-#{i}@example.com")
         create_membership!(u, org, :member)

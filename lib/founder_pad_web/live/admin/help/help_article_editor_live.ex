@@ -224,7 +224,10 @@ defmodule FounderPadWeb.Admin.HelpArticleEditorLive do
         {:ok, _article} ->
           {:noreply,
            socket
-           |> put_flash(:info, if(socket.assigns.editing, do: "Article updated.", else: "Article created."))
+           |> put_flash(
+             :info,
+             if(socket.assigns.editing, do: "Article updated.", else: "Article created.")
+           )
            |> push_navigate(to: "/admin/help")}
 
         {:error, %Ash.Error.Invalid{} = error} ->

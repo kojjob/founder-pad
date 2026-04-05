@@ -228,7 +228,10 @@ defmodule FounderPadWeb.Admin.ChangelogEditorLive do
         {:ok, _entry} ->
           {:noreply,
            socket
-           |> put_flash(:info, if(socket.assigns.editing, do: "Entry updated.", else: "Entry created."))
+           |> put_flash(
+             :info,
+             if(socket.assigns.editing, do: "Entry updated.", else: "Entry created.")
+           )
            |> push_navigate(to: "/admin/changelog")}
 
         {:error, _changeset} ->

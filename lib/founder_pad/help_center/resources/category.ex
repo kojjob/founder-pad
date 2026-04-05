@@ -5,69 +5,69 @@ defmodule FounderPad.HelpCenter.Category do
     authorizers: [Ash.Policy.Authorizer]
 
   postgres do
-    table "help_categories"
-    repo FounderPad.Repo
+    table("help_categories")
+    repo(FounderPad.Repo)
   end
 
   attributes do
-    uuid_primary_key :id
+    uuid_primary_key(:id)
 
     attribute :name, :string do
-      allow_nil? false
-      public? true
+      allow_nil?(false)
+      public?(true)
     end
 
     attribute :slug, :string do
-      allow_nil? false
-      public? true
+      allow_nil?(false)
+      public?(true)
     end
 
     attribute :description, :string do
-      public? true
+      public?(true)
     end
 
     attribute :icon, :string do
-      public? true
-      default "help"
+      public?(true)
+      default("help")
     end
 
     attribute :position, :integer do
-      default 0
-      public? true
+      default(0)
+      public?(true)
     end
 
-    create_timestamp :inserted_at
-    update_timestamp :updated_at
+    create_timestamp(:inserted_at)
+    update_timestamp(:updated_at)
   end
 
   identities do
-    identity :unique_slug, [:slug]
+    identity(:unique_slug, [:slug])
   end
 
   relationships do
-    has_many :articles, FounderPad.HelpCenter.Article
+    has_many(:articles, FounderPad.HelpCenter.Article)
   end
 
   actions do
-    defaults [:read, :destroy]
+    defaults([:read, :destroy])
 
     create :create do
-      accept [:name, :slug, :description, :icon, :position]
-      change FounderPad.Content.Changes.GenerateSlug
+      accept([:name, :slug, :description, :icon, :position])
+      change(FounderPad.Content.Changes.GenerateSlug)
     end
 
     update :update do
-      accept [:name, :slug, :description, :icon, :position]
+      accept([:name, :slug, :description, :icon, :position])
     end
   end
 
   policies do
     policy action_type(:read) do
-      authorize_if always()
+      authorize_if(always())
     end
 
     policy action_type([:create, :update, :destroy]) do
-      authorize_if expr(^actor(:is_admin) == true)
+      authorize_if(expr(^actor(:is_admin) == true))
     end
   end
 end

@@ -24,7 +24,8 @@ defmodule FounderPadWeb.BillingLive do
         org_id: org_id,
         payment: %{last_four: "4242", expires: "12/26"},
         billing_contact: %{
-          legal_entity: if(user, do: "#{user.name || "Your"} Organization", else: "Your Organization"),
+          legal_entity:
+            if(user, do: "#{user.name || "Your"} Organization", else: "Your Organization"),
           email: if(user, do: to_string(user.email), else: "billing@company.com")
         },
         editing_contact: false,
@@ -42,7 +43,11 @@ defmodule FounderPadWeb.BillingLive do
           put_flash(socket, :error, "Checkout was canceled.")
 
         params["checkout"] == "simulated" ->
-          put_flash(socket, :info, "Simulated checkout for #{params["plan"]} plan (Stripe not configured)")
+          put_flash(
+            socket,
+            :info,
+            "Simulated checkout for #{params["plan"]} plan (Stripe not configured)"
+          )
 
         true ->
           socket
@@ -249,30 +254,50 @@ defmodule FounderPadWeb.BillingLive do
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         <%!-- Current Plan Card --%>
         <div class="lg:col-span-5 bg-surface-container-high rounded-xl p-8 relative overflow-hidden">
-          <div class="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 blur-3xl"></div>
+          <div class="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 blur-3xl">
+          </div>
           <div class="relative z-10">
             <div class="flex justify-between items-start mb-6">
               <div>
-                <span class="text-[10px] uppercase tracking-widest text-primary font-bold mb-1 block">Current Plan</span>
-                <h2 class="text-3xl font-extrabold text-on-surface font-headline italic">{@current_plan.name}</h2>
+                <span class="text-[10px] uppercase tracking-widest text-primary font-bold mb-1 block">
+                  Current Plan
+                </span>
+                <h2 class="text-3xl font-extrabold text-on-surface font-headline italic">
+                  {@current_plan.name}
+                </h2>
               </div>
-              <span class="bg-primary/10 text-primary text-xs font-bold px-3 py-1 rounded-full">Active</span>
+              <span class="bg-primary/10 text-primary text-xs font-bold px-3 py-1 rounded-full">
+                Active
+              </span>
             </div>
             <div class="space-y-4 mb-8">
-              <div :for={feature <- @current_plan.features} class="flex items-center gap-3 text-on-surface-variant text-sm">
-                <span class="material-symbols-outlined text-primary text-lg" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+              <div
+                :for={feature <- @current_plan.features}
+                class="flex items-center gap-3 text-on-surface-variant text-sm"
+              >
+                <span
+                  class="material-symbols-outlined text-primary text-lg"
+                  style="font-variation-settings: 'FILL' 1;"
+                >
+                  check_circle
+                </span>
                 <span>{feature}</span>
               </div>
             </div>
             <div class="pt-6 space-y-4">
               <div class="flex justify-between items-baseline">
                 <span class="text-on-surface-variant text-sm">Monthly Cost</span>
-                <span class="font-mono text-2xl font-bold text-on-surface">{@current_plan.price}</span>
+                <span class="font-mono text-2xl font-bold text-on-surface">
+                  {@current_plan.price}
+                </span>
               </div>
               <%!-- Dynamic upgrade: pick next tier --%>
               <form method="post" action={"/checkout/#{next_plan_slug(@current_plan.slug, @plans)}"}>
                 <input type="hidden" name="_csrf_token" value={Plug.CSRFProtection.get_csrf_token()} />
-                <button type="submit" class="w-full primary-gradient font-bold py-3 rounded-lg flex items-center justify-center gap-2 hover:scale-[1.01] transition-transform">
+                <button
+                  type="submit"
+                  class="w-full primary-gradient font-bold py-3 rounded-lg flex items-center justify-center gap-2 hover:scale-[1.01] transition-transform"
+                >
                   <span>Upgrade Plan</span>
                   <span class="material-symbols-outlined">rocket_launch</span>
                 </button>
@@ -287,15 +312,23 @@ defmodule FounderPadWeb.BillingLive do
             <div class="flex justify-between items-start">
               <div>
                 <p class="text-xs text-on-surface-variant font-medium">Compute Hours</p>
-                <p class="text-2xl font-bold font-mono">{@usage.compute_used} / {format_number(@usage.compute_limit)}</p>
+                <p class="text-2xl font-bold font-mono">
+                  {@usage.compute_used} / {format_number(@usage.compute_limit)}
+                </p>
               </div>
               <span class="material-symbols-outlined text-secondary opacity-50">speed</span>
             </div>
             <div class="space-y-2">
               <div class="w-full h-3 bg-surface-container-highest rounded-full overflow-hidden">
-                <div class={"h-full bg-secondary rounded-full transition-all duration-500"} style={"width: #{@compute_pct}%"}></div>
+                <div
+                  class="h-full bg-secondary rounded-full transition-all duration-500"
+                  style={"width: #{@compute_pct}%"}
+                >
+                </div>
               </div>
-              <p class="text-[10px] text-on-surface-variant">{@compute_pct}% used • Resets in 12 days</p>
+              <p class="text-[10px] text-on-surface-variant">
+                {@compute_pct}% used • Resets in 12 days
+              </p>
             </div>
           </div>
 
@@ -303,13 +336,21 @@ defmodule FounderPadWeb.BillingLive do
             <div class="flex justify-between items-start">
               <div>
                 <p class="text-xs text-on-surface-variant font-medium">Token Processing</p>
-                <p class="text-2xl font-bold font-mono">{format_number(@usage.token_used)} / {format_number(@usage.token_limit)}</p>
+                <p class="text-2xl font-bold font-mono">
+                  {format_number(@usage.token_used)} / {format_number(@usage.token_limit)}
+                </p>
               </div>
-              <span class="material-symbols-outlined text-secondary opacity-50">data_thresholding</span>
+              <span class="material-symbols-outlined text-secondary opacity-50">
+                data_thresholding
+              </span>
             </div>
             <div class="space-y-2">
               <div class="w-full h-3 bg-surface-container-highest rounded-full overflow-hidden">
-                <div class={"h-full bg-secondary rounded-full transition-all duration-500"} style={"width: #{@token_pct}%"}></div>
+                <div
+                  class="h-full bg-secondary rounded-full transition-all duration-500"
+                  style={"width: #{@token_pct}%"}
+                >
+                </div>
               </div>
               <p class="text-[10px] text-on-surface-variant">{@token_pct}% of limit reached</p>
             </div>
@@ -323,10 +364,17 @@ defmodule FounderPadWeb.BillingLive do
                 </div>
                 <div>
                   <h4 class="font-bold text-sm">Approaching Usage Limit</h4>
-                  <p class="text-xs text-on-surface-variant">You've used {@compute_pct}% of your monthly compute hours.</p>
+                  <p class="text-xs text-on-surface-variant">
+                    You've used {@compute_pct}% of your monthly compute hours.
+                  </p>
                 </div>
               </div>
-              <button phx-click="enable_auto_refill" class="text-sm font-semibold text-secondary hover:underline">Enable Auto-Refill</button>
+              <button
+                phx-click="enable_auto_refill"
+                class="text-sm font-semibold text-secondary hover:underline"
+              >
+                Enable Auto-Refill
+              </button>
             </div>
           </div>
         </div>
@@ -338,16 +386,29 @@ defmodule FounderPadWeb.BillingLive do
         <div class="bg-surface-container-low rounded-xl p-6 flex flex-col justify-between">
           <div>
             <div class="flex justify-between items-center mb-6">
-              <h3 class="text-sm font-bold uppercase tracking-wider text-on-surface-variant">Payment Method</h3>
-              <button phx-click="update_payment" class="text-xs font-semibold text-primary hover:underline">Update</button>
+              <h3 class="text-sm font-bold uppercase tracking-wider text-on-surface-variant">
+                Payment Method
+              </h3>
+              <button
+                phx-click="update_payment"
+                class="text-xs font-semibold text-primary hover:underline"
+              >
+                Update
+              </button>
             </div>
             <div class="flex items-center gap-4 bg-surface-container-highest/30 p-4 rounded-lg">
               <div class="w-12 h-8 bg-surface-container-highest rounded flex items-center justify-center">
-                <span class="material-symbols-outlined text-on-surface-variant text-lg">credit_card</span>
+                <span class="material-symbols-outlined text-on-surface-variant text-lg">
+                  credit_card
+                </span>
               </div>
               <div>
-                <p class="font-mono text-sm tracking-widest text-on-surface">•••• •••• •••• {@payment.last_four}</p>
-                <p class="text-[10px] text-on-surface-variant uppercase">Expires {@payment.expires}</p>
+                <p class="font-mono text-sm tracking-widest text-on-surface">
+                  •••• •••• •••• {@payment.last_four}
+                </p>
+                <p class="text-[10px] text-on-surface-variant uppercase">
+                  Expires {@payment.expires}
+                </p>
               </div>
             </div>
           </div>
@@ -360,37 +421,79 @@ defmodule FounderPadWeb.BillingLive do
         <%!-- Billing Contact (editable) --%>
         <div class="bg-surface-container-low rounded-xl p-6">
           <div class="flex justify-between items-center mb-6">
-            <h3 class="text-sm font-bold uppercase tracking-wider text-on-surface-variant">Billing Contact</h3>
-            <button :if={!@editing_contact} phx-click="edit_contact" class="text-xs font-semibold text-primary hover:underline">Edit</button>
-            <button :if={@editing_contact} phx-click="cancel_edit_contact" class="text-xs font-semibold text-on-surface-variant hover:underline">Cancel</button>
+            <h3 class="text-sm font-bold uppercase tracking-wider text-on-surface-variant">
+              Billing Contact
+            </h3>
+            <button
+              :if={!@editing_contact}
+              phx-click="edit_contact"
+              class="text-xs font-semibold text-primary hover:underline"
+            >
+              Edit
+            </button>
+            <button
+              :if={@editing_contact}
+              phx-click="cancel_edit_contact"
+              class="text-xs font-semibold text-on-surface-variant hover:underline"
+            >
+              Cancel
+            </button>
           </div>
 
           <%!-- View mode --%>
           <div :if={!@editing_contact} class="space-y-4">
             <div>
-              <label class="text-[10px] text-on-surface-variant font-bold uppercase mb-1 block">Legal Entity</label>
+              <label class="text-[10px] text-on-surface-variant font-bold uppercase mb-1 block">
+                Legal Entity
+              </label>
               <p class="text-sm font-medium">{@billing_contact.legal_entity}</p>
             </div>
             <div>
-              <label class="text-[10px] text-on-surface-variant font-bold uppercase mb-1 block">Invoicing Email</label>
+              <label class="text-[10px] text-on-surface-variant font-bold uppercase mb-1 block">
+                Invoicing Email
+              </label>
               <p class="text-sm font-medium">{@billing_contact.email}</p>
             </div>
             <div class="pt-4">
-              <button class="text-xs bg-surface-container-highest px-3 py-1.5 rounded-md hover:bg-surface-bright transition-colors">VAT/Tax ID Settings</button>
+              <button class="text-xs bg-surface-container-highest px-3 py-1.5 rounded-md hover:bg-surface-bright transition-colors">
+                VAT/Tax ID Settings
+              </button>
             </div>
           </div>
 
           <%!-- Edit mode --%>
-          <.form :if={@editing_contact} for={%{}} as={:contact} phx-submit="save_contact" class="space-y-4">
+          <.form
+            :if={@editing_contact}
+            for={%{}}
+            as={:contact}
+            phx-submit="save_contact"
+            class="space-y-4"
+          >
             <div>
-              <label class="text-[10px] text-on-surface-variant font-bold uppercase mb-1 block">Legal Entity</label>
-              <input type="text" name="contact[legal_entity]" value={@billing_contact.legal_entity} class="w-full bg-surface-container-highest rounded-lg px-4 py-2.5 text-sm text-on-surface focus:ring-1 focus:ring-primary" />
+              <label class="text-[10px] text-on-surface-variant font-bold uppercase mb-1 block">
+                Legal Entity
+              </label>
+              <input
+                type="text"
+                name="contact[legal_entity]"
+                value={@billing_contact.legal_entity}
+                class="w-full bg-surface-container-highest rounded-lg px-4 py-2.5 text-sm text-on-surface focus:ring-1 focus:ring-primary"
+              />
             </div>
             <div>
-              <label class="text-[10px] text-on-surface-variant font-bold uppercase mb-1 block">Invoicing Email</label>
-              <input type="email" name="contact[email]" value={@billing_contact.email} class="w-full bg-surface-container-highest rounded-lg px-4 py-2.5 text-sm text-on-surface focus:ring-1 focus:ring-primary" />
+              <label class="text-[10px] text-on-surface-variant font-bold uppercase mb-1 block">
+                Invoicing Email
+              </label>
+              <input
+                type="email"
+                name="contact[email]"
+                value={@billing_contact.email}
+                class="w-full bg-surface-container-highest rounded-lg px-4 py-2.5 text-sm text-on-surface focus:ring-1 focus:ring-primary"
+              />
             </div>
-            <button type="submit" class="primary-gradient font-semibold px-4 py-2 rounded-lg text-sm">Save Contact</button>
+            <button type="submit" class="primary-gradient font-semibold px-4 py-2 rounded-lg text-sm">
+              Save Contact
+            </button>
           </.form>
         </div>
       </div>
@@ -400,44 +503,75 @@ defmodule FounderPadWeb.BillingLive do
         <div class="flex justify-between items-end px-2">
           <div>
             <h3 class="text-xl font-bold font-headline">Invoice History</h3>
-            <p class="text-xs text-on-surface-variant">View and download your past subscription receipts.</p>
+            <p class="text-xs text-on-surface-variant">
+              View and download your past subscription receipts.
+            </p>
           </div>
-          <button phx-click="export_invoices" class="text-xs font-semibold bg-surface-container-high px-4 py-2 rounded-lg hover:bg-surface-container-highest transition-colors flex items-center gap-2">
-            <span class="material-symbols-outlined text-sm">download</span>
-            Export All (CSV)
+          <button
+            phx-click="export_invoices"
+            class="text-xs font-semibold bg-surface-container-high px-4 py-2 rounded-lg hover:bg-surface-container-highest transition-colors flex items-center gap-2"
+          >
+            <span class="material-symbols-outlined text-sm">download</span> Export All (CSV)
           </button>
         </div>
         <div class="bg-surface-container rounded-xl overflow-hidden">
           <table class="w-full text-left border-collapse">
             <thead>
               <tr class="bg-surface-container-highest/30">
-                <th class="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Invoice ID</th>
-                <th class="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Date</th>
-                <th class="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Amount</th>
-                <th class="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Status</th>
-                <th class="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant text-right">Actions</th>
+                <th class="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">
+                  Invoice ID
+                </th>
+                <th class="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">
+                  Date
+                </th>
+                <th class="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">
+                  Amount
+                </th>
+                <th class="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">
+                  Status
+                </th>
+                <th class="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant text-right">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody>
-              <tr :if={@invoices == []} >
+              <tr :if={@invoices == []}>
                 <td colspan="5" class="px-6 py-12 text-center text-on-surface-variant text-sm">
-                  <span class="material-symbols-outlined text-3xl mb-2 block opacity-40">receipt_long</span>
+                  <span class="material-symbols-outlined text-3xl mb-2 block opacity-40">
+                    receipt_long
+                  </span>
                   No invoices yet
                 </td>
               </tr>
-              <tr :for={inv <- @invoices} class="hover:bg-surface-container-high transition-colors group">
+              <tr
+                :for={inv <- @invoices}
+                class="hover:bg-surface-container-high transition-colors group"
+              >
                 <td class="px-6 py-4 font-mono text-sm text-on-surface-variant">{inv.id}</td>
                 <td class="px-6 py-4 text-sm font-medium">{inv.date}</td>
                 <td class="px-6 py-4 font-mono text-sm">{inv.amount}</td>
                 <td class="px-6 py-4">
-                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-secondary/10 text-secondary">Paid</span>
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-secondary/10 text-secondary">
+                    Paid
+                  </span>
                 </td>
                 <td class="px-6 py-4 text-right">
                   <div class="flex justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button phx-click="view_invoice" phx-value-id={inv.id} class="text-primary hover:text-on-surface transition-colors" title="View">
+                    <button
+                      phx-click="view_invoice"
+                      phx-value-id={inv.id}
+                      class="text-primary hover:text-on-surface transition-colors"
+                      title="View"
+                    >
                       <span class="material-symbols-outlined text-[20px]">visibility</span>
                     </button>
-                    <button phx-click="download_invoice" phx-value-id={inv.id} class="text-primary hover:text-on-surface transition-colors" title="Download PDF">
+                    <button
+                      phx-click="download_invoice"
+                      phx-value-id={inv.id}
+                      class="text-primary hover:text-on-surface transition-colors"
+                      title="Download PDF"
+                    >
                       <span class="material-symbols-outlined text-[20px]">download</span>
                     </button>
                   </div>
@@ -445,8 +579,13 @@ defmodule FounderPadWeb.BillingLive do
               </tr>
             </tbody>
           </table>
-          <div :if={length(@invoices) >= 3} class="bg-surface-container-lowest/50 px-6 py-3 flex justify-center">
-            <button class="text-xs text-on-surface-variant hover:text-on-surface font-medium transition-colors">Load more invoices...</button>
+          <div
+            :if={length(@invoices) >= 3}
+            class="bg-surface-container-lowest/50 px-6 py-3 flex justify-center"
+          >
+            <button class="text-xs text-on-surface-variant hover:text-on-surface font-medium transition-colors">
+              Load more invoices...
+            </button>
           </div>
         </div>
       </div>
@@ -456,17 +595,32 @@ defmodule FounderPadWeb.BillingLive do
         <div class="p-6 bg-error-container/10 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h4 class="font-bold text-error">Cancel Subscription</h4>
-            <p class="text-xs text-on-surface-variant">Immediate access will be revoked at the end of your billing cycle.</p>
+            <p class="text-xs text-on-surface-variant">
+              Immediate access will be revoked at the end of your billing cycle.
+            </p>
           </div>
           <div :if={!@show_cancel_confirm}>
-            <button phx-click="toggle_cancel_confirm" class="px-4 py-2 text-error text-xs font-bold rounded-lg hover:bg-error/10 transition-all uppercase tracking-widest bg-surface-container-highest">
+            <button
+              phx-click="toggle_cancel_confirm"
+              class="px-4 py-2 text-error text-xs font-bold rounded-lg hover:bg-error/10 transition-all uppercase tracking-widest bg-surface-container-highest"
+            >
               Terminate Plan
             </button>
           </div>
           <div :if={@show_cancel_confirm} class="flex items-center gap-3">
             <span class="text-xs text-error font-medium">Are you sure?</span>
-            <button phx-click="confirm_cancel" class="px-4 py-2 bg-error text-on-error text-xs font-bold rounded-lg uppercase tracking-widest">Yes, Cancel</button>
-            <button phx-click="toggle_cancel_confirm" class="px-4 py-2 bg-surface-container-highest text-on-surface-variant text-xs font-bold rounded-lg">Keep Plan</button>
+            <button
+              phx-click="confirm_cancel"
+              class="px-4 py-2 bg-error text-on-error text-xs font-bold rounded-lg uppercase tracking-widest"
+            >
+              Yes, Cancel
+            </button>
+            <button
+              phx-click="toggle_cancel_confirm"
+              class="px-4 py-2 bg-surface-container-highest text-on-surface-variant text-xs font-bold rounded-lg"
+            >
+              Keep Plan
+            </button>
           </div>
         </div>
       </div>

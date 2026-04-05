@@ -9,11 +9,13 @@ defmodule FounderPad.HelpCenter.ArticleTest do
 
       {:ok, article} =
         FounderPad.HelpCenter.Article
-        |> Ash.Changeset.for_create(:create, %{
-          title: "How to Set Up Billing",
-          body: "Step by step guide to billing setup.",
-          category_id: cat.id
-        }, actor: admin)
+        |> Ash.Changeset.for_create(
+          :create,
+          %{
+            title: "How to Set Up Billing",
+            body: "Step by step guide to billing setup.",
+            category_id: cat.id
+          }, actor: admin)
         |> Ash.create()
 
       assert article.slug == "how-to-set-up-billing"
@@ -41,11 +43,13 @@ defmodule FounderPad.HelpCenter.ArticleTest do
     test "finds articles by keyword" do
       admin = create_admin_user!()
       cat = create_help_category!(%{actor: admin})
+
       create_published_help_article!(cat, %{
         title: "Billing FAQ",
         body: "How to manage your billing and payments.",
         actor: admin
       })
+
       create_published_help_article!(cat, %{
         title: "Agent Setup",
         body: "How to configure AI agents.",

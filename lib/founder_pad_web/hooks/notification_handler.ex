@@ -31,7 +31,9 @@ defmodule FounderPadWeb.Hooks.NotificationHandler do
 
   defp handle_notification_info({:new_notification, notif}, socket) do
     notifications = [notif | socket.assigns.notifications]
-    {:cont, assign(socket, notifications: notifications, notification_count: length(notifications))}
+
+    {:cont,
+     assign(socket, notifications: notifications, notification_count: length(notifications))}
   end
 
   defp handle_notification_info(_msg, socket), do: {:cont, socket}
@@ -50,7 +52,9 @@ defmodule FounderPadWeb.Hooks.NotificationHandler do
     if notif do
       notif |> Ash.Changeset.for_update(:mark_read) |> Ash.update()
       notifications = Enum.reject(socket.assigns.notifications, &(&1.id == id))
-      {:halt, assign(socket, notifications: notifications, notification_count: length(notifications))}
+
+      {:halt,
+       assign(socket, notifications: notifications, notification_count: length(notifications))}
     else
       {:cont, socket}
     end

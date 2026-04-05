@@ -100,7 +100,11 @@ defmodule FounderPadWeb.AgentDetailLive do
          |> Ash.create() do
       {:ok, _saved_msg} ->
         # Enqueue agent runner — it will NOT create the user message again
-        %{conversation_id: conversation.id, message_content: trimmed, organisation_id: agent.organisation_id}
+        %{
+          conversation_id: conversation.id,
+          message_content: trimmed,
+          organisation_id: agent.organisation_id
+        }
         |> FounderPad.AI.Workers.AgentRunner.new()
         |> Oban.insert()
 
@@ -128,7 +132,11 @@ defmodule FounderPadWeb.AgentDetailLive do
     case agent |> Ash.Changeset.for_update(:update, %{active: new_active}) |> Ash.update() do
       {:ok, updated} ->
         FounderPad.Audit.log(
-          :settings_changed, "Agent", agent.id, socket.assigns[:current_user] && socket.assigns.current_user.id, nil,
+          :settings_changed,
+          "Agent",
+          agent.id,
+          socket.assigns[:current_user] && socket.assigns.current_user.id,
+          nil,
           changes: %{active: new_active}
         )
 
@@ -147,10 +155,11 @@ defmodule FounderPadWeb.AgentDetailLive do
   end
 
   def handle_event("update_temperature", %{"value" => val}, socket) do
-    temp = case Float.parse(val) do
-      {t, _} when t >= 0.0 and t <= 1.0 -> t
-      _ -> socket.assigns.temperature
-    end
+    temp =
+      case Float.parse(val) do
+        {t, _} when t >= 0.0 and t <= 1.0 -> t
+        _ -> socket.assigns.temperature
+      end
 
     {:noreply, assign(socket, temperature: temp)}
   end
@@ -221,7 +230,9 @@ defmodule FounderPadWeb.AgentDetailLive do
           </div>
 
           <div class="flex items-center gap-4 mb-2">
-            <h1 class="text-4xl font-extrabold font-headline tracking-tight text-on-surface leading-none">{@agent.name}</h1>
+            <h1 class="text-4xl font-extrabold font-headline tracking-tight text-on-surface leading-none">
+              {@agent.name}
+            </h1>
             <.agent_status active={@agent.active} />
           </div>
           <p class="text-on-surface-variant max-w-2xl">{@agent.description || "No description"}</p>
@@ -237,28 +248,47 @@ defmodule FounderPadWeb.AgentDetailLive do
         <div class="flex items-center gap-3">
           <%!-- Presence indicators --%>
           <%= if @present_users != [] do %>
-            <div class="flex items-center gap-1 mr-2" title={"#{length(@present_users)} user(s) viewing"}>
+            <div
+              class="flex items-center gap-1 mr-2"
+              title={"#{length(@present_users)} user(s) viewing"}
+            >
               <div class="flex -space-x-2">
-                <div :for={{user, idx} <- Enum.with_index(@present_users)} class={[
-                  "w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white ring-2 ring-surface",
-                  presence_color(idx)
-                ]} title={user.name}>
+                <div
+                  :for={{user, idx} <- Enum.with_index(@present_users)}
+                  class={[
+                    "w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white ring-2 ring-surface",
+                    presence_color(idx)
+                  ]}
+                  title={user.name}
+                >
                   {user_initials(user.name)}
                 </div>
               </div>
-              <span class="text-xs text-on-surface-variant ml-2">{length(@present_users)} online</span>
+              <span class="text-xs text-on-surface-variant ml-2">
+                {length(@present_users)} online
+              </span>
             </div>
           <% end %>
-          <button phx-click="toggle_agent" class={[
-            "px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors flex items-center gap-2",
-            if(@agent.active,
-              do: "bg-surface-container-high hover:bg-surface-container-highest text-on-surface",
-              else: "primary-gradient")
-          ]}>
-            <span class="material-symbols-outlined text-lg">{if @agent.active, do: "pause", else: "play_arrow"}</span>
+          <button
+            phx-click="toggle_agent"
+            class={[
+              "px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors flex items-center gap-2",
+              if(@agent.active,
+                do: "bg-surface-container-high hover:bg-surface-container-highest text-on-surface",
+                else: "primary-gradient"
+              )
+            ]}
+          >
+            <span class="material-symbols-outlined text-lg">
+              {if @agent.active, do: "pause", else: "play_arrow"}
+            </span>
             {if @agent.active, do: "Pause", else: "Resume"}
           </button>
-          <button phx-click="delete_agent" data-confirm="Delete this agent permanently?" class="bg-error/10 hover:bg-error/20 text-error px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors flex items-center gap-2">
+          <button
+            phx-click="delete_agent"
+            data-confirm="Delete this agent permanently?"
+            class="bg-error/10 hover:bg-error/20 text-error px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors flex items-center gap-2"
+          >
             <span class="w-2 h-2 rounded-sm bg-error"></span> Delete
           </button>
         </div>
@@ -267,27 +297,41 @@ defmodule FounderPadWeb.AgentDetailLive do
       <%!-- Stats Row --%>
       <section class="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div class="bg-surface-container p-6 rounded-2xl">
-          <p class="text-[10px] font-bold tracking-wider uppercase text-on-surface-variant mb-2">Conversations</p>
+          <p class="text-[10px] font-bold tracking-wider uppercase text-on-surface-variant mb-2">
+            Conversations
+          </p>
           <p class="text-3xl font-mono font-medium text-on-surface mb-1">{@stats.conversations}</p>
           <p class="text-xs text-on-surface-variant">Total sessions</p>
         </div>
         <div class="bg-surface-container p-6 rounded-2xl">
-          <p class="text-[10px] font-bold tracking-wider uppercase text-on-surface-variant mb-2">Messages</p>
+          <p class="text-[10px] font-bold tracking-wider uppercase text-on-surface-variant mb-2">
+            Messages
+          </p>
           <p class="text-3xl font-mono font-medium text-on-surface mb-1">{@stats.messages}</p>
-          <p class="text-xs text-on-surface-variant">{@stats.user_messages} sent / {@stats.assistant_messages} received</p>
+          <p class="text-xs text-on-surface-variant">
+            {@stats.user_messages} sent / {@stats.assistant_messages} received
+          </p>
         </div>
         <div class="bg-surface-container p-6 rounded-2xl">
-          <p class="text-[10px] font-bold tracking-wider uppercase text-on-surface-variant mb-2">Tokens Used</p>
+          <p class="text-[10px] font-bold tracking-wider uppercase text-on-surface-variant mb-2">
+            Tokens Used
+          </p>
           <p class="text-3xl font-mono font-medium text-secondary mb-1">{@stats.tokens}</p>
           <p class="text-xs text-secondary/70">Est. cost: {@stats.est_cost}</p>
         </div>
         <div class="bg-surface-container p-6 rounded-2xl">
           <div class="flex justify-between items-center mb-4">
-            <p class="text-[10px] font-bold tracking-wider uppercase text-on-surface-variant">Latency</p>
+            <p class="text-[10px] font-bold tracking-wider uppercase text-on-surface-variant">
+              Latency
+            </p>
             <p class="text-[10px] font-mono text-on-surface-variant">{@stats.avg_latency}ms</p>
           </div>
           <div class="flex items-end gap-1 h-10 w-full">
-            <div :for={h <- @stats.latency_chart} class="w-full rounded-sm transition-all" style={"height: #{h}%; background-color: var(--fp-chart-primary); opacity: #{max(h / 100, 0.3)};"}>
+            <div
+              :for={h <- @stats.latency_chart}
+              class="w-full rounded-sm transition-all"
+              style={"height: #{h}%; background-color: var(--fp-chart-primary); opacity: #{max(h / 100, 0.3)};"}
+            >
             </div>
           </div>
         </div>
@@ -296,16 +340,31 @@ defmodule FounderPadWeb.AgentDetailLive do
       <%!-- Tabs --%>
       <div class="flex gap-8">
         <button
-          :for={{label, icon, key} <- [{"Activity", "monitoring", "activity"}, {"Chat", "chat", "chat"}, {"Configuration", "tune", "config"}, {"Logs", "terminal", "logs"}]}
+          :for={
+            {label, icon, key} <- [
+              {"Activity", "monitoring", "activity"},
+              {"Chat", "chat", "chat"},
+              {"Configuration", "tune", "config"},
+              {"Logs", "terminal", "logs"}
+            ]
+          }
           phx-click="set_tab"
           phx-value-tab={key}
-          class={["text-sm font-semibold transition-colors relative pb-4 flex items-center gap-2",
-            if(@active_tab == key, do: "text-on-surface", else: "text-on-surface-variant hover:text-on-surface")
+          class={[
+            "text-sm font-semibold transition-colors relative pb-4 flex items-center gap-2",
+            if(@active_tab == key,
+              do: "text-on-surface",
+              else: "text-on-surface-variant hover:text-on-surface"
+            )
           ]}
         >
           <span class="material-symbols-outlined text-[18px]">{icon}</span>
           {label}
-          <span :if={@active_tab == key} class="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full"></span>
+          <span
+            :if={@active_tab == key}
+            class="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full"
+          >
+          </span>
         </button>
       </div>
 
@@ -322,16 +381,27 @@ defmodule FounderPadWeb.AgentDetailLive do
               </tr>
             </thead>
             <tbody>
-              <tr :for={act <- @activities} class="hover:bg-surface-container-high/30 transition-colors">
-                <td class="p-6 py-4 whitespace-nowrap text-on-surface-variant font-mono text-xs">{act.timestamp}</td>
+              <tr
+                :for={act <- @activities}
+                class="hover:bg-surface-container-high/30 transition-colors"
+              >
+                <td class="p-6 py-4 whitespace-nowrap text-on-surface-variant font-mono text-xs">
+                  {act.timestamp}
+                </td>
                 <td class="p-6 py-4 whitespace-nowrap text-on-surface font-medium">{act.action}</td>
                 <td class="p-6 py-4 whitespace-nowrap">
-                  <span class="px-2 py-1 bg-surface-container-highest text-on-surface-variant text-[10px] font-mono rounded">{act.entity}</span>
+                  <span class="px-2 py-1 bg-surface-container-highest text-on-surface-variant text-[10px] font-mono rounded">
+                    {act.entity}
+                  </span>
                 </td>
-                <td class={"p-6 py-4 whitespace-nowrap text-right font-bold text-xs " <> act.impact_color}>{act.impact}</td>
+                <td class={"p-6 py-4 whitespace-nowrap text-right font-bold text-xs " <> act.impact_color}>
+                  {act.impact}
+                </td>
               </tr>
               <tr :if={@activities == []}>
-                <td colspan="4" class="p-6 text-center text-on-surface-variant">No activity recorded yet</td>
+                <td colspan="4" class="p-6 text-center text-on-surface-variant">
+                  No activity recorded yet
+                </td>
               </tr>
             </tbody>
           </table>
@@ -346,19 +416,27 @@ defmodule FounderPadWeb.AgentDetailLive do
               <span class="material-symbols-outlined text-primary">chat</span>
               <h3 class="font-bold text-sm">Conversation</h3>
             </div>
-            <span class="text-xs font-mono text-on-surface-variant">ID: {String.slice(@conversation.id, 0..7)}</span>
+            <span class="text-xs font-mono text-on-surface-variant">
+              ID: {String.slice(@conversation.id, 0..7)}
+            </span>
           </div>
 
           <div class="p-6 overflow-y-auto flex-1 space-y-6" id="chat-messages">
             <div :if={@messages == []} class="text-center text-on-surface-variant py-12">
-              <span class="material-symbols-outlined text-4xl text-on-surface-variant/30 mb-3 block">forum</span>
+              <span class="material-symbols-outlined text-4xl text-on-surface-variant/30 mb-3 block">
+                forum
+              </span>
               <p>Send a message to start the conversation</p>
             </div>
             <div :for={msg <- @messages} class="flex gap-4">
-              <div class={["w-8 h-8 rounded-lg flex items-center justify-center shrink-0",
-                if(msg.role == :user, do: "bg-surface-container-highest", else: "bg-primary/10")]}>
-                <span class={["material-symbols-outlined text-sm",
-                  if(msg.role == :user, do: "text-on-surface", else: "text-primary")]}>
+              <div class={[
+                "w-8 h-8 rounded-lg flex items-center justify-center shrink-0",
+                if(msg.role == :user, do: "bg-surface-container-highest", else: "bg-primary/10")
+              ]}>
+                <span class={[
+                  "material-symbols-outlined text-sm",
+                  if(msg.role == :user, do: "text-on-surface", else: "text-primary")
+                ]}>
                   {if msg.role == :user, do: "person", else: "psychology"}
                 </span>
               </div>
@@ -366,17 +444,23 @@ defmodule FounderPadWeb.AgentDetailLive do
                 <p class="text-xs font-mono text-on-surface-variant mb-1">
                   {if msg.role == :user, do: "You", else: @agent.name} • {msg.time}
                 </p>
-                <div class="text-sm leading-relaxed text-on-surface whitespace-pre-wrap">{msg.content}</div>
+                <div class="text-sm leading-relaxed text-on-surface whitespace-pre-wrap">
+                  {msg.content}
+                </div>
               </div>
             </div>
             <div :if={@streaming} class="flex gap-4">
               <div class="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                <span class="material-symbols-outlined text-sm text-primary animate-pulse">psychology</span>
+                <span class="material-symbols-outlined text-sm text-primary animate-pulse">
+                  psychology
+                </span>
               </div>
               <div class="flex items-center gap-1 py-2">
                 <div class="w-2 h-2 rounded-full bg-primary/60 animate-bounce"></div>
-                <div class="w-2 h-2 rounded-full bg-primary/40 animate-bounce [animation-delay:150ms]"></div>
-                <div class="w-2 h-2 rounded-full bg-primary/20 animate-bounce [animation-delay:300ms]"></div>
+                <div class="w-2 h-2 rounded-full bg-primary/40 animate-bounce [animation-delay:150ms]">
+                </div>
+                <div class="w-2 h-2 rounded-full bg-primary/20 animate-bounce [animation-delay:300ms]">
+                </div>
               </div>
             </div>
           </div>
@@ -392,8 +476,14 @@ defmodule FounderPadWeb.AgentDetailLive do
                 class="flex-1 bg-surface-container-highest rounded-lg px-4 py-2.5 text-sm text-on-surface placeholder:text-on-surface-variant/50 focus:ring-1 focus:ring-primary disabled:opacity-50"
                 autofocus
               />
-              <button type="submit" disabled={@streaming} class="primary-gradient px-4 py-2.5 rounded-lg text-sm font-semibold transition-transform active:scale-95 disabled:opacity-50">
-                <span class="material-symbols-outlined text-lg">{if @streaming, do: "hourglass_top", else: "send"}</span>
+              <button
+                type="submit"
+                disabled={@streaming}
+                class="primary-gradient px-4 py-2.5 rounded-lg text-sm font-semibold transition-transform active:scale-95 disabled:opacity-50"
+              >
+                <span class="material-symbols-outlined text-lg">
+                  {if @streaming, do: "hourglass_top", else: "send"}
+                </span>
               </button>
             </div>
           </form>
@@ -407,7 +497,9 @@ defmodule FounderPadWeb.AgentDetailLive do
             <h3 class="font-bold text-lg text-on-surface mb-6">Parameters</h3>
             <div class="space-y-8">
               <div>
-                <p class="text-[10px] font-bold tracking-wider uppercase text-on-surface-variant mb-2">System Prompt</p>
+                <p class="text-[10px] font-bold tracking-wider uppercase text-on-surface-variant mb-2">
+                  System Prompt
+                </p>
                 <textarea
                   phx-change="update_system_prompt"
                   name="value"
@@ -418,7 +510,9 @@ defmodule FounderPadWeb.AgentDetailLive do
               </div>
 
               <div>
-                <p class="text-[10px] font-bold tracking-wider uppercase text-on-surface-variant mb-2">Provider</p>
+                <p class="text-[10px] font-bold tracking-wider uppercase text-on-surface-variant mb-2">
+                  Provider
+                </p>
                 <select
                   phx-change="change_provider"
                   name="provider"
@@ -430,13 +524,19 @@ defmodule FounderPadWeb.AgentDetailLive do
               </div>
 
               <div>
-                <p class="text-[10px] font-bold tracking-wider uppercase text-on-surface-variant mb-2">Model</p>
+                <p class="text-[10px] font-bold tracking-wider uppercase text-on-surface-variant mb-2">
+                  Model
+                </p>
                 <select
                   phx-change="change_model"
                   name="model"
                   class="w-full bg-surface-container-highest rounded-lg px-4 py-3 text-sm text-on-surface focus:ring-1 focus:ring-primary"
                 >
-                  <option :for={{label, value} <- models_for_provider(@provider)} value={value} selected={@model == value}>
+                  <option
+                    :for={{label, value} <- models_for_provider(@provider)}
+                    value={value}
+                    selected={@model == value}
+                  >
                     {label}
                   </option>
                 </select>
@@ -444,24 +544,43 @@ defmodule FounderPadWeb.AgentDetailLive do
 
               <div>
                 <div class="flex justify-between items-center mb-3">
-                  <p class="text-[10px] font-bold tracking-wider uppercase text-on-surface-variant">Temperature</p>
+                  <p class="text-[10px] font-bold tracking-wider uppercase text-on-surface-variant">
+                    Temperature
+                  </p>
                   <span class="text-sm font-mono text-primary font-bold">{@temperature}</span>
                 </div>
-                <input type="range" min="0" max="1" step="0.1" value={@temperature}
-                  phx-change="update_temperature" name="value"
-                  class="w-full h-1.5 bg-surface-container-highest rounded-full appearance-none cursor-pointer accent-primary" />
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.1"
+                  value={@temperature}
+                  phx-change="update_temperature"
+                  name="value"
+                  class="w-full h-1.5 bg-surface-container-highest rounded-full appearance-none cursor-pointer accent-primary"
+                />
                 <div class="flex justify-between text-[10px] text-on-surface-variant mt-1">
                   <span>Precise</span><span>Creative</span>
                 </div>
               </div>
 
               <div>
-                <p class="text-[10px] font-bold tracking-wider uppercase text-on-surface-variant mb-2">Max Tokens</p>
+                <p class="text-[10px] font-bold tracking-wider uppercase text-on-surface-variant mb-2">
+                  Max Tokens
+                </p>
                 <div class="grid grid-cols-4 gap-2 bg-surface-container-high p-1 rounded-lg text-xs font-mono font-medium">
-                  <button :for={t <- [1024, 2048, 4096, 8192]}
-                    phx-click="set_max_tokens" phx-value-tokens={t}
-                    class={["py-2 rounded-md transition-colors",
-                      if(@max_tokens == t, do: "bg-primary text-on-primary", else: "text-on-surface-variant hover:text-on-surface")]}>
+                  <button
+                    :for={t <- [1024, 2048, 4096, 8192]}
+                    phx-click="set_max_tokens"
+                    phx-value-tokens={t}
+                    class={[
+                      "py-2 rounded-md transition-colors",
+                      if(@max_tokens == t,
+                        do: "bg-primary text-on-primary",
+                        else: "text-on-surface-variant hover:text-on-surface"
+                      )
+                    ]}
+                  >
                     {t}
                   </button>
                 </div>
@@ -470,18 +589,29 @@ defmodule FounderPadWeb.AgentDetailLive do
               <div class="bg-surface-container-low p-4 rounded-xl flex items-center justify-between">
                 <div>
                   <p class="text-sm font-bold text-on-surface">Auto-Recovery</p>
-                  <p class="text-[10px] text-on-surface-variant mt-0.5">Automatically retry on failure</p>
+                  <p class="text-[10px] text-on-surface-variant mt-0.5">
+                    Automatically retry on failure
+                  </p>
                 </div>
-                <button phx-click="toggle_recovery" class={[
-                  "w-11 h-6 rounded-full transition-colors relative",
-                  if(@auto_recovery, do: "bg-primary", else: "bg-surface-container-highest")
-                ]}>
-                  <span class={["absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform",
-                    if(@auto_recovery, do: "left-[22px]", else: "left-0.5")]}></span>
+                <button
+                  phx-click="toggle_recovery"
+                  class={[
+                    "w-11 h-6 rounded-full transition-colors relative",
+                    if(@auto_recovery, do: "bg-primary", else: "bg-surface-container-highest")
+                  ]}
+                >
+                  <span class={[
+                    "absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform",
+                    if(@auto_recovery, do: "left-[22px]", else: "left-0.5")
+                  ]}>
+                  </span>
                 </button>
               </div>
 
-              <button phx-click="save_config" class="w-full primary-gradient py-3 rounded-lg text-sm font-bold transition-transform hover:scale-[1.01] active:scale-95">
+              <button
+                phx-click="save_config"
+                class="w-full primary-gradient py-3 rounded-lg text-sm font-bold transition-transform hover:scale-[1.01] active:scale-95"
+              >
                 Save Configuration
               </button>
             </div>
@@ -495,10 +625,15 @@ defmodule FounderPadWeb.AgentDetailLive do
               <h3 class="font-bold text-sm text-on-surface">Security Context</h3>
             </div>
             <p class="text-xs text-on-surface-variant leading-relaxed mb-4">
-              This agent has <span class="text-primary font-mono font-bold">READ/WRITE</span> access to conversations and messages. All actions are audit-logged.
+              This agent has <span class="text-primary font-mono font-bold">READ/WRITE</span>
+              access to conversations and messages. All actions are audit-logged.
             </p>
-            <a href="/settings" class="text-xs font-bold text-primary flex items-center gap-1 hover:underline">
-              Review Permissions <span class="material-symbols-outlined text-[14px]">arrow_outward</span>
+            <a
+              href="/settings"
+              class="text-xs font-bold text-primary flex items-center gap-1 hover:underline"
+            >
+              Review Permissions
+              <span class="material-symbols-outlined text-[14px]">arrow_outward</span>
             </a>
           </div>
 
@@ -515,7 +650,9 @@ defmodule FounderPadWeb.AgentDetailLive do
               </div>
               <div class="flex justify-between">
                 <span class="text-on-surface-variant">Created</span>
-                <span class="font-mono text-on-surface">{Calendar.strftime(@agent.inserted_at, "%b %d, %Y")}</span>
+                <span class="font-mono text-on-surface">
+                  {Calendar.strftime(@agent.inserted_at, "%b %d, %Y")}
+                </span>
               </div>
               <div class="flex justify-between">
                 <span class="text-on-surface-variant">Tools</span>
@@ -547,7 +684,9 @@ defmodule FounderPadWeb.AgentDetailLive do
               <span class={"shrink-0 font-bold " <> log_color(log.level)}>[{log.level}]</span>
               <span class="text-[#c9d1d9] break-all">{log.msg}</span>
             </div>
-            <div :if={@logs == []} class="text-[#484f58]">No logs yet. Agent activity will appear here.</div>
+            <div :if={@logs == []} class="text-[#484f58]">
+              No logs yet. Agent activity will appear here.
+            </div>
             <div class="flex gap-2 pt-2 text-[#484f58] animate-pulse">
               <span>$</span>
               <span class="w-2 h-4 bg-[#484f58] block relative top-1"></span>
@@ -577,7 +716,12 @@ defmodule FounderPadWeb.AgentDetailLive do
     """
   end
 
-  defp models_for_provider(:anthropic), do: [{"Claude Sonnet 4", "claude-sonnet-4-20250514"}, {"Claude Opus 4", "claude-opus-4-20250514"}]
+  defp models_for_provider(:anthropic),
+    do: [
+      {"Claude Sonnet 4", "claude-sonnet-4-20250514"},
+      {"Claude Opus 4", "claude-opus-4-20250514"}
+    ]
+
   defp models_for_provider(:openai), do: [{"GPT-4o", "gpt-4o"}, {"GPT-4o Mini", "gpt-4o-mini"}]
   defp models_for_provider(_), do: models_for_provider(:anthropic)
 
@@ -596,7 +740,9 @@ defmodule FounderPadWeb.AgentDetailLive do
          |> Ash.Query.sort(inserted_at: :desc)
          |> Ash.Query.limit(1)
          |> Ash.read() do
-      {:ok, [conv | _]} -> conv
+      {:ok, [conv | _]} ->
+        conv
+
       _ ->
         {:ok, conv} =
           FounderPad.AI.Conversation
@@ -607,6 +753,7 @@ defmodule FounderPadWeb.AgentDetailLive do
             user_id: user && user.id
           })
           |> Ash.create()
+
         conv
     end
   end
@@ -616,21 +763,28 @@ defmodule FounderPadWeb.AgentDetailLive do
          |> Ash.Query.filter(conversation_id: conversation_id)
          |> Ash.Query.sort(inserted_at: :asc)
          |> Ash.read() do
-      {:ok, msgs} -> Enum.map(msgs, fn m -> %{role: m.role, content: m.content, time: format_time(m.inserted_at)} end)
-      _ -> []
+      {:ok, msgs} ->
+        Enum.map(msgs, fn m ->
+          %{role: m.role, content: m.content, time: format_time(m.inserted_at)}
+        end)
+
+      _ ->
+        []
     end
   end
 
   defp compute_agent_stats(agent) do
-    convos = case FounderPad.AI.Conversation |> Ash.Query.filter(agent_id: agent.id) |> Ash.count() do
-      {:ok, n} -> n; _ -> 0
-    end
+    convos =
+      case FounderPad.AI.Conversation |> Ash.Query.filter(agent_id: agent.id) |> Ash.count() do
+        {:ok, n} -> n
+        _ -> 0
+      end
 
-    msgs = case FounderPad.AI.Message
-         |> Ash.Query.new()
-         |> Ash.count() do
-      {:ok, n} -> n; _ -> 0
-    end
+    msgs =
+      case FounderPad.AI.Message |> Ash.Query.new() |> Ash.count() do
+        {:ok, n} -> n
+        _ -> 0
+      end
 
     %{
       conversations: convos,
@@ -658,7 +812,9 @@ defmodule FounderPadWeb.AgentDetailLive do
             msg: "#{l.action} — #{inspect(l.changes)}"
           }
         end)
-      _ -> sample_logs()
+
+      _ ->
+        sample_logs()
     end
   end
 
@@ -672,12 +828,15 @@ defmodule FounderPadWeb.AgentDetailLive do
           %{
             timestamp: format_time(e.inserted_at),
             action: e.event_name,
-            entity: e.organisation_id && String.slice(to_string(e.organisation_id), 0..7) || "system",
+            entity:
+              (e.organisation_id && String.slice(to_string(e.organisation_id), 0..7)) || "system",
             impact: "Recorded",
             impact_color: "text-on-surface-variant"
           }
         end)
-      _ -> []
+
+      _ ->
+        []
     end
   end
 
@@ -716,8 +875,7 @@ defmodule FounderPadWeb.AgentDetailLive do
   defp user_initials(name) when is_binary(name) and byte_size(name) > 0 do
     name
     |> String.split(" ", parts: 2)
-    |> Enum.map(&String.first/1)
-    |> Enum.join()
+    |> Enum.map_join(&String.first/1)
     |> String.upcase()
   end
 

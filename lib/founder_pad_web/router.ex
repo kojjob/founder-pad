@@ -91,12 +91,16 @@ defmodule FounderPadWeb.Router do
       live "/dashboard", DashboardLive
       live "/activity", ActivityLive
       live "/workspaces", WorkspacesLive
-      live "/agents", AgentsLive
-      live "/agents/new", AgentCreateLive
-      live "/agents/templates", AgentTemplatesLive
-      live "/agents/:id", AgentDetailLive
-      live "/agents/:id/analytics", AgentAnalyticsLive
-      live "/agents/:id/widget", WidgetConfigLive
+
+      if FounderPad.FeatureConfig.ai_enabled?() do
+        live "/agents", AgentsLive
+        live "/agents/new", AgentCreateLive
+        live "/agents/templates", AgentTemplatesLive
+        live "/agents/:id", AgentDetailLive
+        live "/agents/:id/analytics", AgentAnalyticsLive
+        live "/agents/:id/widget", WidgetConfigLive
+      end
+
       live "/billing", BillingLive
       live "/team", TeamLive
       live "/settings", SettingsLive
@@ -142,7 +146,10 @@ defmodule FounderPadWeb.Router do
         live "/help/new", HelpArticleEditorLive
         live "/help/:id/edit", HelpArticleEditorLive
         live "/incidents", IncidentsLive
-        live "/templates", AgentTemplatesLive
+
+        if FounderPad.FeatureConfig.ai_enabled?() do
+          live "/templates", AgentTemplatesLive
+        end
       end
     end
 
@@ -150,10 +157,12 @@ defmodule FounderPadWeb.Router do
   end
 
   # Widget routes (public, no auth required)
-  scope "/widget", FounderPadWeb do
-    pipe_through :api_public
-    get "/embed/:agent_id", WidgetController, :script
-    get "/chat/:agent_id", WidgetController, :chat
+  if FounderPad.FeatureConfig.ai_enabled?() do
+    scope "/widget", FounderPadWeb do
+      pipe_through :api_public
+      get "/embed/:agent_id", WidgetController, :script
+      get "/chat/:agent_id", WidgetController, :chat
+    end
   end
 
   # Global search API (no API key required)

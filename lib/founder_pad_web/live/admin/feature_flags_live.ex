@@ -73,7 +73,10 @@ defmodule FounderPadWeb.Admin.FeatureFlagsLive do
                   <span :if={flag.enabled} class="material-symbols-outlined text-3xl text-green-600">
                     toggle_on
                   </span>
-                  <span :if={!flag.enabled} class="material-symbols-outlined text-3xl text-neutral-400">
+                  <span
+                    :if={!flag.enabled}
+                    class="material-symbols-outlined text-3xl text-neutral-400"
+                  >
                     toggle_off
                   </span>
                 </button>

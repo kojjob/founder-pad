@@ -47,7 +47,10 @@ defmodule FounderPadWeb.Blog.BlogCategoryLive do
           <h1 class="font-heading text-4xl md:text-5xl font-extrabold tracking-tight text-on-surface mb-4">
             {@category.name}
           </h1>
-          <p :if={@category.description} class="text-on-surface-variant text-lg max-w-2xl mx-auto leading-relaxed">
+          <p
+            :if={@category.description}
+            class="text-on-surface-variant text-lg max-w-2xl mx-auto leading-relaxed"
+          >
             {@category.description}
           </p>
         </div>

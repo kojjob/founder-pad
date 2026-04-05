@@ -199,7 +199,7 @@ defmodule FounderPadWeb.Auth.RegisterLive do
       other ->
         inspect(other)
     end)
-    |> Enum.join(". ")
+    |> Enum.map_join(". ", & &1)
   end
 
   defp extract_errors(_), do: "Registration failed. Please try again."

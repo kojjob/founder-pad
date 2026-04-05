@@ -62,15 +62,31 @@ config :phoenix, :json_library, Jason
 
 # Ash Framework
 config :founder_pad,
-  ash_domains: [FounderPad.Accounts, FounderPad.Billing, FounderPad.AI, FounderPad.Notifications, FounderPad.Audit, FounderPad.FeatureFlags, FounderPad.Webhooks, FounderPad.Analytics, FounderPad.Content, FounderPad.ApiKeys, FounderPad.HelpCenter, FounderPad.Privacy, FounderPad.System, FounderPad.Referrals]
+  # To disable AI agents, set :ai_enabled to false and remove FounderPad.AI from ash_domains
+  ash_domains: [
+    FounderPad.Accounts,
+    FounderPad.Billing,
+    FounderPad.AI,
+    FounderPad.Notifications,
+    FounderPad.Audit,
+    FounderPad.FeatureFlags,
+    FounderPad.Webhooks,
+    FounderPad.Analytics,
+    FounderPad.Content,
+    FounderPad.ApiKeys,
+    FounderPad.HelpCenter,
+    FounderPad.Privacy,
+    FounderPad.System,
+    FounderPad.Referrals
+  ]
 
 # Token signing secret — loaded from env var; fallback only for dev/test
 config :founder_pad,
-  token_signing_secret: System.get_env("TOKEN_SIGNING_SECRET", "dev-only-not-for-production-at-least-32-bytes!!")
+  token_signing_secret:
+    System.get_env("TOKEN_SIGNING_SECRET", "dev-only-not-for-production-at-least-32-bytes!!")
 
 # Database
-config :founder_pad, FounderPad.Repo,
-  migration_primary_key: [name: :id, type: :binary_id]
+config :founder_pad, FounderPad.Repo, migration_primary_key: [name: :id, type: :binary_id]
 
 config :founder_pad,
   ecto_repos: [FounderPad.Repo]
@@ -81,11 +97,12 @@ config :founder_pad, Oban,
   queues: [default: 10, mailers: 20, billing: 5, ai: 3],
   repo: FounderPad.Repo,
   plugins: [
-    {Oban.Plugins.Cron, crontab: [
-      {"*/5 * * * *", FounderPad.Content.Workers.PublishScheduledPostsWorker},
-      {"0 3 * * *", FounderPad.Privacy.Workers.HardDeleteWorker},
-      {"0 9 * * 1", FounderPad.Notifications.Workers.WeeklyDigestWorker}
-    ]}
+    {Oban.Plugins.Cron,
+     crontab: [
+       {"*/5 * * * *", FounderPad.Content.Workers.PublishScheduledPostsWorker},
+       {"0 3 * * *", FounderPad.Privacy.Workers.HardDeleteWorker},
+       {"0 9 * * 1", FounderPad.Notifications.Workers.WeeklyDigestWorker}
+     ]}
   ]
 
 # Stripe (keys loaded from runtime.exs)
@@ -94,6 +111,9 @@ config :stripity_stripe,
 
 # Demo mode
 config :founder_pad, :demo_mode, System.get_env("DEMO_MODE") == "true"
+
+# AI agents feature — set to false to disable AI agent management
+config :founder_pad, :ai_enabled, true
 
 # Import branding and plans config
 import_config "branding.exs"

@@ -19,13 +19,19 @@ defmodule FounderPadWeb.TermsLive do
         <p><em>Last updated: April 2026</em></p>
 
         <h2>1. Acceptance of Terms</h2>
-        <p>By accessing or using FounderPad, you agree to be bound by these Terms of Service and our Privacy Policy.</p>
+        <p>
+          By accessing or using FounderPad, you agree to be bound by these Terms of Service and our Privacy Policy.
+        </p>
 
         <h2>2. Description of Service</h2>
-        <p>FounderPad provides an AI agent management platform that allows users to create, configure, and deploy AI-powered agents.</p>
+        <p>
+          FounderPad provides an AI agent management platform that allows users to create, configure, and deploy AI-powered agents.
+        </p>
 
         <h2>3. User Accounts</h2>
-        <p>You are responsible for maintaining the security of your account credentials. You must provide accurate information when creating an account.</p>
+        <p>
+          You are responsible for maintaining the security of your account credentials. You must provide accurate information when creating an account.
+        </p>
 
         <h2>4. Acceptable Use</h2>
         <p>You agree not to misuse the service, including but not limited to:</p>
@@ -37,19 +43,29 @@ defmodule FounderPadWeb.TermsLive do
         </ul>
 
         <h2>5. Intellectual Property</h2>
-        <p>You retain ownership of content you create using FounderPad. We retain ownership of the platform and its underlying technology.</p>
+        <p>
+          You retain ownership of content you create using FounderPad. We retain ownership of the platform and its underlying technology.
+        </p>
 
         <h2>6. Payment Terms</h2>
-        <p>Paid plans are billed in advance on a monthly or annual basis. Refunds are handled on a case-by-case basis.</p>
+        <p>
+          Paid plans are billed in advance on a monthly or annual basis. Refunds are handled on a case-by-case basis.
+        </p>
 
         <h2>7. Termination</h2>
-        <p>Either party may terminate the agreement at any time. Upon termination, you may export your data within 30 days.</p>
+        <p>
+          Either party may terminate the agreement at any time. Upon termination, you may export your data within 30 days.
+        </p>
 
         <h2>8. Limitation of Liability</h2>
-        <p>FounderPad is provided "as is" without warranties. We are not liable for indirect, incidental, or consequential damages.</p>
+        <p>
+          FounderPad is provided "as is" without warranties. We are not liable for indirect, incidental, or consequential damages.
+        </p>
 
         <h2>9. Changes to Terms</h2>
-        <p>We may update these terms from time to time. Continued use of the service constitutes acceptance of the updated terms.</p>
+        <p>
+          We may update these terms from time to time. Continued use of the service constitutes acceptance of the updated terms.
+        </p>
 
         <h2>10. Contact</h2>
         <p>For questions about these terms: <a href="/help/contact">Contact Support</a></p>

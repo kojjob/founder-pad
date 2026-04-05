@@ -57,7 +57,12 @@ defmodule FounderPadWeb.AuditLogLive do
     logs = load_logs(socket.assigns.filters, socket.assigns.search_query, :all)
     csv = build_csv(logs)
 
-    {:noreply, push_event(socket, "download", %{data: csv, filename: "audit_log.csv", content_type: "text/csv"})}
+    {:noreply,
+     push_event(socket, "download", %{
+       data: csv,
+       filename: "audit_log.csv",
+       content_type: "text/csv"
+     })}
   end
 
   def handle_event("refresh", _, socket) do
@@ -76,18 +81,25 @@ defmodule FounderPadWeb.AuditLogLive do
       <section class="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
           <div class="flex items-center gap-2 text-xs font-mono text-on-surface-variant/60 uppercase tracking-widest mb-2">
-            <span class="material-symbols-outlined text-sm text-primary">shield</span>
-            Compliance
+            <span class="material-symbols-outlined text-sm text-primary">shield</span> Compliance
           </div>
           <h1 class="text-4xl font-extrabold font-headline tracking-tight">Audit Log</h1>
-          <p class="text-on-surface-variant mt-1">Immutable record of all system actions for compliance and security review.</p>
+          <p class="text-on-surface-variant mt-1">
+            Immutable record of all system actions for compliance and security review.
+          </p>
         </div>
         <div class="flex items-center gap-3">
-          <button phx-click="export_csv" class="px-4 py-2 text-sm font-medium rounded-lg bg-surface-container-high text-on-surface hover:bg-surface-container-highest transition-colors flex items-center gap-2">
-            <span class="material-symbols-outlined text-sm">download</span>
-            Export CSV
+          <button
+            phx-click="export_csv"
+            class="px-4 py-2 text-sm font-medium rounded-lg bg-surface-container-high text-on-surface hover:bg-surface-container-highest transition-colors flex items-center gap-2"
+          >
+            <span class="material-symbols-outlined text-sm">download</span> Export CSV
           </button>
-          <button phx-click="refresh" class="p-2 text-on-surface-variant hover:text-primary rounded-lg hover:bg-surface-container-high transition-colors" title="Refresh">
+          <button
+            phx-click="refresh"
+            class="p-2 text-on-surface-variant hover:text-primary rounded-lg hover:bg-surface-container-high transition-colors"
+            title="Refresh"
+          >
             <span class="material-symbols-outlined">refresh</span>
           </button>
         </div>
@@ -130,7 +142,9 @@ defmodule FounderPadWeb.AuditLogLive do
         <%!-- Search --%>
         <div class="flex gap-3">
           <div class="flex-1 relative">
-            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">search</span>
+            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">
+              search
+            </span>
             <input
               type="text"
               placeholder="Search by resource type, IP address..."
@@ -176,10 +190,14 @@ defmodule FounderPadWeb.AuditLogLive do
 
       <%!-- Empty State --%>
       <div :if={@logs == []} class="text-center py-16">
-        <span class="material-symbols-outlined text-6xl text-on-surface-variant/30 mb-4 block">shield</span>
+        <span class="material-symbols-outlined text-6xl text-on-surface-variant/30 mb-4 block">
+          shield
+        </span>
         <h3 class="text-xl font-bold font-headline text-on-surface mb-2">No audit logs found</h3>
         <p class="text-on-surface-variant">
-          {if @filters != %{} or @search_query != "", do: "Try adjusting your filters or search query.", else: "Audit events will appear here as actions are performed."}
+          {if @filters != %{} or @search_query != "",
+            do: "Try adjusting your filters or search query.",
+            else: "Audit events will appear here as actions are performed."}
         </p>
       </div>
 
@@ -196,18 +214,29 @@ defmodule FounderPadWeb.AuditLogLive do
             class="w-full px-6 py-3 flex items-center gap-4 hover:bg-surface-container-high/50 transition-colors text-left"
           >
             <div class={"w-8 h-8 rounded flex items-center justify-center shrink-0 #{action_bg(log.action)}"}>
-              <span class={"material-symbols-outlined text-sm #{action_text(log.action)}"}>{action_icon(log.action)}</span>
+              <span class={"material-symbols-outlined text-sm #{action_text(log.action)}"}>
+                {action_icon(log.action)}
+              </span>
             </div>
             <div class="flex-1 min-w-0 grid grid-cols-12 gap-2 items-center">
               <div class="col-span-2">
-                <span class={["px-1.5 py-0.5 rounded text-[10px] font-bold uppercase", action_badge(log.action)]}>
+                <span class={[
+                  "px-1.5 py-0.5 rounded text-[10px] font-bold uppercase",
+                  action_badge(log.action)
+                ]}>
                   {log.action}
                 </span>
               </div>
-              <div class="col-span-2 text-sm font-medium text-on-surface truncate">{log.resource_type}</div>
-              <div class="col-span-3 text-xs font-mono text-on-surface-variant truncate">{short_id(log.resource_id)}</div>
+              <div class="col-span-2 text-sm font-medium text-on-surface truncate">
+                {log.resource_type}
+              </div>
+              <div class="col-span-3 text-xs font-mono text-on-surface-variant truncate">
+                {short_id(log.resource_id)}
+              </div>
               <div class="col-span-2 text-xs text-on-surface-variant">{log.ip_address || "—"}</div>
-              <div class="col-span-3 text-xs font-mono text-on-surface-variant">{format_time(log.inserted_at)}</div>
+              <div class="col-span-3 text-xs font-mono text-on-surface-variant">
+                {format_time(log.inserted_at)}
+              </div>
             </div>
             <span class="material-symbols-outlined text-on-surface-variant text-sm shrink-0">
               {if @expanded_id == log.id, do: "expand_less", else: "expand_more"}
@@ -215,14 +244,19 @@ defmodule FounderPadWeb.AuditLogLive do
           </button>
 
           <%!-- Expanded Details --%>
-          <div :if={@expanded_id == log.id} class="border-t border-outline-variant/20 px-6 py-4 space-y-4 bg-surface-container-high/20">
+          <div
+            :if={@expanded_id == log.id}
+            class="border-t border-outline-variant/20 px-6 py-4 space-y-4 bg-surface-container-high/20"
+          >
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <p class="text-xs font-mono text-on-surface-variant uppercase mb-1">Actor ID</p>
                 <p class="text-sm font-mono">{log.actor_id || "System"}</p>
               </div>
               <div>
-                <p class="text-xs font-mono text-on-surface-variant uppercase mb-1">Organisation ID</p>
+                <p class="text-xs font-mono text-on-surface-variant uppercase mb-1">
+                  Organisation ID
+                </p>
                 <p class="text-sm font-mono">{log.organisation_id || "—"}</p>
               </div>
               <div>
@@ -333,7 +367,8 @@ defmodule FounderPadWeb.AuditLogLive do
   end
 
   defp build_csv(logs) do
-    header = "timestamp,action,resource_type,resource_id,actor_id,organisation_id,ip_address,user_agent,changes,metadata\n"
+    header =
+      "timestamp,action,resource_type,resource_id,actor_id,organisation_id,ip_address,user_agent,changes,metadata\n"
 
     rows =
       Enum.map(logs, fn log ->
@@ -349,9 +384,9 @@ defmodule FounderPadWeb.AuditLogLive do
           csv_escape(Jason.encode!(log.changes || %{})),
           csv_escape(Jason.encode!(log.metadata || %{}))
         ]
-        |> Enum.join(",")
+        |> Enum.map_join(",", & &1)
       end)
-      |> Enum.join("\n")
+      |> Enum.map_join("\n", & &1)
 
     header <> rows
   end

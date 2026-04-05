@@ -171,7 +171,9 @@ defmodule FounderPadWeb.Admin.BlogCategoriesLive do
     user = socket.assigns.current_user
 
     case FounderPad.Content.Category
-         |> Ash.Changeset.for_create(:create, %{name: name, description: description}, actor: user)
+         |> Ash.Changeset.for_create(:create, %{name: name, description: description},
+           actor: user
+         )
          |> Ash.create() do
       {:ok, _category} ->
         {:noreply,
@@ -199,12 +201,18 @@ defmodule FounderPadWeb.Admin.BlogCategoriesLive do
     {:noreply, assign(socket, editing_id: nil)}
   end
 
-  def handle_event("update", %{"category_id" => id, "name" => name, "description" => description}, socket) do
+  def handle_event(
+        "update",
+        %{"category_id" => id, "name" => name, "description" => description},
+        socket
+      ) do
     user = socket.assigns.current_user
     cat = Ash.get!(FounderPad.Content.Category, id, actor: user)
 
     case cat
-         |> Ash.Changeset.for_update(:update, %{name: name, description: description}, actor: user)
+         |> Ash.Changeset.for_update(:update, %{name: name, description: description},
+           actor: user
+         )
          |> Ash.update() do
       {:ok, _} ->
         {:noreply,
