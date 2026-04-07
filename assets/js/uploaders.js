@@ -23,6 +23,7 @@ Uploaders.S3 = function(entries, onViewError) {
     xhr.onload = () => {
       if (xhr.status === 200 || xhr.status === 204) {
         entry.progress(100)
+        entry.done()
       } else {
         entry.error("Upload failed with status " + xhr.status)
       }

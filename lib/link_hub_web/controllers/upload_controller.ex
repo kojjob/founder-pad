@@ -33,6 +33,27 @@ defmodule LinkHubWeb.UploadController do
     user = conn.assigns[:current_user]
     workspace_id = params["workspace_id"]
 
+    require Ash.Query
+
+    # Verify user is a member of the workspace
+    membership_check =
+      LinkHub.Accounts.Membership
+      |> Ash.Query.filter(user_id == ^user.id and workspace_id == ^workspace_id)
+      |> Ash.read_one()
+
+    case membership_check do
+      {:ok, nil} ->
+        conn |> put_status(:forbidden) |> json(%{error: "Not a member of this workspace"})
+
+      {:error, _} ->
+        conn |> put_status(:forbidden) |> json(%{error: "Not a member of this workspace"})
+
+      {:ok, _membership} ->
+        do_initiate(conn, user, workspace_id, filename, content_type, size_bytes)
+    end
+  end
+
+  defp do_initiate(conn, user, workspace_id, filename, content_type, size_bytes) do
     storage_key = "uploads/#{Ash.UUID.generate()}/#{filename}"
 
     case LinkHub.Media.Storage.presigned_upload_url(storage_key, content_type: content_type) do
@@ -76,7 +97,9 @@ defmodule LinkHubWeb.UploadController do
   end
 
   def complete(conn, %{"file_id" => file_id}) do
-    case Ash.get(LinkHub.Media.StoredFile, file_id) do
+    user = conn.assigns[:current_user]
+
+    case get_file_for_user(file_id, user) do
       {:ok, _file} ->
         %{"file_id" => file_id}
         |> LinkHub.Media.Workers.FileProcessor.new()
@@ -84,7 +107,7 @@ defmodule LinkHubWeb.UploadController do
 
         json(conn, %{status: "processing", file_id: file_id})
 
-      {:error, _} ->
+      {:error, :not_found} ->
         conn
         |> put_status(:not_found)
         |> json(%{error: "File not found"})
@@ -92,7 +115,9 @@ defmodule LinkHubWeb.UploadController do
   end
 
   def get_url(conn, %{"file_id" => file_id}) do
-    case Ash.get(LinkHub.Media.StoredFile, file_id) do
+    user = conn.assigns[:current_user]
+
+    case get_file_for_user(file_id, user) do
       {:ok, file} ->
         case LinkHub.Media.Storage.presigned_download_url(file.storage_key) do
           {:ok, url} ->
@@ -108,10 +133,31 @@ defmodule LinkHubWeb.UploadController do
             |> json(%{error: "Failed to generate download URL"})
         end
 
-      {:error, _} ->
+      {:error, :not_found} ->
         conn
         |> put_status(:not_found)
         |> json(%{error: "File not found"})
+    end
+  end
+
+  defp get_file_for_user(file_id, user) do
+    case Ash.get(LinkHub.Media.StoredFile, file_id) do
+      {:ok, file} ->
+        if file.uploader_id == user.id do
+          {:ok, file}
+        else
+          # Check workspace membership
+          file = Ash.load!(file, workspace: [:memberships])
+
+          if Enum.any?(file.workspace.memberships, &(&1.user_id == user.id)) do
+            {:ok, file}
+          else
+            {:error, :not_found}
+          end
+        end
+
+      {:error, _} ->
+        {:error, :not_found}
     end
   end
 end

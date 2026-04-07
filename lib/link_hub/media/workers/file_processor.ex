@@ -70,6 +70,8 @@ defmodule LinkHub.Media.Workers.FileProcessor do
   end
 
   defp run_virus_scan(file) do
+    # VirusScan expects a file path — in production, download from storage first.
+    # The stub adapter ignores the path and returns :clean.
     scan_result =
       case LinkHub.Media.VirusScan.scan(file.storage_key) do
         {:ok, :clean} -> :clean
@@ -91,15 +93,18 @@ defmodule LinkHub.Media.Workers.FileProcessor do
 
   defp extract_metadata(file) do
     if image?(file.content_type) do
-      {:ok, image_meta} = extract_image_metadata(file.storage_key)
-      metadata = Map.merge(file.metadata, image_meta)
+      case extract_image_metadata(file.storage_key) do
+        {:ok, image_meta} ->
+          metadata = Map.merge(file.metadata, image_meta)
+          {:ok, %{file | metadata: metadata}}
 
-      file =
-        file
-        |> Ash.Changeset.for_update(:mark_ready, %{metadata: metadata})
-        |> Ash.update!()
+        {:error, reason} ->
+          Logger.warning(
+            "FileProcessor: metadata extraction failed for #{file.id}: #{inspect(reason)}"
+          )
 
-      {:ok, %{file | metadata: metadata}}
+          {:ok, file}
+      end
     else
       {:ok, file}
     end

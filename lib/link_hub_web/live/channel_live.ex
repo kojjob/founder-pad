@@ -194,7 +194,12 @@ defmodule LinkHubWeb.ChannelLive do
     user = socket.assigns.current_user
     workspace = socket.assigns.workspace
 
-    visibility_atom = String.to_existing_atom(visibility)
+    visibility_atom =
+      case visibility do
+        "public" -> :public
+        "private" -> :private
+        _ -> :public
+      end
 
     case LinkHub.Messaging.Channel
          |> Ash.Changeset.for_create(:create, %{

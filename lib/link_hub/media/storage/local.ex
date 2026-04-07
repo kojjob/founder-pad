@@ -8,8 +8,10 @@ defmodule LinkHub.Media.Storage.Local do
 
   @impl true
   def presigned_upload_url(key, _opts) do
-    base_url = LinkHubWeb.Endpoint.url()
-    {:ok, "#{base_url}/api/uploads/local/#{key}"}
+    # Local adapter uses server-side upload_file/3 via ChannelLive's
+    # consume_uploaded_entries, not client-side presigned URLs.
+    # Return a placeholder — the actual file is written by upload_file/3.
+    {:ok, "local://#{key}"}
   end
 
   @impl true

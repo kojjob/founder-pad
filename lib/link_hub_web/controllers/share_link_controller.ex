@@ -57,15 +57,16 @@ defmodule LinkHubWeb.ShareLinkController do
     if link.max_downloads && link.download_count >= link.max_downloads do
       conn |> put_status(:gone) |> json(%{error: "Download limit reached"})
     else
-      link
-      |> Ash.Changeset.for_update(:record_download)
-      |> Ash.update!()
-
       case LinkHub.Media.Storage.presigned_download_url(
              link.stored_file.storage_key,
              filename: link.stored_file.filename
            ) do
         {:ok, url} ->
+          # Record download AFTER successful URL generation
+          link
+          |> Ash.Changeset.for_update(:record_download)
+          |> Ash.update!()
+
           json(conn, %{
             download_url: url,
             filename: link.stored_file.filename,
