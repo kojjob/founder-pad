@@ -28,12 +28,31 @@ import Analytics from "./hooks/analytics"
 import ScrollReveal from "./hooks/scroll_reveal"
 import AutoDismiss from "./hooks/auto_dismiss"
 import ThemeSettings from "./hooks/theme_settings"
+import Uploaders from "./uploaders"
+
+// Messaging hooks
+const ScrollBottom = {
+  mounted() {
+    this.el.scrollTop = this.el.scrollHeight
+    this.observer = new MutationObserver(() => {
+      this.el.scrollTop = this.el.scrollHeight
+    })
+    this.observer.observe(this.el, { childList: true, subtree: true })
+  },
+  updated() {
+    this.el.scrollTop = this.el.scrollHeight
+  },
+  destroyed() {
+    if (this.observer) this.observer.disconnect()
+  }
+}
 
 const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 const liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,
   params: {_csrf_token: csrfToken},
-  hooks: {ThemeToggle, Analytics, ScrollReveal, AutoDismiss, ThemeSettings},
+  hooks: {ThemeToggle, Analytics, ScrollReveal, AutoDismiss, ThemeSettings, ScrollBottom},
+  uploaders: Uploaders,
 })
 
 // Show progress bar on live navigation and form submits
