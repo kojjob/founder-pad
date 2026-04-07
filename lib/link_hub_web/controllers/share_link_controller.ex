@@ -31,10 +31,15 @@ defmodule LinkHubWeb.ShareLinkController do
   def unlock(conn, %{"token" => token, "password" => password}) do
     case get_share_link(token) do
       {:ok, link} ->
-        if Bcrypt.verify_pass(password, link.password_hash || "") do
-          serve_download(conn, link)
-        else
-          conn |> put_status(:unauthorized) |> json(%{error: "Invalid password"})
+        cond do
+          expired?(link) ->
+            conn |> put_status(:gone) |> json(%{error: "Link has expired"})
+
+          Bcrypt.verify_pass(password, link.password_hash || "") ->
+            serve_download(conn, link)
+
+          true ->
+            conn |> put_status(:unauthorized) |> json(%{error: "Invalid password"})
         end
 
       {:error, _} ->
