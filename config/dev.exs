@@ -1,11 +1,11 @@
 import Config
 
 # Database
-config :founder_pad, FounderPad.Repo,
+config :link_hub, LinkHub.Repo,
   username: "postgres",
   password: "postgres",
   hostname: "localhost",
-  database: "founder_pad_dev",
+  database: "link_hub_dev",
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
   pool_size: 10
@@ -16,7 +16,7 @@ config :founder_pad, FounderPad.Repo,
 # The watchers configuration can be used to run external
 # watchers to your application. For example, we can use it
 # to bundle .js and .css sources.
-config :founder_pad, FounderPadWeb.Endpoint,
+config :link_hub, LinkHubWeb.Endpoint,
   # Binding to loopback ipv4 address prevents access from other machines.
   # Change to `ip: {0, 0, 0, 0}` to allow access from other machines.
   http: [ip: {127, 0, 0, 1}],
@@ -25,8 +25,8 @@ config :founder_pad, FounderPadWeb.Endpoint,
   debug_errors: true,
   secret_key_base: "BTgCVIeHS6oYm8sR2iE60Ok0MSsYhlE80chog5RPe82cm5V2NRD6i6mbY4pjMgtX",
   watchers: [
-    esbuild: {Esbuild, :install_and_run, [:founder_pad, ~w(--sourcemap=inline --watch)]},
-    tailwind: {Tailwind, :install_and_run, [:founder_pad, ~w(--watch)]}
+    esbuild: {Esbuild, :install_and_run, [:link_hub, ~w(--sourcemap=inline --watch)]},
+    tailwind: {Tailwind, :install_and_run, [:link_hub, ~w(--watch)]}
   ]
 
 # ## SSL Support
@@ -53,7 +53,7 @@ config :founder_pad, FounderPadWeb.Endpoint,
 # different ports.
 
 # Reload browser tabs when matching files change.
-config :founder_pad, FounderPadWeb.Endpoint,
+config :link_hub, LinkHubWeb.Endpoint,
   live_reload: [
     web_console_logger: true,
     patterns: [
@@ -62,13 +62,13 @@ config :founder_pad, FounderPadWeb.Endpoint,
       # Gettext translations
       ~r"priv/gettext/.*\.po$"E,
       # Router, Controllers, LiveViews and LiveComponents
-      ~r"lib/founder_pad_web/router\.ex$"E,
-      ~r"lib/founder_pad_web/(controllers|live|components)/.*\.(ex|heex)$"E
+      ~r"lib/link_hub_web/router\.ex$"E,
+      ~r"lib/link_hub_web/(controllers|live|components)/.*\.(ex|heex)$"E
     ]
   ]
 
 # Enable dev routes for dashboard and mailbox
-config :founder_pad, dev_routes: true
+config :link_hub, dev_routes: true
 
 # Do not include metadata nor timestamps in development logs
 config :logger, :default_formatter, format: "[$level] $message\n"
@@ -90,3 +90,7 @@ config :phoenix_live_view,
 
 # Disable swoosh api client as it is only required for production adapters.
 config :swoosh, :api_client, false
+
+# Use local filesystem storage adapter in dev
+config :link_hub, :storage_adapter, LinkHub.Media.Storage.Local
+config :link_hub, :storage_bucket, "linkhub-dev"

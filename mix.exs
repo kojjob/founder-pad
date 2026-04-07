@@ -1,9 +1,9 @@
-defmodule FounderPad.MixProject do
+defmodule LinkHub.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :founder_pad,
+      app: :link_hub,
       version: "0.1.0",
       elixir: "~> 1.17",
       elixirc_paths: elixirc_paths(Mix.env()),
@@ -24,7 +24,7 @@ defmodule FounderPad.MixProject do
   # Type `mix help compile.app` for more information.
   def application do
     [
-      mod: {FounderPad.Application, []},
+      mod: {LinkHub.Application, []},
       extra_applications: [:logger, :runtime_tools]
     ]
   end
@@ -76,6 +76,15 @@ defmodule FounderPad.MixProject do
       # HTTP client (for AI providers)
       {:req, "~> 0.5"},
 
+      # Cloud storage (S3)
+      {:ex_aws, "~> 2.5"},
+      {:ex_aws_s3, "~> 2.5"},
+      {:hackney, "~> 1.9"},
+      {:sweet_xml, "~> 0.7"},
+
+      # Image processing
+      {:mogrify, "~> 0.9"},
+
       # Telemetry & monitoring
       {:telemetry_metrics, "~> 1.0"},
       {:telemetry_poller, "~> 1.1"},
@@ -126,10 +135,10 @@ defmodule FounderPad.MixProject do
     [
       setup: ["deps.get", "assets.setup", "assets.build"],
       "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
-      "assets.build": ["compile", "tailwind founder_pad", "esbuild founder_pad"],
+      "assets.build": ["compile", "tailwind link_hub", "esbuild link_hub"],
       "assets.deploy": [
-        "tailwind founder_pad --minify",
-        "esbuild founder_pad --minify",
+        "tailwind link_hub --minify",
+        "esbuild link_hub --minify",
         "phx.digest"
       ],
       precommit: ["compile --warnings-as-errors", "deps.unlock --unused", "format", "test"]
