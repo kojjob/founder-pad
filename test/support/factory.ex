@@ -1,5 +1,5 @@
-defmodule FounderPad.Factory do
-  @moduledoc "Test factories for FounderPad resources."
+defmodule LinkHub.Factory do
+  @moduledoc "Test factories for LinkHub resources."
 
   def unique_email, do: "user_#{System.unique_integer([:positive])}@example.com"
 
@@ -14,7 +14,7 @@ defmodule FounderPad.Factory do
   end
 
   def create_user!(attrs \\ %{}) do
-    FounderPad.Accounts.User
+    LinkHub.Accounts.User
     |> Ash.Changeset.for_create(:register_with_password, %{
       email: attrs[:email] || unique_email(),
       password: attrs[:password] || "Password123!",
@@ -23,7 +23,7 @@ defmodule FounderPad.Factory do
     |> Ash.create!()
   end
 
-  def build_organisation(attrs \\ %{}) do
+  def build_workspace(attrs \\ %{}) do
     default = %{
       name: "Test Org #{System.unique_integer([:positive])}"
     }
@@ -31,26 +31,17 @@ defmodule FounderPad.Factory do
     Map.merge(default, Map.new(attrs))
   end
 
-  def create_admin_user!(attrs \\ %{}) do
-    user = create_user!(attrs)
+  def create_workspace!(attrs \\ %{}) do
+    params = build_workspace(attrs)
 
-    user
-    |> Ash.Changeset.for_update(:update_profile, %{})
-    |> Ash.Changeset.force_change_attribute(:is_admin, true)
-    |> Ash.update!()
-  end
-
-  def create_organisation!(attrs \\ %{}) do
-    params = build_organisation(attrs)
-
-    FounderPad.Accounts.Organisation
+    LinkHub.Accounts.Workspace
     |> Ash.Changeset.for_create(:create, params)
     |> Ash.create!()
   end
 
   def create_membership!(user, org, role \\ :member) do
-    FounderPad.Accounts.Membership
-    |> Ash.Changeset.for_create(:create, %{role: role, user_id: user.id, organisation_id: org.id})
+    LinkHub.Accounts.Membership
+    |> Ash.Changeset.for_create(:create, %{role: role, user_id: user.id, workspace_id: org.id})
     |> Ash.create!()
   end
 
@@ -65,12 +56,14 @@ defmodule FounderPad.Factory do
       features: ["Feature A"],
       max_seats: 5,
       max_agents: 10,
-      max_api_calls_per_month: 10_000
+      max_api_calls_per_month: 10_000,
+      max_file_size_bytes: 20_000_000,
+      max_storage_bytes: 5_368_709_120
     }
 
     params = Map.merge(default, Map.new(attrs))
 
-    FounderPad.Billing.Plan
+    LinkHub.Billing.Plan
     |> Ash.Changeset.for_create(:create, params)
     |> Ash.create!()
   end
@@ -81,12 +74,12 @@ defmodule FounderPad.Factory do
       system_prompt: "You are a helpful test assistant.",
       model: "claude-sonnet-4-20250514",
       provider: :anthropic,
-      organisation_id: org.id
+      workspace_id: org.id
     }
 
     params = Map.merge(default, Map.new(attrs))
 
-    FounderPad.AI.Agent
+    LinkHub.AI.Agent
     |> Ash.Changeset.for_create(:create, params)
     |> Ash.create!()
   end
@@ -98,165 +91,96 @@ defmodule FounderPad.Factory do
       status: :paid,
       period_start: Date.utc_today() |> Date.beginning_of_month(),
       period_end: Date.utc_today() |> Date.end_of_month(),
-      organisation_id: org.id
+      workspace_id: org.id
     }
 
-    FounderPad.Billing.Invoice
+    LinkHub.Billing.Invoice
     |> Ash.Changeset.for_create(:create, Map.merge(default, Map.new(attrs)))
     |> Ash.create!()
   end
 
-  def create_category!(attrs \\ %{}) do
-    admin = Map.get_lazy(attrs, :actor, fn -> create_admin_user!() end)
+  # ── Messaging factories ──
 
-    FounderPad.Content.Category
-    |> Ash.Changeset.for_create(
-      :create,
-      %{
-        name: Map.get(attrs, :name, "Category #{System.unique_integer([:positive])}"),
-        slug: Map.get(attrs, :slug, nil),
-        description: Map.get(attrs, :description, "A test category")
-      }, actor: admin)
-    |> Ash.create!()
-  end
-
-  def create_tag!(attrs \\ %{}) do
-    admin = Map.get_lazy(attrs, :actor, fn -> create_admin_user!() end)
-
-    FounderPad.Content.Tag
-    |> Ash.Changeset.for_create(
-      :create,
-      %{
-        name: Map.get(attrs, :name, "Tag #{System.unique_integer([:positive])}"),
-        slug: Map.get(attrs, :slug, nil)
-      }, actor: admin)
-    |> Ash.create!()
-  end
-
-  def create_post!(attrs \\ %{}) do
-    admin = Map.get_lazy(attrs, :actor, fn -> create_admin_user!() end)
-
-    FounderPad.Content.Post
-    |> Ash.Changeset.for_create(
-      :create,
-      %{
-        title: Map.get(attrs, :title, "Test Post #{System.unique_integer([:positive])}"),
-        slug: Map.get(attrs, :slug, nil),
-        body:
-          Map.get(
-            attrs,
-            :body,
-            "<p>Test post content with enough words to make this realistic for a blog post.</p>"
-          ),
-        excerpt: Map.get(attrs, :excerpt, "Test excerpt"),
-        status: Map.get(attrs, :status, :draft),
-        published_at: Map.get(attrs, :published_at, nil),
-        author_id: admin.id
-      }, actor: admin)
-    |> Ash.create!()
-  end
-
-  def create_published_post!(attrs \\ %{}) do
-    admin = Map.get_lazy(attrs, :actor, fn -> create_admin_user!() end)
-    post = create_post!(Map.put(attrs, :actor, admin))
-
-    post
-    |> Ash.Changeset.for_update(:publish, %{}, actor: admin)
-    |> Ash.update!()
-  end
-
-  def create_changelog_entry!(attrs \\ %{}) do
-    admin = Map.get_lazy(attrs, :actor, fn -> create_admin_user!() end)
-
-    FounderPad.Content.ChangelogEntry
-    |> Ash.Changeset.for_create(
-      :create,
-      %{
-        version: Map.get(attrs, :version, "v#{System.unique_integer([:positive])}.0.0"),
-        title: Map.get(attrs, :title, "Release #{System.unique_integer([:positive])}"),
-        body: Map.get(attrs, :body, "<p>Release notes</p>"),
-        type: Map.get(attrs, :type, :feature),
-        author_id: admin.id
-      }, actor: admin)
-    |> Ash.create!()
-  end
-
-  def create_api_key!(org, user, attrs \\ %{}) do
-    FounderPad.ApiKeys.ApiKey
-    |> Ash.Changeset.for_create(:create, %{
-      name: Map.get(attrs, :name, "Test Key #{System.unique_integer([:positive])}"),
-      scopes: Map.get(attrs, :scopes, [:read]),
-      organisation_id: org.id,
+  def create_channel!(workspace, user, attrs \\ %{}) do
+    default = %{
+      name: "test-channel-#{System.unique_integer([:positive])}",
+      visibility: :public,
+      workspace_id: workspace.id,
       created_by_id: user.id
-    })
+    }
+
+    params = Map.merge(default, Map.new(attrs))
+
+    LinkHub.Messaging.Channel
+    |> Ash.Changeset.for_create(:create, params)
     |> Ash.create!()
   end
 
-  def create_help_category!(attrs \\ %{}) do
-    admin = Map.get_lazy(attrs, :actor, fn -> create_admin_user!() end)
-
-    FounderPad.HelpCenter.Category
-    |> Ash.Changeset.for_create(
-      :create,
-      %{
-        name: Map.get(attrs, :name, "Category #{System.unique_integer([:positive])}"),
-        slug: Map.get(attrs, :slug, nil),
-        description: Map.get(attrs, :description, "Help category"),
-        icon: Map.get(attrs, :icon, "help"),
-        position: Map.get(attrs, :position, 0)
-      }, actor: admin)
+  def join_channel!(channel, user) do
+    LinkHub.Messaging.ChannelMembership
+    |> Ash.Changeset.for_create(:join, %{channel_id: channel.id, user_id: user.id})
     |> Ash.create!()
   end
 
-  def create_help_article!(category, attrs \\ %{}) do
-    admin = Map.get_lazy(attrs, :actor, fn -> create_admin_user!() end)
+  def send_message!(channel, user, body, opts \\ %{}) do
+    params =
+      Map.merge(
+        %{body: body, channel_id: channel.id, author_id: user.id},
+        Map.new(opts)
+      )
 
-    FounderPad.HelpCenter.Article
-    |> Ash.Changeset.for_create(
-      :create,
-      %{
-        title: Map.get(attrs, :title, "Article #{System.unique_integer([:positive])}"),
-        slug: Map.get(attrs, :slug, nil),
-        body: Map.get(attrs, :body, "This is help article content about billing and payments."),
-        excerpt: Map.get(attrs, :excerpt, "Help article excerpt"),
-        status: Map.get(attrs, :status, :draft),
-        position: Map.get(attrs, :position, 0),
-        category_id: category.id
-      }, actor: admin)
+    LinkHub.Messaging.Message
+    |> Ash.Changeset.for_create(:send, params)
     |> Ash.create!()
   end
 
-  def create_published_help_article!(category, attrs \\ %{}) do
-    admin = Map.get_lazy(attrs, :actor, fn -> create_admin_user!() end)
-    article = create_help_article!(category, Map.put(attrs, :actor, admin))
-
-    article
-    |> Ash.Changeset.for_update(:publish, %{}, actor: admin)
-    |> Ash.update!()
-  end
-
-  def create_push_subscription!(user, attrs \\ %{}) do
-    FounderPad.Notifications.PushSubscription
-    |> Ash.Changeset.for_create(:create, %{
-      type: Map.get(attrs, :type, :web_push),
-      token: Map.get(attrs, :token, "test_token_#{System.unique_integer([:positive])}"),
-      device_name: Map.get(attrs, :device_name, "Test Browser"),
-      user_id: user.id
-    })
+  def add_reaction!(message, user, emoji) do
+    LinkHub.Messaging.Reaction
+    |> Ash.Changeset.for_create(:add, %{emoji: emoji, message_id: message.id, user_id: user.id})
     |> Ash.create!()
   end
+
+  def create_messaging_context! do
+    workspace = create_workspace!()
+    user = create_user!()
+    create_membership!(user, workspace)
+    channel = create_channel!(workspace, user)
+    join_channel!(channel, user)
+    {workspace, user, channel}
+  end
+
+  # ── Media factories ──
+
+  def create_stored_file!(workspace, user, attrs \\ %{}) do
+    default = %{
+      filename: "test-file-#{System.unique_integer([:positive])}.png",
+      content_type: "image/png",
+      size_bytes: 1_048_576,
+      storage_key: "uploads/#{Ash.UUID.generate()}.png",
+      workspace_id: workspace.id,
+      uploader_id: user.id
+    }
+
+    params = Map.merge(default, Map.new(attrs))
+
+    LinkHub.Media.StoredFile
+    |> Ash.Changeset.for_create(:upload, params)
+    |> Ash.create!()
+  end
+
+  # ── AI factories ──
 
   def create_conversation_chain! do
-    org = create_organisation!()
+    org = create_workspace!()
     user = create_user!()
     agent = create_agent!(org)
 
     {:ok, conversation} =
-      FounderPad.AI.Conversation
+      LinkHub.AI.Conversation
       |> Ash.Changeset.for_create(:create, %{
         title: "Test Conversation",
         agent_id: agent.id,
-        organisation_id: org.id,
+        workspace_id: org.id,
         user_id: user.id
       })
       |> Ash.create()

@@ -1,0 +1,168 @@
+defmodule LinkHub.AI.Workers.AgentRunner do
+  @moduledoc """
+  Oban worker that runs AI agent conversations.
+  Broadcasts streaming results via PubSub.
+  """
+  use Oban.Worker, queue: :ai, max_attempts: 3
+
+  require Logger
+  require Ash.Query
+
+  alias LinkHub.AI
+  alias LinkHub.Notifications
+  alias LinkHub.Notifications.AgentMailer
+
+  @impl Oban.Worker
+  def perform(%Oban.Job{
+        args: %{
+          "conversation_id" => conversation_id,
+          "message_content" => _message_content,
+          "workspace_id" => workspace_id
+        }
+      }) do
+    # Note: user message is already saved by the LiveView before enqueuing this job
+    with {:ok, conversation} <- Ash.get(AI.Conversation, conversation_id, load: [:agent]),
+         provider <- get_provider(conversation.agent.provider),
+         messages <- build_messages(conversation_id, nil),
+         {:ok, response} <- provider.chat(messages, agent_opts(conversation.agent)) do
+      # Save assistant message
+      {:ok, _assistant_msg} = create_message(conversation_id, :assistant, response)
+
+      # Record usage
+      record_usage(workspace_id)
+
+      # Broadcast completion
+      broadcast(conversation_id, {:message_complete, response})
+
+      # Notify user of completion
+      notify_agent_completed(conversation, conversation.agent)
+
+      :ok
+    else
+      {:error, reason} ->
+        Logger.error("Agent run failed: #{inspect(reason)}")
+        broadcast(conversation_id, {:error, reason})
+
+        # Notify user of failure
+        case Ash.get(AI.Conversation, conversation_id, load: [:agent]) do
+          {:ok, conv} -> notify_agent_failed(conv, inspect(reason))
+          _ -> :ok
+        end
+
+        {:error, reason}
+    end
+  end
+
+  @doc "Creates an agent_completed notification, sends email, and broadcasts it to the user."
+  def notify_agent_completed(conversation, agent) do
+    user_id = conversation.user_id
+
+    if user_id do
+      {:ok, notif} =
+        Notifications.Notification
+        |> Ash.Changeset.for_create(:create, %{
+          type: :agent_completed,
+          title: "#{agent.name} completed a run",
+          body: "Agent run completed successfully",
+          action_url: "/agents/#{agent.id}",
+          user_id: user_id
+        })
+        |> Ash.create()
+
+      Notifications.broadcast_to_user(user_id, notif)
+
+      # Send email notification
+      with {:ok, user} <- Ash.get(LinkHub.Accounts.User, user_id) do
+        AgentMailer.agent_run_completed(user, agent, conversation)
+      end
+    end
+
+    :ok
+  end
+
+  @doc "Creates an agent_failed notification, sends email, and broadcasts it to the user."
+  def notify_agent_failed(conversation, reason) do
+    user_id = conversation.user_id
+
+    if user_id do
+      {:ok, notif} =
+        Notifications.Notification
+        |> Ash.Changeset.for_create(:create, %{
+          type: :agent_failed,
+          title: "Agent run failed",
+          body: "Agent run failed: #{reason}",
+          user_id: user_id
+        })
+        |> Ash.create()
+
+      Notifications.broadcast_to_user(user_id, notif)
+
+      # Send email notification
+      with {:ok, user} <- Ash.get(LinkHub.Accounts.User, user_id),
+           {:ok, agent} <- resolve_agent(conversation) do
+        AgentMailer.agent_run_failed(user, agent, reason)
+      end
+    end
+
+    :ok
+  end
+
+  defp resolve_agent(%{agent: agent}) when is_map(agent), do: {:ok, agent}
+
+  defp resolve_agent(conversation) do
+    case Ash.get(AI.Conversation, conversation.id, load: [:agent]) do
+      {:ok, conv} -> {:ok, conv.agent}
+      error -> error
+    end
+  end
+
+  defp get_provider(:anthropic), do: LinkHub.AI.Providers.Anthropic
+  defp get_provider(:openai), do: LinkHub.AI.Providers.OpenAI
+  defp get_provider(_), do: LinkHub.AI.Providers.Anthropic
+
+  defp agent_opts(agent) do
+    [
+      model: agent.model,
+      system_prompt: agent.system_prompt,
+      max_tokens: agent.max_tokens,
+      temperature: agent.temperature
+    ]
+  end
+
+  defp build_messages(conversation_id, _new_content) do
+    # Fetch all messages (user message already saved by LiveView)
+    AI.Message
+    |> Ash.Query.filter(conversation_id: conversation_id)
+    |> Ash.Query.sort(inserted_at: :asc)
+    |> Ash.read!()
+    |> Enum.map(fn msg -> %{role: msg.role, content: msg.content} end)
+  end
+
+  defp create_message(conversation_id, role, content) do
+    AI.Message
+    |> Ash.Changeset.for_create(:create, %{
+      role: role,
+      content: content,
+      conversation_id: conversation_id
+    })
+    |> Ash.create()
+  end
+
+  defp record_usage(workspace_id) do
+    LinkHub.Billing.UsageRecord
+    |> Ash.Changeset.for_create(:create, %{
+      event_type: "agent.run",
+      quantity: 1,
+      workspace_id: workspace_id
+    })
+    |> Ash.create()
+  end
+
+  defp broadcast(conversation_id, message) do
+    Phoenix.PubSub.broadcast(
+      LinkHub.PubSub,
+      "conversation:#{conversation_id}",
+      message
+    )
+  end
+end

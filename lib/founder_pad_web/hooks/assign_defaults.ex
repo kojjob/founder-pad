@@ -1,53 +1,38 @@
 defmodule FounderPadWeb.Hooks.AssignDefaults do
   @moduledoc """
   LiveView on_mount hook that assigns default values needed by the app layout.
-  Loads the current_user from the session token.
-  Supports admin impersonation via session["impersonated_user_id"].
+  Loads the current_user from the session token and checks onboarding status.
   """
   import Phoenix.Component, only: [assign: 2]
 
+  require Ash.Query
+
   def on_mount(:default, _params, session, socket) do
-    socket = assign(socket, active_nav: :dashboard)
+    socket = assign(socket, active_nav: :dashboard, setup_banner_dismissed: false)
 
     case session["user_token"] do
       nil ->
-        {:cont, assign(socket, current_user: nil, impersonating: false, admin_user: nil)}
+        {:cont, assign(socket, current_user: nil, onboarding_complete: false)}
 
       token ->
         case AshAuthentication.subject_to_user(token, FounderPad.Accounts.User) do
           {:ok, user} ->
-            impersonated_id = session["impersonated_user_id"]
-
-            if impersonated_id && user.is_admin do
-              case Ash.get(FounderPad.Accounts.User, impersonated_id) do
-                {:ok, imp_user} ->
-                  {:cont,
-                   assign(socket,
-                     current_user: imp_user,
-                     admin_user: user,
-                     impersonating: true
-                   )}
-
-                _ ->
-                  {:cont,
-                   assign(socket,
-                     current_user: user,
-                     impersonating: false,
-                     admin_user: nil
-                   )}
-              end
-            else
-              {:cont,
-               assign(socket,
-                 current_user: user,
-                 impersonating: false,
-                 admin_user: nil
-               )}
-            end
+            onboarding_complete = has_membership?(user.id)
+            {:cont, assign(socket, current_user: user, onboarding_complete: onboarding_complete)}
 
           _ ->
-            {:cont, assign(socket, current_user: nil, impersonating: false, admin_user: nil)}
+            {:cont, assign(socket, current_user: nil, onboarding_complete: false)}
         end
+    end
+  end
+
+  defp has_membership?(user_id) do
+    case FounderPad.Accounts.Membership
+         |> Ash.Query.filter(user_id: user_id)
+         |> Ash.Query.limit(1)
+         |> Ash.read() do
+      {:ok, [_ | _]} -> true
+      _ -> false
     end
   end
 end

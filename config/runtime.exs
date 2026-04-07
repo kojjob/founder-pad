@@ -12,24 +12,27 @@ import Config
 # If you use `mix release`, you need to explicitly enable the server
 # by passing the PHX_SERVER=true when you start it:
 #
-#     PHX_SERVER=true bin/founder_pad start
+#     PHX_SERVER=true bin/link_hub start
 #
 # Alternatively, you can use `mix phx.gen.release` to generate a `bin/server`
 # script that automatically sets the env var above.
 if System.get_env("PHX_SERVER") do
-  config :founder_pad, FounderPadWeb.Endpoint, server: true
+  config :link_hub, LinkHubWeb.Endpoint, server: true
 end
 
-config :founder_pad, FounderPadWeb.Endpoint,
+config :link_hub, LinkHubWeb.Endpoint,
   http: [port: String.to_integer(System.get_env("PORT", "4000"))]
 
-config :founder_pad, :oauth,
-  google_client_id: System.get_env("GOOGLE_CLIENT_ID"),
-  google_client_secret: System.get_env("GOOGLE_CLIENT_SECRET"),
-  github_client_id: System.get_env("GITHUB_CLIENT_ID"),
-  github_client_secret: System.get_env("GITHUB_CLIENT_SECRET"),
-  microsoft_client_id: System.get_env("MICROSOFT_CLIENT_ID"),
-  microsoft_client_secret: System.get_env("MICROSOFT_CLIENT_SECRET")
+# AWS / S3 credentials (all environments — resolved at runtime)
+if System.get_env("AWS_ACCESS_KEY_ID") do
+  config :ex_aws,
+    access_key_id: [{:system, "AWS_ACCESS_KEY_ID"}, :instance_role],
+    secret_access_key: [{:system, "AWS_SECRET_ACCESS_KEY"}, :instance_role],
+    region: System.get_env("AWS_REGION") || "us-east-1"
+
+  config :link_hub,
+    storage_bucket: System.get_env("S3_BUCKET") || "linkhub-uploads"
+end
 
 if config_env() == :prod do
   # Database
@@ -37,14 +40,14 @@ if config_env() == :prod do
     System.get_env("DATABASE_URL") ||
       raise "environment variable DATABASE_URL is missing."
 
-  config :founder_pad, FounderPad.Repo,
+  config :link_hub, LinkHub.Repo,
     url: database_url,
     pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
     ssl: System.get_env("DATABASE_SSL", "true") == "true",
     socket_options: if(System.get_env("ECTO_IPV6") == "true", do: [:inet6], else: [])
 
   # Swoosh / Resend
-  config :founder_pad, FounderPad.Mailer,
+  config :link_hub, LinkHub.Mailer,
     adapter: Swoosh.Adapters.Resend,
     api_key: System.get_env("RESEND_API_KEY")
 
@@ -54,20 +57,13 @@ if config_env() == :prod do
     signing_secret: System.get_env("STRIPE_WEBHOOK_SECRET")
 
   # Google Search Console
-  config :founder_pad, :gsc_credentials, System.get_env("GSC_CREDENTIALS_JSON")
+  config :link_hub, :gsc_credentials, System.get_env("GSC_CREDENTIALS_JSON")
 
   # Plausible
-  config :founder_pad, :plausible_domain, System.get_env("PLAUSIBLE_DOMAIN")
-
-  # Push notifications
-  config :founder_pad, :push,
-    fcm_service_account: System.get_env("FIREBASE_SERVICE_ACCOUNT_JSON"),
-    vapid_public_key: System.get_env("VAPID_PUBLIC_KEY"),
-    vapid_private_key: System.get_env("VAPID_PRIVATE_KEY"),
-    vapid_subject: System.get_env("VAPID_SUBJECT") || "mailto:support@founderpad.io"
+  config :link_hub, :plausible_domain, System.get_env("PLAUSIBLE_DOMAIN")
 
   # AI Providers
-  config :founder_pad, :ai,
+  config :link_hub, :ai,
     anthropic_api_key: System.get_env("ANTHROPIC_API_KEY"),
     openai_api_key: System.get_env("OPENAI_API_KEY"),
     default_provider: System.get_env("AI_DEFAULT_PROVIDER", "anthropic")
@@ -86,9 +82,9 @@ if config_env() == :prod do
 
   host = System.get_env("PHX_HOST") || "example.com"
 
-  config :founder_pad, :dns_cluster_query, System.get_env("DNS_CLUSTER_QUERY")
+  config :link_hub, :dns_cluster_query, System.get_env("DNS_CLUSTER_QUERY")
 
-  config :founder_pad, FounderPadWeb.Endpoint,
+  config :link_hub, LinkHubWeb.Endpoint,
     url: [host: host, port: 443, scheme: "https"],
     http: [
       # Enable IPv6 and bind on all interfaces.
@@ -104,7 +100,7 @@ if config_env() == :prod do
   # To get SSL working, you will need to add the `https` key
   # to your endpoint configuration:
   #
-  #     config :founder_pad, FounderPadWeb.Endpoint,
+  #     config :link_hub, LinkHubWeb.Endpoint,
   #       https: [
   #         ...,
   #         port: 443,
@@ -126,7 +122,7 @@ if config_env() == :prod do
   # We also recommend setting `force_ssl` in your config/prod.exs,
   # ensuring no data is ever sent via http, always redirecting to https:
   #
-  #     config :founder_pad, FounderPadWeb.Endpoint,
+  #     config :link_hub, LinkHubWeb.Endpoint,
   #       force_ssl: [hsts: true]
   #
   # Check `Plug.SSL` for all available options in `force_ssl`.
@@ -136,7 +132,7 @@ if config_env() == :prod do
   # In production you need to configure the mailer to use a different adapter.
   # Here is an example configuration for Mailgun:
   #
-  #     config :founder_pad, FounderPad.Mailer,
+  #     config :link_hub, LinkHub.Mailer,
   #       adapter: Swoosh.Adapters.Mailgun,
   #       api_key: System.get_env("MAILGUN_API_KEY"),
   #       domain: System.get_env("MAILGUN_DOMAIN")

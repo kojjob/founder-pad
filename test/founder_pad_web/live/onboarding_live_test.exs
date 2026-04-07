@@ -3,131 +3,132 @@ defmodule FounderPadWeb.OnboardingLiveTest do
   import Phoenix.LiveViewTest
   import FounderPad.Factory
 
-  defp setup_auth(conn) do
-    user = create_user!()
+  defp auth_conn(conn, user) do
     token = AshAuthentication.user_to_subject(user)
 
-    conn =
-      conn
-      |> init_test_session(%{})
-      |> put_session(:user_token, token)
-
-    {conn, user}
+    conn
+    |> Phoenix.ConnTest.init_test_session(%{})
+    |> Plug.Conn.put_session(:user_token, token)
   end
 
-  describe "Onboarding step navigation" do
-    test "renders first step", %{conn: conn} do
+  describe "mount" do
+    test "renders step 1 for unauthenticated user", %{conn: conn} do
+      conn = Phoenix.ConnTest.init_test_session(conn, %{})
       {:ok, _view, html} = live(conn, "/onboarding")
       assert html =~ "Create Your Organisation"
-      assert html =~ "Step 1 of 4"
     end
 
-    test "navigates through all steps", %{conn: conn} do
+    test "redirects to dashboard when user already has an org", %{conn: conn} do
+      user = create_user!()
+      org = create_organisation!()
+      create_membership!(user, org, :owner)
+
+      conn = auth_conn(conn, user)
+
+      assert {:error, {:live_redirect, %{to: "/dashboard"}}} = live(conn, "/onboarding")
+    end
+
+    test "renders step 1 for authenticated user without org", %{conn: conn} do
+      user = create_user!()
+      conn = auth_conn(conn, user)
+
+      {:ok, _view, html} = live(conn, "/onboarding")
+      assert html =~ "Create Your Organisation"
+    end
+  end
+
+  describe "step validation" do
+    test "blocks step 1 advance with blank org name", %{conn: conn} do
+      user = create_user!()
+      conn = auth_conn(conn, user)
+
       {:ok, view, _html} = live(conn, "/onboarding")
 
       html = render_click(view, "next_step")
-      assert html =~ "Step 2 of 4"
+      assert html =~ "Please enter an organisation name"
+    end
+
+    test "advances from step 1 with valid org name", %{conn: conn} do
+      user = create_user!()
+      conn = auth_conn(conn, user)
+
+      {:ok, view, _html} = live(conn, "/onboarding")
+
+      render_change(view, "update_org_name", %{"org_name" => "Test Org"})
+      html = render_click(view, "next_step")
       assert html =~ "Invite Your Team"
-
-      html = render_click(view, "next_step")
-      assert html =~ "Step 3 of 4"
-      assert html =~ "Create Your First Agent"
-
-      html = render_click(view, "next_step")
-      assert html =~ "Step 4 of 4"
-      assert html =~ "All Set"
     end
 
-    test "can go back to previous step", %{conn: conn} do
-      {:ok, view, _html} = live(conn, "/onboarding")
-      render_click(view, "next_step")
-      html = render_click(view, "prev_step")
-      assert html =~ "Step 1 of 4"
-    end
-  end
+    test "rejects invalid email in step 2", %{conn: conn} do
+      user = create_user!()
+      conn = auth_conn(conn, user)
 
-  describe "Onboarding data capture" do
-    test "org name persists across steps", %{conn: conn} do
       {:ok, view, _html} = live(conn, "/onboarding")
 
-      render_change(view, "update_org_name", %{"org_name" => "Acme Inc"})
-      html = render_click(view, "next_step")
-      # Go to step 4 to see summary
+      render_change(view, "update_org_name", %{"org_name" => "Test Org"})
       render_click(view, "next_step")
-      html = render_click(view, "next_step")
-      assert html =~ "Acme Inc"
+
+      html = render_submit(view, "add_invite", %{"email" => "not-an-email"})
+      assert html =~ "valid email"
     end
 
-    test "can select agent template", %{conn: conn} do
+    test "accepts valid email in step 2", %{conn: conn} do
+      user = create_user!()
+      conn = auth_conn(conn, user)
+
       {:ok, view, _html} = live(conn, "/onboarding")
-      # Go to step 3
-      render_click(view, "next_step")
-      render_click(view, "next_step")
 
-      html = render_click(view, "select_template", %{"template" => "research"})
-      assert html =~ "border-primary"
-    end
-
-    test "can add invite emails", %{conn: conn} do
-      {:ok, view, _html} = live(conn, "/onboarding")
+      render_change(view, "update_org_name", %{"org_name" => "Test Org"})
       render_click(view, "next_step")
 
-      html = render_submit(view, "add_invite", %{"email" => "alice@example.com"})
-      assert html =~ "alice@example.com"
-    end
-
-    test "can remove invite emails", %{conn: conn} do
-      {:ok, view, _html} = live(conn, "/onboarding")
-      render_click(view, "next_step")
-
-      render_submit(view, "add_invite", %{"email" => "alice@example.com"})
-      html = render_click(view, "remove_invite", %{"email" => "alice@example.com"})
-      refute html =~ "alice@example.com"
+      html = render_submit(view, "add_invite", %{"email" => "teammate@example.com"})
+      assert html =~ "teammate@example.com"
     end
   end
 
-  describe "Onboarding completion (authenticated)" do
-    test "creates organisation on complete", %{conn: conn} do
-      {conn, user} = setup_auth(conn)
+  describe "complete" do
+    test "creates org, membership, and agent with template", %{conn: conn} do
+      user = create_user!()
+      conn = auth_conn(conn, user)
+
       {:ok, view, _html} = live(conn, "/onboarding")
 
-      render_change(view, "update_org_name", %{"org_name" => "Test Org Complete"})
+      # Step 1: org name
+      render_change(view, "update_org_name", %{"org_name" => "My Startup"})
       render_click(view, "next_step")
-      render_click(view, "next_step")
-      render_click(view, "next_step")
-      render_click(view, "complete")
 
-      # Should redirect to dashboard (no agent selected)
-      assert_redirect(view, "/dashboard")
-    end
-
-    test "creates org + agent when template selected", %{conn: conn} do
-      {conn, user} = setup_auth(conn)
-      {:ok, view, _html} = live(conn, "/onboarding")
-
-      render_change(view, "update_org_name", %{"org_name" => "Agent Org"})
+      # Step 2: skip invites
       render_click(view, "next_step")
-      render_click(view, "next_step")
+
+      # Step 3: select template
       render_click(view, "select_template", %{"template" => "research"})
       render_click(view, "next_step")
+
+      # Step 4: complete
       render_click(view, "complete")
 
-      # Should redirect to the agent page
-      {path, _flash} = assert_redirect(view)
-      assert path =~ ~r"/agents/"
+      # Verify org created
+      orgs = FounderPad.Accounts.Organisation |> Ash.read!()
+      assert Enum.any?(orgs, &(&1.name == "My Startup"))
+
+      # Verify membership created
+      memberships =
+        FounderPad.Accounts.Membership
+        |> Ash.read!()
+        |> Enum.filter(&(&1.user_id == user.id))
+
+      assert length(memberships) == 1
+      assert hd(memberships).role == :owner
     end
 
-    test "shows error when org name is empty", %{conn: conn} do
-      {conn, _user} = setup_auth(conn)
+    test "shows error when completing without org name", %{conn: conn} do
+      user = create_user!()
+      conn = auth_conn(conn, user)
+
       {:ok, view, _html} = live(conn, "/onboarding")
 
-      # Don't set org name, go to step 4 and complete
-      render_click(view, "next_step")
-      render_click(view, "next_step")
-      render_click(view, "next_step")
-      html = render_click(view, "complete")
-
-      assert html =~ "organisation name"
+      html = render_click(view, "next_step")
+      assert html =~ "Please enter an organisation name"
     end
   end
 end

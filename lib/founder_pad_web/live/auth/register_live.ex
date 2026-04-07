@@ -133,40 +133,14 @@ defmodule FounderPadWeb.Auth.RegisterLive do
           |> Ash.update()
         end
 
-        # Create default organisation and membership
-        org_name = if(name != "", do: "#{name}'s Workspace", else: "My Organisation")
+        token = AshAuthentication.user_to_subject(user)
 
-        with {:ok, org} <-
-               FounderPad.Accounts.Organisation
-               |> Ash.Changeset.for_create(:create, %{name: org_name})
-               |> Ash.create(),
-             {:ok, _membership} <-
-               FounderPad.Accounts.Membership
-               |> Ash.Changeset.for_create(:create, %{
-                 role: :owner,
-                 user_id: user.id,
-                 organisation_id: org.id
-               })
-               |> Ash.create() do
-          token = AshAuthentication.user_to_subject(user)
-
-          {:noreply,
-           socket
-           |> put_flash(:info, "Account created successfully!")
-           |> redirect(
-             to: "/auth/session?token=#{URI.encode_www_form(token)}&redirect_to=%2Fonboarding"
-           )}
-        else
-          {:error, _} ->
-            token = AshAuthentication.user_to_subject(user)
-
-            {:noreply,
-             socket
-             |> put_flash(:info, "Account created successfully!")
-             |> redirect(
-               to: "/auth/session?token=#{URI.encode_www_form(token)}&redirect_to=%2Fonboarding"
-             )}
-        end
+        {:noreply,
+         socket
+         |> put_flash(:info, "Account created successfully!")
+         |> redirect(
+           to: "/auth/session?token=#{URI.encode_www_form(token)}&redirect_to=%2Fonboarding"
+         )}
 
       {:error, error} ->
         error_messages = extract_errors(error)

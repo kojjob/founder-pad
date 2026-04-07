@@ -1,0 +1,104 @@
+defmodule LinkHub.Billing.Subscription do
+  @moduledoc "Ash resource representing a user's billing subscription."
+  use Ash.Resource,
+    domain: LinkHub.Billing,
+    data_layer: AshPostgres.DataLayer
+
+  postgres do
+    table("subscriptions")
+    repo(LinkHub.Repo)
+  end
+
+  attributes do
+    uuid_primary_key(:id)
+
+    attribute :stripe_subscription_id, :string do
+      allow_nil?(false)
+      public?(true)
+    end
+
+    attribute :stripe_customer_id, :string do
+      allow_nil?(false)
+      public?(true)
+    end
+
+    attribute :status, :atom do
+      constraints(one_of: [:active, :past_due, :canceled, :incomplete, :trialing, :unpaid])
+      default(:active)
+      allow_nil?(false)
+      public?(true)
+    end
+
+    attribute(:current_period_start, :utc_datetime, public?: true)
+    attribute(:current_period_end, :utc_datetime, public?: true)
+    attribute(:cancel_at_period_end, :boolean, default: false, public?: true)
+    attribute(:canceled_at, :utc_datetime, public?: true)
+    attribute(:trial_end, :utc_datetime, public?: true)
+
+    timestamps()
+  end
+
+  relationships do
+    belongs_to :workspace, LinkHub.Accounts.Workspace do
+      allow_nil?(false)
+      public?(true)
+    end
+
+    belongs_to :plan, LinkHub.Billing.Plan do
+      allow_nil?(false)
+      public?(true)
+    end
+  end
+
+  identities do
+    identity(:unique_stripe_subscription, [:stripe_subscription_id])
+  end
+
+  actions do
+    defaults([:read, :destroy])
+
+    create :create do
+      accept([
+        :stripe_subscription_id,
+        :stripe_customer_id,
+        :status,
+        :current_period_start,
+        :current_period_end,
+        :cancel_at_period_end,
+        :trial_end
+      ])
+
+      argument(:workspace_id, :uuid, allow_nil?: false)
+      argument(:plan_id, :uuid, allow_nil?: false)
+      change(manage_relationship(:workspace_id, :workspace, type: :append))
+      change(manage_relationship(:plan_id, :plan, type: :append))
+    end
+
+    update :update_from_stripe do
+      accept([
+        :status,
+        :current_period_start,
+        :current_period_end,
+        :cancel_at_period_end,
+        :canceled_at,
+        :trial_end
+      ])
+    end
+
+    update :cancel do
+      accept([])
+      change(set_attribute(:status, :canceled))
+      change(set_attribute(:canceled_at, &DateTime.utc_now/0))
+    end
+
+    read :by_workspace do
+      argument(:workspace_id, :uuid, allow_nil?: false)
+      filter(expr(workspace_id == ^arg(:workspace_id) and status in [:active, :trialing]))
+    end
+
+    read :by_stripe_id do
+      argument(:stripe_subscription_id, :string, allow_nil?: false)
+      filter(expr(stripe_subscription_id == ^arg(:stripe_subscription_id)))
+    end
+  end
+end

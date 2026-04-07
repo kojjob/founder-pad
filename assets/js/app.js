@@ -32,12 +32,31 @@ import TiptapEditor from "./hooks/tiptap_editor"
 import PushNotifications from "./hooks/push_notifications"
 import CommandPalette from "./hooks/command_palette"
 import Collaboration from "./hooks/collaboration"
+import Uploaders from "./uploaders"
+
+// Messaging hooks
+const ScrollBottom = {
+  mounted() {
+    this.el.scrollTop = this.el.scrollHeight
+    this.observer = new MutationObserver(() => {
+      this.el.scrollTop = this.el.scrollHeight
+    })
+    this.observer.observe(this.el, { childList: true, subtree: true })
+  },
+  updated() {
+    this.el.scrollTop = this.el.scrollHeight
+  },
+  destroyed() {
+    if (this.observer) this.observer.disconnect()
+  }
+}
 
 const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 const liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,
   params: {_csrf_token: csrfToken},
-  hooks: {ThemeToggle, Analytics, ScrollReveal, AutoDismiss, ThemeSettings, TiptapEditor, PushNotifications, CommandPalette, Collaboration},
+  hooks: {ThemeToggle, Analytics, ScrollReveal, AutoDismiss, ThemeSettings, TiptapEditor, PushNotifications, CommandPalette, Collaboration, ScrollBottom},
+  uploaders: Uploaders,
 })
 
 // Show progress bar on live navigation and form submits
