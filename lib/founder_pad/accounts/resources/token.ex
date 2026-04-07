@@ -5,11 +5,11 @@ defmodule FounderPad.Accounts.Token do
     extensions: [AshAuthentication.TokenResource]
 
   postgres do
-    table "tokens"
-    repo FounderPad.Repo
+    table("tokens")
+    repo(FounderPad.Repo)
   end
 
   actions do
-    defaults [:read, :destroy]
+    defaults([:read, :destroy])
   end
 end

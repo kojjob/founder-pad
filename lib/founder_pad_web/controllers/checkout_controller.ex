@@ -5,9 +5,10 @@ defmodule FounderPadWeb.CheckoutController do
   def create(conn, %{"plan_slug" => plan_slug}) do
     require Ash.Query
 
-    with {:ok, plan} <- FounderPad.Billing.Plan
-                        |> Ash.Query.filter(slug: plan_slug, active: true)
-                        |> Ash.read_one(),
+    with {:ok, plan} <-
+           FounderPad.Billing.Plan
+           |> Ash.Query.filter(slug: plan_slug, active: true)
+           |> Ash.read_one(),
          true <- not is_nil(plan),
          {:ok, session} <- create_checkout_session(plan, conn) do
       redirect(conn, external: session.url)

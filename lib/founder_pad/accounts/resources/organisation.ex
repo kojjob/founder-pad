@@ -5,56 +5,56 @@ defmodule FounderPad.Accounts.Organisation do
     authorizers: [Ash.Policy.Authorizer]
 
   postgres do
-    table "organisations"
-    repo FounderPad.Repo
+    table("organisations")
+    repo(FounderPad.Repo)
   end
 
   attributes do
-    uuid_primary_key :id
+    uuid_primary_key(:id)
 
     attribute :name, :string do
-      allow_nil? false
-      public? true
+      allow_nil?(false)
+      public?(true)
     end
 
     attribute :slug, :string do
-      allow_nil? false
-      public? true
+      allow_nil?(false)
+      public?(true)
     end
 
-    attribute :logo_url, :string, public?: true
+    attribute(:logo_url, :string, public?: true)
 
-    attribute :billing_email, :string, public?: true
+    attribute(:billing_email, :string, public?: true)
 
     timestamps()
   end
 
   relationships do
-    has_many :memberships, FounderPad.Accounts.Membership
+    has_many(:memberships, FounderPad.Accounts.Membership)
 
     many_to_many :users, FounderPad.Accounts.User do
-      through FounderPad.Accounts.Membership
+      through(FounderPad.Accounts.Membership)
     end
   end
 
   identities do
-    identity :unique_slug, [:slug]
+    identity(:unique_slug, [:slug])
   end
 
   policies do
     # TODO: Restrict update/destroy to org owners once all call sites pass actor:
     policy always() do
-      authorize_if always()
+      authorize_if(always())
     end
   end
 
   actions do
-    defaults [:read]
+    defaults([:read])
 
     create :create do
-      accept [:name, :billing_email, :logo_url]
+      accept([:name, :billing_email, :logo_url])
 
-      change fn changeset, _ctx ->
+      change(fn changeset, _ctx ->
         case Ash.Changeset.get_attribute(changeset, :name) do
           nil ->
             changeset
@@ -68,15 +68,15 @@ defmodule FounderPad.Accounts.Organisation do
 
             Ash.Changeset.change_attribute(changeset, :slug, slug)
         end
-      end
+      end)
     end
 
     update :update do
-      accept [:name, :billing_email, :logo_url]
+      accept([:name, :billing_email, :logo_url])
     end
 
     destroy :destroy do
-      primary? true
+      primary?(true)
     end
   end
 end

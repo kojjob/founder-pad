@@ -28,6 +28,10 @@ import Analytics from "./hooks/analytics"
 import ScrollReveal from "./hooks/scroll_reveal"
 import AutoDismiss from "./hooks/auto_dismiss"
 import ThemeSettings from "./hooks/theme_settings"
+import TiptapEditor from "./hooks/tiptap_editor"
+import PushNotifications from "./hooks/push_notifications"
+import CommandPalette from "./hooks/command_palette"
+import Collaboration from "./hooks/collaboration"
 import Uploaders from "./uploaders"
 
 // Messaging hooks
@@ -51,7 +55,7 @@ const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute
 const liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,
   params: {_csrf_token: csrfToken},
-  hooks: {ThemeToggle, Analytics, ScrollReveal, AutoDismiss, ThemeSettings, ScrollBottom},
+  hooks: {ThemeToggle, Analytics, ScrollReveal, AutoDismiss, ThemeSettings, TiptapEditor, PushNotifications, CommandPalette, Collaboration, ScrollBottom},
   uploaders: Uploaders,
 })
 

@@ -22,7 +22,8 @@ defmodule FounderPadWeb.AgentsLive do
        plan_name: if(plan, do: plan.name, else: "Free"),
        plan_agents_limit: if(plan, do: plan.max_agents, else: 3),
        plan_api_limit: if(plan, do: plan.max_api_calls_per_month, else: 1000),
-       agents_used_pct: if(plan, do: min(round(length(agents) / max(plan.max_agents, 1) * 100), 100), else: 0)
+       agents_used_pct:
+         if(plan, do: min(round(length(agents) / max(plan.max_agents, 1) * 100), 100), else: 0)
      )}
   end
 
@@ -32,12 +33,17 @@ defmodule FounderPadWeb.AgentsLive do
       <%!-- Header Section --%>
       <section class="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-          <h1 class="text-4xl font-extrabold font-headline tracking-tight text-on-surface">Agent Directory</h1>
+          <h1 class="text-4xl font-extrabold font-headline tracking-tight text-on-surface">
+            Agent Directory
+          </h1>
           <p class="text-on-surface-variant mt-2 max-w-2xl leading-relaxed">
             Manage and orchestrate your AI agents. Deploy specialized workloads with multi-provider support across Anthropic and OpenAI.
           </p>
         </div>
-        <a href="/agents/new" class="primary-gradient px-5 py-2.5 rounded-lg text-sm font-semibold transition-transform hover:scale-[1.02] active:scale-95 flex items-center gap-2 whitespace-nowrap">
+        <a
+          href="/agents/new"
+          class="primary-gradient px-5 py-2.5 rounded-lg text-sm font-semibold transition-transform hover:scale-[1.02] active:scale-95 flex items-center gap-2 whitespace-nowrap"
+        >
           <span class="material-symbols-outlined text-lg">add</span> Deploy New Agent
         </a>
       </section>
@@ -52,28 +58,38 @@ defmodule FounderPadWeb.AgentsLive do
 
           <div class="relative z-10 w-full flex justify-between items-start mb-10">
             <div>
-               <div class="inline-flex items-center bg-secondary/10 text-secondary text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full mb-4">
-                 Fleet Status
-               </div>
-               <h2 class="text-3xl font-extrabold font-headline text-on-surface mb-2">Fleet Performance</h2>
-               <p class="text-on-surface-variant text-sm">{@stats.uptime}% uptime • {@stats.active_count} active agents</p>
+              <div class="inline-flex items-center bg-secondary/10 text-secondary text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full mb-4">
+                Fleet Status
+              </div>
+              <h2 class="text-3xl font-extrabold font-headline text-on-surface mb-2">
+                Fleet Performance
+              </h2>
+              <p class="text-on-surface-variant text-sm">
+                {@stats.uptime}% uptime • {@stats.active_count} active agents
+              </p>
             </div>
           </div>
 
           <div class="relative z-10 grid grid-cols-3 gap-6">
             <div>
-              <p class="text-[10px] font-bold tracking-wider uppercase text-on-surface-variant/70 mb-1">Conversations</p>
+              <p class="text-[10px] font-bold tracking-wider uppercase text-on-surface-variant/70 mb-1">
+                Conversations
+              </p>
               <p class="text-3xl font-mono font-medium text-on-surface">{@stats.conversations}</p>
             </div>
             <div>
-              <p class="text-[10px] font-bold tracking-wider uppercase text-on-surface-variant/70 mb-1">Avg Latency</p>
+              <p class="text-[10px] font-bold tracking-wider uppercase text-on-surface-variant/70 mb-1">
+                Avg Latency
+              </p>
               <div class="flex items-baseline gap-1">
                 <p class="text-3xl font-mono font-medium text-on-surface">{@stats.avg_latency}</p>
                 <p class="text-sm font-mono text-on-surface">ms</p>
               </div>
             </div>
             <div>
-              <p class="text-[10px] font-bold tracking-wider uppercase text-on-surface-variant/70 mb-1">API Calls</p>
+              <p class="text-[10px] font-bold tracking-wider uppercase text-on-surface-variant/70 mb-1">
+                API Calls
+              </p>
               <p class="text-3xl font-mono font-medium text-on-surface">{@stats.api_calls}</p>
             </div>
           </div>
@@ -82,16 +98,21 @@ defmodule FounderPadWeb.AgentsLive do
         <%!-- Plan & Usage Card --%>
         <div class="bg-gradient-to-br from-[#4648d4] via-[#5558e0] to-[#6063ee] rounded-2xl p-8 relative overflow-hidden text-white flex flex-col justify-between">
           <%!-- Decorative pattern --%>
-          <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-20 -mt-20 pointer-events-none"></div>
-          <div class="absolute bottom-0 left-0 w-32 h-32 bg-white/5 rounded-full -ml-10 -mb-10 pointer-events-none"></div>
+          <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-20 -mt-20 pointer-events-none">
+          </div>
+          <div class="absolute bottom-0 left-0 w-32 h-32 bg-white/5 rounded-full -ml-10 -mb-10 pointer-events-none">
+          </div>
 
           <div class="flex justify-between items-start mb-10 relative z-10">
-             <div class="bg-white/15 w-12 h-12 rounded-xl flex items-center justify-center backdrop-blur-md">
-               <span class="material-symbols-outlined text-white text-2xl">deployed_code</span>
-             </div>
-             <a href="/billing" class="text-white/70 hover:text-white transition-colors text-xs font-semibold uppercase tracking-wider">
-               Manage Plan →
-             </a>
+            <div class="bg-white/15 w-12 h-12 rounded-xl flex items-center justify-center backdrop-blur-md">
+              <span class="material-symbols-outlined text-white text-2xl">deployed_code</span>
+            </div>
+            <a
+              href="/billing"
+              class="text-white/70 hover:text-white transition-colors text-xs font-semibold uppercase tracking-wider"
+            >
+              Manage Plan →
+            </a>
           </div>
 
           <div class="relative z-10">
@@ -99,10 +120,15 @@ defmodule FounderPadWeb.AgentsLive do
             <h2 class="text-3xl font-extrabold font-headline mb-8">{@plan_name}</h2>
 
             <div class="w-full bg-black/20 rounded-full h-2 overflow-hidden mb-2">
-              <div class="bg-white h-full rounded-full transition-all duration-500" style={"width: #{@agents_used_pct}%"}></div>
+              <div
+                class="bg-white h-full rounded-full transition-all duration-500"
+                style={"width: #{@agents_used_pct}%"}
+              >
+              </div>
             </div>
             <p class="text-xs text-white/70 font-medium">
-              {length(@agents)} / {@plan_agents_limit} Agent Slots Used • {@plan_api_limit |> format_number()} API calls/mo
+              {length(@agents)} / {@plan_agents_limit} Agent Slots Used • {@plan_api_limit
+              |> format_number()} API calls/mo
             </p>
           </div>
         </div>
@@ -112,7 +138,15 @@ defmodule FounderPadWeb.AgentsLive do
       <div class="flex items-center justify-between pb-4">
         <div class="flex gap-6">
           <button
-            :for={{label, key} <- [{"All Agents", :all}, {"Anthropic", :anthropic}, {"OpenAI", :openai}, {"Active", :active}, {"Paused", :paused}]}
+            :for={
+              {label, key} <- [
+                {"All Agents", :all},
+                {"Anthropic", :anthropic},
+                {"OpenAI", :openai},
+                {"Active", :active},
+                {"Paused", :paused}
+              ]
+            }
             phx-click="filter"
             phx-value-filter={key}
             class={[
@@ -124,14 +158,32 @@ defmodule FounderPadWeb.AgentsLive do
             ]}
           >
             {label}
-            <span :if={@filter == key} class="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full"></span>
+            <span
+              :if={@filter == key}
+              class="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full"
+            >
+            </span>
           </button>
         </div>
         <div class="flex items-center gap-3 text-on-surface-variant">
-          <button phx-click="set_view" phx-value-mode="grid" class={["hover:text-on-surface transition-colors cursor-pointer", if(@view_mode == :grid, do: "text-primary", else: "")]}>
+          <button
+            phx-click="set_view"
+            phx-value-mode="grid"
+            class={[
+              "hover:text-on-surface transition-colors cursor-pointer",
+              if(@view_mode == :grid, do: "text-primary", else: "")
+            ]}
+          >
             <span class="material-symbols-outlined">grid_view</span>
           </button>
-          <button phx-click="set_view" phx-value-mode="list" class={["hover:text-on-surface transition-colors cursor-pointer", if(@view_mode == :list, do: "text-primary", else: "")]}>
+          <button
+            phx-click="set_view"
+            phx-value-mode="list"
+            class={[
+              "hover:text-on-surface transition-colors cursor-pointer",
+              if(@view_mode == :list, do: "text-primary", else: "")
+            ]}
+          >
             <span class="material-symbols-outlined">view_list</span>
           </button>
         </div>
@@ -139,25 +191,44 @@ defmodule FounderPadWeb.AgentsLive do
 
       <%!-- Empty State --%>
       <div :if={filtered_agents(@agents, @filter) == []} class="text-center py-16">
-        <span class="material-symbols-outlined text-6xl text-on-surface-variant/30 mb-4">smart_toy</span>
+        <span class="material-symbols-outlined text-6xl text-on-surface-variant/30 mb-4">
+          smart_toy
+        </span>
         <h3 class="text-xl font-bold font-headline text-on-surface mb-2">
           {if @filter == :all, do: "No agents yet", else: "No #{@filter} agents"}
         </h3>
         <p class="text-on-surface-variant mb-6">
-          {if @filter == :all, do: "Deploy your first AI agent to get started.", else: "Try a different filter or deploy a new agent."}
+          {if @filter == :all,
+            do: "Deploy your first AI agent to get started.",
+            else: "Try a different filter or deploy a new agent."}
         </p>
-        <a :if={@filter == :all} href="/agents/new" class="primary-gradient px-6 py-2.5 rounded-lg text-sm font-semibold inline-flex items-center gap-2">
+        <a
+          :if={@filter == :all}
+          href="/agents/new"
+          class="primary-gradient px-6 py-2.5 rounded-lg text-sm font-semibold inline-flex items-center gap-2"
+        >
           <span class="material-symbols-outlined text-lg">add</span> Deploy First Agent
         </a>
-        <button :if={@filter != :all} phx-click="filter" phx-value-filter="all" class="text-primary font-semibold text-sm hover:underline">
+        <button
+          :if={@filter != :all}
+          phx-click="filter"
+          phx-value-filter="all"
+          class="text-primary font-semibold text-sm hover:underline"
+        >
           Clear Filters
         </button>
       </div>
 
       <%!-- Agent Grid --%>
-      <div :if={filtered_agents(@agents, @filter) != []} class={[
-        if(@view_mode == :grid, do: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6", else: "space-y-3")
-      ]}>
+      <div
+        :if={filtered_agents(@agents, @filter) != []}
+        class={[
+          if(@view_mode == :grid,
+            do: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6",
+            else: "space-y-3"
+          )
+        ]}
+      >
         <div
           :for={agent <- filtered_agents(@agents, @filter)}
           class={[
@@ -167,9 +238,16 @@ defmodule FounderPadWeb.AgentsLive do
           phx-click="navigate_agent"
           phx-value-id={agent.id}
         >
-          <div class={if(@view_mode == :grid, do: "flex items-start justify-between mb-6", else: "flex items-center gap-4 shrink-0")}>
+          <div class={
+            if(@view_mode == :grid,
+              do: "flex items-start justify-between mb-6",
+              else: "flex items-center gap-4 shrink-0"
+            )
+          }>
             <div class={"w-12 h-12 rounded-xl flex items-center justify-center bg-#{agent.color}/10"}>
-              <span class={"material-symbols-outlined text-#{agent.color} text-xl"}>{agent.icon}</span>
+              <span class={"material-symbols-outlined text-#{agent.color} text-xl"}>
+                {agent.icon}
+              </span>
             </div>
             <div :if={@view_mode == :grid}>
               <.agent_status status={agent.status} />
@@ -181,7 +259,9 @@ defmodule FounderPadWeb.AgentsLive do
               <h3 class="font-extrabold text-xl font-headline text-on-surface">{agent.name}</h3>
               <.agent_status :if={@view_mode == :list} status={agent.status} />
             </div>
-            <p class={"text-sm text-on-surface-variant leading-relaxed #{if @view_mode == :grid, do: "mb-6 line-clamp-2", else: "line-clamp-1"}"}>{agent.description}</p>
+            <p class={"text-sm text-on-surface-variant leading-relaxed #{if @view_mode == :grid, do: "mb-6 line-clamp-2", else: "line-clamp-1"}"}>
+              {agent.description}
+            </p>
 
             <div class={if(@view_mode == :grid, do: "flex gap-2 mb-8", else: "flex gap-2 mt-2")}>
               <span class="px-2.5 py-1 bg-surface-container-high text-on-surface-variant text-[10px] font-bold rounded uppercase tracking-wider">
@@ -190,7 +270,10 @@ defmodule FounderPadWeb.AgentsLive do
               <span class="px-2.5 py-1 bg-surface-container-high text-on-surface-variant text-[10px] font-bold rounded uppercase tracking-wider">
                 {agent.model_short}
               </span>
-              <span :if={agent.tools_count > 0} class="px-2.5 py-1 bg-surface-container-high text-on-surface-variant text-[10px] font-bold rounded uppercase tracking-wider">
+              <span
+                :if={agent.tools_count > 0}
+                class="px-2.5 py-1 bg-surface-container-high text-on-surface-variant text-[10px] font-bold rounded uppercase tracking-wider"
+              >
                 {agent.tools_count} tools
               </span>
             </div>
@@ -209,7 +292,9 @@ defmodule FounderPadWeb.AgentsLive do
 
           <div :if={@view_mode == :list} class="shrink-0 flex items-center gap-4">
             <span class="text-xs font-mono text-on-surface-variant">{agent.temperature}°</span>
-            <span class="material-symbols-outlined text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity">arrow_forward</span>
+            <span class="material-symbols-outlined text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity">
+              arrow_forward
+            </span>
           </div>
         </div>
       </div>
@@ -222,7 +307,8 @@ defmodule FounderPadWeb.AgentsLive do
   defp agent_status(%{status: :active} = assigns) do
     ~H"""
     <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-green-500/10 text-green-500 text-[10px] font-bold uppercase tracking-wider">
-      <span class="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_5px_rgba(34,197,94,0.5)]"></span> Active
+      <span class="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_5px_rgba(34,197,94,0.5)]"></span>
+      Active
     </span>
     """
   end
@@ -230,7 +316,8 @@ defmodule FounderPadWeb.AgentsLive do
   defp agent_status(%{status: :paused} = assigns) do
     ~H"""
     <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-secondary/10 text-secondary text-[10px] font-bold uppercase tracking-wider">
-      <span class="w-2 h-2 rounded-full bg-secondary shadow-[0_0_5px_rgba(245,158,11,0.5)]"></span> Paused
+      <span class="w-2 h-2 rounded-full bg-secondary shadow-[0_0_5px_rgba(245,158,11,0.5)]"></span>
+      Paused
     </span>
     """
   end
@@ -280,7 +367,9 @@ defmodule FounderPadWeb.AgentsLive do
       {:ok, [_ | _] = plans} ->
         # Find the "best" plan (highest sort_order that's active)
         Enum.find(plans, List.first(plans), &(&1.slug == "pro")) || List.first(plans)
-      _ -> nil
+
+      _ ->
+        nil
     end
   end
 
@@ -306,7 +395,8 @@ defmodule FounderPadWeb.AgentsLive do
   end
 
   defp format_agent(agent) do
-    model_short = agent.model
+    model_short =
+      agent.model
       |> String.split("-")
       |> Enum.take(3)
       |> Enum.join("-")
@@ -342,9 +432,48 @@ defmodule FounderPadWeb.AgentsLive do
 
   defp sample_agents do
     [
-      %{id: "sample-1", name: "Research Assistant", description: "Deep research across documents and web sources with citation tracking.", provider: :anthropic, provider_label: "Anthropic", model_short: "claude-sonnet-4", icon: "psychology", color: "primary", status: :active, temperature: 0.7, max_tokens: 4096, tools_count: 0},
-      %{id: "sample-2", name: "Code Reviewer", description: "Automated PR reviews with security vulnerability detection.", provider: :anthropic, provider_label: "Anthropic", model_short: "claude-opus-4", icon: "psychology", color: "primary", status: :active, temperature: 0.3, max_tokens: 8192, tools_count: 2},
-      %{id: "sample-3", name: "Data Analyzer", description: "Process datasets and generate insights from structured data.", provider: :openai, provider_label: "OpenAI", model_short: "gpt-4o", icon: "auto_awesome", color: "secondary", status: :paused, temperature: 0.5, max_tokens: 4096, tools_count: 1}
+      %{
+        id: "sample-1",
+        name: "Research Assistant",
+        description: "Deep research across documents and web sources with citation tracking.",
+        provider: :anthropic,
+        provider_label: "Anthropic",
+        model_short: "claude-sonnet-4",
+        icon: "psychology",
+        color: "primary",
+        status: :active,
+        temperature: 0.7,
+        max_tokens: 4096,
+        tools_count: 0
+      },
+      %{
+        id: "sample-2",
+        name: "Code Reviewer",
+        description: "Automated PR reviews with security vulnerability detection.",
+        provider: :anthropic,
+        provider_label: "Anthropic",
+        model_short: "claude-opus-4",
+        icon: "psychology",
+        color: "primary",
+        status: :active,
+        temperature: 0.3,
+        max_tokens: 8192,
+        tools_count: 2
+      },
+      %{
+        id: "sample-3",
+        name: "Data Analyzer",
+        description: "Process datasets and generate insights from structured data.",
+        provider: :openai,
+        provider_label: "OpenAI",
+        model_short: "gpt-4o",
+        icon: "auto_awesome",
+        color: "secondary",
+        status: :paused,
+        temperature: 0.5,
+        max_tokens: 4096,
+        tools_count: 1
+      }
     ]
   end
 end

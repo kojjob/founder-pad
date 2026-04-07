@@ -3,15 +3,15 @@ defmodule FounderPad.Analytics do
 
   resources do
     resource FounderPad.Analytics.AppEvent do
-      define :create_event, action: :create
-      define :list_events, action: :read
-      define :list_by_org, action: :by_organisation, args: [:organisation_id]
+      define(:create_event, action: :create)
+      define(:list_events, action: :read)
+      define(:list_by_org, action: :by_organisation, args: [:organisation_id])
     end
 
     resource FounderPad.Analytics.SearchConsoleData do
-      define :create_search_data, action: :create
-      define :list_search_data, action: :read
-      define :list_search_by_org, action: :by_organisation, args: [:organisation_id]
+      define(:create_search_data, action: :create)
+      define(:list_search_data, action: :read)
+      define(:list_search_by_org, action: :by_organisation, args: [:organisation_id])
     end
   end
 

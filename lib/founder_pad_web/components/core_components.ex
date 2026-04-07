@@ -535,7 +535,6 @@ defmodule FounderPadWeb.CoreComponents do
               <li>
                 <a
                   href="/docs"
-                  
                   class="hover:text-on-surface transition-colors"
                 >
                   Documentation
@@ -544,7 +543,6 @@ defmodule FounderPadWeb.CoreComponents do
               <li>
                 <a
                   href="/docs/changelog"
-                  
                   class="hover:text-on-surface transition-colors"
                 >
                   Changelog
@@ -572,8 +570,14 @@ defmodule FounderPadWeb.CoreComponents do
             <h4 class="text-sm font-semibold font-headline text-on-surface mb-4">Company</h4>
             <ul class="space-y-2.5 text-sm text-on-surface-variant">
               <li><a href="/" class="hover:text-on-surface transition-colors">About</a></li>
-              <li><a href="/docs/changelog" class="hover:text-on-surface transition-colors">Blog</a></li>
-              <li><a href="mailto:careers@founderpad.io" class="hover:text-on-surface transition-colors">Careers</a></li>
+              <li>
+                <a href="/docs/changelog" class="hover:text-on-surface transition-colors">Blog</a>
+              </li>
+              <li>
+                <a href="mailto:careers@founderpad.io" class="hover:text-on-surface transition-colors">
+                  Careers
+                </a>
+              </li>
               <li>
                 <a href="mailto:support@founderpad.io" class="hover:text-on-surface transition-colors">
                   Contact
@@ -586,11 +590,15 @@ defmodule FounderPadWeb.CoreComponents do
           <div>
             <h4 class="text-sm font-semibold font-headline text-on-surface mb-4">Legal</h4>
             <ul class="space-y-2.5 text-sm text-on-surface-variant">
-              <li><a href="/docs" class="hover:text-on-surface transition-colors">Privacy Policy</a></li>
+              <li>
+                <a href="/docs" class="hover:text-on-surface transition-colors">Privacy Policy</a>
+              </li>
               <li>
                 <a href="/docs" class="hover:text-on-surface transition-colors">Terms of Service</a>
               </li>
-              <li><a href="/docs" class="hover:text-on-surface transition-colors">Cookie Policy</a></li>
+              <li>
+                <a href="/docs" class="hover:text-on-surface transition-colors">Cookie Policy</a>
+              </li>
             </ul>
           </div>
         </div>
@@ -637,6 +645,26 @@ defmodule FounderPadWeb.CoreComponents do
         </div>
       </div>
     </footer>
+    """
+  end
+
+  @doc "Renders a contextual help link icon."
+  attr :context, :string, required: true, doc: "Help context key, e.g. 'agents.create'"
+  attr :class, :string, default: ""
+
+  def help_link(assigns) do
+    ~H"""
+    <a
+      href={"/help/search?q=#{@context}"}
+      target="_blank"
+      class={[
+        "inline-flex items-center justify-center w-5 h-5 rounded-full text-on-surface-variant/50 hover:text-primary hover:bg-primary/10 transition-colors cursor-help",
+        @class
+      ]}
+      title="Help"
+    >
+      <span class="material-symbols-outlined text-sm">help</span>
+    </a>
     """
   end
 end

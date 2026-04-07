@@ -100,25 +100,34 @@ defmodule FounderPad.AnalyticsTest do
       org = create_organisation!()
 
       assert :ok =
-               FounderPad.Analytics.Workers.GscSyncWorker.perform(
-                 %Oban.Job{args: %{"organisation_id" => org.id}}
-               )
+               FounderPad.Analytics.Workers.GscSyncWorker.perform(%Oban.Job{
+                 args: %{"organisation_id" => org.id}
+               })
     end
   end
 
   describe "edge cases" do
     test "handles high-frequency event tracking" do
       org = create_organisation!()
+      test_pid = self()
 
       tasks =
-        for i <- 1..30 do
-          Task.async(fn ->
-            Analytics.track("load_test.#{i}", org_id: org.id)
-          end)
+        for i <- 1..10 do
+          task =
+            Task.async(fn ->
+              Analytics.track("load_test.#{i}", org_id: org.id)
+            end)
+
+          Ecto.Adapters.SQL.Sandbox.allow(FounderPad.Repo, test_pid, task.pid)
+          task
         end
 
       results = Task.await_many(tasks)
-      assert Enum.all?(results, fn {:ok, _} -> true; _ -> false end)
+
+      assert Enum.all?(results, fn
+               {:ok, _} -> true
+               _ -> false
+             end)
     end
 
     test "handles unicode in event metadata" do

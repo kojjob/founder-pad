@@ -3,22 +3,39 @@ defmodule FounderPad.Accounts do
 
   resources do
     resource FounderPad.Accounts.User do
-      define :register_with_password, args: [:email, :password, :password_confirmation]
-      define :sign_in_with_password, args: [:email, :password]
-      define :request_magic_link, args: [:email]
-      define :get_user_by_id, action: :read, get_by: [:id]
+      define(:register_with_password, args: [:email, :password, :password_confirmation])
+      define(:sign_in_with_password, args: [:email, :password])
+      define(:request_magic_link, args: [:email])
+      define(:get_user_by_id, action: :read, get_by: [:id])
+      define(:suspend_user, action: :suspend)
+      define(:unsuspend_user, action: :unsuspend)
+      define(:list_all_users, action: :list_all)
     end
 
     resource FounderPad.Accounts.Organisation do
-      define :create_organisation, action: :create, args: [:name]
-      define :get_organisation, action: :read, get_by: [:id]
+      define(:create_organisation, action: :create, args: [:name])
+      define(:get_organisation, action: :read, get_by: [:id])
     end
 
     resource FounderPad.Accounts.Membership do
-      define :create_membership, action: :create
-      define :list_memberships, action: :read
+      define(:create_membership, action: :create)
+      define(:list_memberships, action: :read)
     end
 
-    resource FounderPad.Accounts.Token
+    resource(FounderPad.Accounts.Token)
+
+    resource FounderPad.Accounts.SocialIdentity do
+      define(:create_social_identity, action: :create)
+      define(:find_social_identity, action: :by_provider, args: [:provider, :provider_uid])
+      define(:list_user_social_identities, action: :by_user, args: [:user_id])
+    end
+
+    resource FounderPad.Accounts.UserTotp do
+      define(:create_user_totp, action: :create)
+      define(:enable_totp, action: :enable)
+      define(:disable_totp, action: :disable)
+      define(:get_totp_by_user, action: :by_user, args: [:user_id])
+      define(:destroy_user_totp, action: :destroy)
+    end
   end
 end

@@ -48,10 +48,11 @@ defmodule FounderPadWeb.TeamLive do
   end
 
   def handle_event("change_page", %{"page" => page}, socket) do
-    page_num = case Integer.parse(page) do
-      {n, _} when n > 0 -> n
-      _ -> 1
-    end
+    page_num =
+      case Integer.parse(page) do
+        {n, _} when n > 0 -> n
+        _ -> 1
+      end
 
     {:noreply, assign(socket, current_page: page_num)}
   end
@@ -62,7 +63,15 @@ defmodule FounderPadWeb.TeamLive do
   end
 
   def handle_event("next_page", _, socket) do
-    total_pages = max(1, ceil(length(filtered_members(socket.assigns.members, socket.assigns.search_query)) / @per_page))
+    total_pages =
+      max(
+        1,
+        ceil(
+          length(filtered_members(socket.assigns.members, socket.assigns.search_query)) /
+            @per_page
+        )
+      )
+
     page = min(socket.assigns.current_page + 1, total_pages)
     {:noreply, assign(socket, current_page: page)}
   end
@@ -70,7 +79,15 @@ defmodule FounderPadWeb.TeamLive do
   # ── Invite Modal ──
 
   def handle_event("show_invite_modal", _, socket) do
-    {:noreply, assign(socket, show_invite_modal: true, invite_error: nil, invite_emails: [], invite_email_input: "", invite_role: "member", invite_success_count: 0)}
+    {:noreply,
+     assign(socket,
+       show_invite_modal: true,
+       invite_error: nil,
+       invite_emails: [],
+       invite_email_input: "",
+       invite_role: "member",
+       invite_success_count: 0
+     )}
   end
 
   def handle_event("close_invite_modal", _, socket) do
@@ -182,7 +199,11 @@ defmodule FounderPadWeb.TeamLive do
              |> Ash.update() do
           {:ok, _} ->
             members = reload_members(socket.assigns.org_id)
-            {:noreply, socket |> assign(members: members, role_edit_id: nil) |> put_flash(:info, "Role updated")}
+
+            {:noreply,
+             socket
+             |> assign(members: members, role_edit_id: nil)
+             |> put_flash(:info, "Role updated")}
 
           {:error, _} ->
             {:noreply, put_flash(socket, :error, "Failed to update role")}
@@ -254,49 +275,66 @@ defmodule FounderPadWeb.TeamLive do
           phx-click="show_invite_modal"
           class="primary-gradient text-on-primary px-6 py-3 rounded-lg flex items-center gap-2 font-label font-semibold text-xs tracking-wider uppercase editorial-shadow hover:scale-[1.02] transition-transform whitespace-nowrap"
         >
-          <span class="material-symbols-outlined text-sm">person_add</span>
-          Invite Members
+          <span class="material-symbols-outlined text-sm">person_add</span> Invite Members
         </button>
       </div>
 
       <%!-- Stats Row --%>
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div class="bg-surface-container rounded-xl p-5">
-          <p class="font-label text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/50 mb-2">Total Seats</p>
+          <p class="font-label text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/50 mb-2">
+            Total Seats
+          </p>
           <div class="flex items-baseline gap-1">
             <span class="font-mono text-2xl font-bold text-on-surface">{@used_seats}</span>
             <span class="font-mono text-sm text-on-surface-variant/40">/ {@total_seats}</span>
           </div>
           <div class="mt-3 h-1 bg-surface-container-highest rounded-full overflow-hidden">
-            <div class="h-full bg-primary rounded-full transition-all" style={"width: #{min(round(@used_seats / max(@total_seats, 1) * 100), 100)}%"}></div>
+            <div
+              class="h-full bg-primary rounded-full transition-all"
+              style={"width: #{min(round(@used_seats / max(@total_seats, 1) * 100), 100)}%"}
+            >
+            </div>
           </div>
         </div>
 
         <div class="bg-surface-container rounded-xl p-5">
-          <p class="font-label text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/50 mb-2">Active Now</p>
+          <p class="font-label text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/50 mb-2">
+            Active Now
+          </p>
           <div class="flex items-center gap-3">
             <span class="font-mono text-2xl font-bold text-on-surface">{@active_now}</span>
             <span class="flex items-center gap-1.5">
               <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-              <span class="text-[10px] font-semibold uppercase tracking-wider text-emerald-500">Live</span>
+              <span class="text-[10px] font-semibold uppercase tracking-wider text-emerald-500">
+                Live
+              </span>
             </span>
           </div>
         </div>
 
         <div class="bg-surface-container rounded-xl p-5">
-          <p class="font-label text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/50 mb-2">Pending</p>
-          <span class="font-mono text-2xl font-bold text-on-surface">{String.pad_leading("#{@pending}", 2, "0")}</span>
+          <p class="font-label text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/50 mb-2">
+            Pending
+          </p>
+          <span class="font-mono text-2xl font-bold text-on-surface">
+            {String.pad_leading("#{@pending}", 2, "0")}
+          </span>
         </div>
 
         <div class="bg-surface-container rounded-xl p-5">
-          <p class="font-label text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/50 mb-2">Next Billing</p>
+          <p class="font-label text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/50 mb-2">
+            Next Billing
+          </p>
           <span class="font-mono text-2xl font-bold text-on-surface">{@next_billing}</span>
         </div>
       </div>
 
       <%!-- Search Bar --%>
       <div class="relative">
-        <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant/40 text-xl">search</span>
+        <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant/40 text-xl">
+          search
+        </span>
         <input
           type="text"
           placeholder="Search by name, email, or role..."
@@ -313,18 +351,34 @@ defmodule FounderPadWeb.TeamLive do
           <table class="w-full text-left">
             <thead>
               <tr class="border-b border-outline-variant/10">
-                <th class="px-6 py-4 font-label text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/50">Member Name</th>
-                <th class="px-6 py-4 font-label text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/50">Role</th>
-                <th class="px-6 py-4 font-label text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/50">Status</th>
-                <th class="px-6 py-4 font-label text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/50">Last Active</th>
-                <th class="px-6 py-4 font-label text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/50 text-right">Actions</th>
+                <th class="px-6 py-4 font-label text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/50">
+                  Member Name
+                </th>
+                <th class="px-6 py-4 font-label text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/50">
+                  Role
+                </th>
+                <th class="px-6 py-4 font-label text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/50">
+                  Status
+                </th>
+                <th class="px-6 py-4 font-label text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/50">
+                  Last Active
+                </th>
+                <th class="px-6 py-4 font-label text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/50 text-right">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody>
               <tr :if={@paginated == []} class="border-b border-outline-variant/5">
                 <td colspan="5" class="px-6 py-12 text-center text-on-surface-variant">
-                  <span class="material-symbols-outlined text-4xl text-on-surface-variant/30 mb-2 block">group_off</span>
-                  <p class="text-sm">{if @search_query != "", do: "No members matching \"#{@search_query}\"", else: "No team members yet"}</p>
+                  <span class="material-symbols-outlined text-4xl text-on-surface-variant/30 mb-2 block">
+                    group_off
+                  </span>
+                  <p class="text-sm">
+                    {if @search_query != "",
+                      do: "No members matching \"#{@search_query}\"",
+                      else: "No team members yet"}
+                  </p>
                 </td>
               </tr>
               <tr
@@ -335,9 +389,16 @@ defmodule FounderPadWeb.TeamLive do
                 <td class="px-6 py-4">
                   <div class="flex items-center gap-3">
                     <%= if m.avatar do %>
-                      <img src={m.avatar} alt={m.name} class="w-10 h-10 rounded-full object-cover ring-2 ring-surface-container-highest/50" />
+                      <img
+                        src={m.avatar}
+                        alt={m.name}
+                        class="w-10 h-10 rounded-full object-cover ring-2 ring-surface-container-highest/50"
+                      />
                     <% else %>
-                      <div class={["w-10 h-10 rounded-full flex items-center justify-center font-headline font-bold text-sm", avatar_bg_class(m.role)]}>
+                      <div class={[
+                        "w-10 h-10 rounded-full flex items-center justify-center font-headline font-bold text-sm",
+                        avatar_bg_class(m.role)
+                      ]}>
                         {initials(m.name)}
                       </div>
                     <% end %>
@@ -353,7 +414,10 @@ defmodule FounderPadWeb.TeamLive do
                   <%= if @role_edit_id == m.id do %>
                     <form phx-submit="change_role" phx-value-id={m.id} class="flex items-center gap-2">
                       <input type="hidden" name="id" value={m.id} />
-                      <select name="role" class="bg-surface-container-highest border-none rounded-lg px-2 py-1 text-xs text-on-surface focus:ring-2 focus:ring-primary">
+                      <select
+                        name="role"
+                        class="bg-surface-container-highest border-none rounded-lg px-2 py-1 text-xs text-on-surface focus:ring-2 focus:ring-primary"
+                      >
                         <option value="member" selected={m.role == :member}>Member</option>
                         <option value="admin" selected={m.role == :admin}>Admin</option>
                         <option value="owner" selected={m.role == :owner}>Owner</option>
@@ -361,12 +425,19 @@ defmodule FounderPadWeb.TeamLive do
                       <button type="submit" class="text-primary hover:text-primary/80">
                         <span class="material-symbols-outlined text-lg">check</span>
                       </button>
-                      <button type="button" phx-click="cancel_role_edit" class="text-on-surface-variant hover:text-on-surface">
+                      <button
+                        type="button"
+                        phx-click="cancel_role_edit"
+                        class="text-on-surface-variant hover:text-on-surface"
+                      >
                         <span class="material-symbols-outlined text-lg">close</span>
                       </button>
                     </form>
                   <% else %>
-                    <span class={["inline-flex px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider", role_badge_class(m.role)]}>
+                    <span class={[
+                      "inline-flex px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider",
+                      role_badge_class(m.role)
+                    ]}>
                       {role_label(m.role)}
                     </span>
                   <% end %>
@@ -376,7 +447,9 @@ defmodule FounderPadWeb.TeamLive do
                 <td class="px-6 py-4">
                   <div class="flex items-center gap-2">
                     <span class={["w-2 h-2 rounded-full", status_dot_class(m.status)]}></span>
-                    <span class="font-body text-xs text-on-surface-variant">{status_label(m.status)}</span>
+                    <span class="font-body text-xs text-on-surface-variant">
+                      {status_label(m.status)}
+                    </span>
                   </div>
                 </td>
 
@@ -424,7 +497,10 @@ defmodule FounderPadWeb.TeamLive do
         <%!-- Pagination --%>
         <div class="px-6 py-4 flex items-center justify-between border-t border-outline-variant/10">
           <span class="text-xs text-on-surface-variant/50">
-            Showing {min((@current_page - 1) * 6 + 1, length(@filtered))}-{min(@current_page * 6, length(@filtered))} of {length(@filtered)} members
+            Showing {min((@current_page - 1) * 6 + 1, length(@filtered))}-{min(
+              @current_page * 6,
+              length(@filtered)
+            )} of {length(@filtered)} members
           </span>
           <div class="flex items-center gap-1">
             <button
@@ -440,7 +516,10 @@ defmodule FounderPadWeb.TeamLive do
               phx-value-page={p}
               class={[
                 "w-8 h-8 rounded-lg flex items-center justify-center text-xs font-medium transition-colors",
-                if(p == @current_page, do: "bg-primary text-on-primary", else: "text-on-surface-variant hover:bg-surface-container-high")
+                if(p == @current_page,
+                  do: "bg-primary text-on-primary",
+                  else: "text-on-surface-variant hover:bg-surface-container-high"
+                )
               ]}
             >
               {p}
@@ -467,53 +546,84 @@ defmodule FounderPadWeb.TeamLive do
             </p>
           </div>
         </div>
-        <.link navigate="/activity" class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-primary hover:text-primary/80 transition-colors whitespace-nowrap">
-          View Audit Trail
-          <span class="material-symbols-outlined text-sm">arrow_forward</span>
+        <.link
+          navigate="/activity"
+          class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-primary hover:text-primary/80 transition-colors whitespace-nowrap"
+        >
+          View Audit Trail <span class="material-symbols-outlined text-sm">arrow_forward</span>
         </.link>
       </div>
 
       <%!-- ═══ Enhanced Invite Modal ═══ --%>
-      <div :if={@show_invite_modal} class="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm">
+      <div
+        :if={@show_invite_modal}
+        class="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm"
+      >
         <div class="bg-surface-container rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden">
           <%!-- Modal Header --%>
           <div class="px-8 pt-8 pb-4">
             <div class="flex justify-between items-center mb-2">
               <h2 class="text-xl font-bold font-headline text-on-surface">Invite Team Members</h2>
-              <button phx-click="close_invite_modal" class="p-1 text-on-surface-variant hover:text-on-surface rounded-lg hover:bg-surface-container-high transition-colors">
+              <button
+                phx-click="close_invite_modal"
+                class="p-1 text-on-surface-variant hover:text-on-surface rounded-lg hover:bg-surface-container-high transition-colors"
+              >
                 <span class="material-symbols-outlined">close</span>
               </button>
             </div>
-            <p class="text-xs text-on-surface-variant">Add up to 10 people at once. They must have a FounderPad account.</p>
+            <p class="text-xs text-on-surface-variant">
+              Add up to 10 people at once. They must have a FounderPad account.
+            </p>
           </div>
 
           <%!-- Seat availability --%>
           <div class="mx-8 mb-4 flex items-center gap-3 px-4 py-3 bg-surface-container-high/50 rounded-xl">
             <span class="material-symbols-outlined text-primary text-lg">event_seat</span>
             <div class="flex-1">
-              <p class="text-xs font-medium text-on-surface">{@total_seats - @used_seats} seat(s) available</p>
+              <p class="text-xs font-medium text-on-surface">
+                {@total_seats - @used_seats} seat(s) available
+              </p>
               <div class="mt-1.5 h-1 bg-surface-container-highest rounded-full overflow-hidden">
-                <div class="h-full bg-primary rounded-full" style={"width: #{min(round(@used_seats / max(@total_seats, 1) * 100), 100)}%"}></div>
+                <div
+                  class="h-full bg-primary rounded-full"
+                  style={"width: #{min(round(@used_seats / max(@total_seats, 1) * 100), 100)}%"}
+                >
+                </div>
               </div>
             </div>
-            <span class="text-[10px] font-mono text-on-surface-variant">{@used_seats}/{@total_seats}</span>
+            <span class="text-[10px] font-mono text-on-surface-variant">
+              {@used_seats}/{@total_seats}
+            </span>
           </div>
 
           <div class="px-8 pb-8 space-y-5">
             <%!-- Error/Success messages --%>
-            <div :if={@invite_error} class="flex items-start gap-2 bg-error/10 text-error text-sm p-3 rounded-lg">
+            <div
+              :if={@invite_error}
+              class="flex items-start gap-2 bg-error/10 text-error text-sm p-3 rounded-lg"
+            >
               <span class="material-symbols-outlined text-base mt-0.5">error</span>
               <span>{@invite_error}</span>
             </div>
-            <div :if={@invite_success_count > 0 && @invite_error} class="flex items-start gap-2 bg-primary/10 text-primary text-sm p-3 rounded-lg">
+            <div
+              :if={@invite_success_count > 0 && @invite_error}
+              class="flex items-start gap-2 bg-primary/10 text-primary text-sm p-3 rounded-lg"
+            >
               <span class="material-symbols-outlined text-base mt-0.5">check_circle</span>
               <span>{@invite_success_count} member(s) added successfully</span>
             </div>
 
             <%!-- Email input with add button --%>
-            <form id="add-email-form" phx-submit="add_invite_email" phx-change="update_invite_email" class="flex gap-2">
+            <form
+              id="add-email-form"
+              phx-submit="add_invite_email"
+              phx-change="update_invite_email"
+              class="flex gap-2"
+            >
               <div class="flex-1 relative">
-                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant/40 text-lg">mail</span>
+                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant/40 text-lg">
+                  mail
+                </span>
                 <input
                   type="email"
                   name="email"
@@ -522,9 +632,11 @@ defmodule FounderPadWeb.TeamLive do
                   class="w-full pl-10 pr-4 bg-surface-container-highest border-none rounded-lg py-3 text-sm text-on-surface focus:ring-2 focus:ring-primary placeholder:text-on-surface-variant/40"
                 />
               </div>
-              <button type="submit" class="px-4 py-3 bg-surface-container-highest hover:bg-primary/10 text-primary rounded-lg text-sm font-semibold transition-colors flex items-center gap-1">
-                <span class="material-symbols-outlined text-lg">add</span>
-                Add
+              <button
+                type="submit"
+                class="px-4 py-3 bg-surface-container-highest hover:bg-primary/10 text-primary rounded-lg text-sm font-semibold transition-colors flex items-center gap-1"
+              >
+                <span class="material-symbols-outlined text-lg">add</span> Add
               </button>
             </form>
 
@@ -549,14 +661,18 @@ defmodule FounderPadWeb.TeamLive do
 
             <%!-- Role selector with descriptions --%>
             <div>
-              <label class="text-xs font-bold uppercase tracking-wider text-on-surface-variant mb-3 block">Assign Role</label>
+              <label class="text-xs font-bold uppercase tracking-wider text-on-surface-variant mb-3 block">
+                Assign Role
+              </label>
               <div class="grid grid-cols-3 gap-3">
                 <button
-                  :for={{role_key, role_name, role_desc, role_icon} <- [
-                    {"member", "Member", "View & use agents", "person"},
-                    {"admin", "Admin", "Manage agents & team", "shield_person"},
-                    {"owner", "Owner", "Full access & billing", "admin_panel_settings"}
-                  ]}
+                  :for={
+                    {role_key, role_name, role_desc, role_icon} <- [
+                      {"member", "Member", "View & use agents", "person"},
+                      {"admin", "Admin", "Manage agents & team", "shield_person"},
+                      {"owner", "Owner", "Full access & billing", "admin_panel_settings"}
+                    ]
+                  }
                   type="button"
                   phx-click="update_invite_role"
                   phx-value-role={role_key}
@@ -568,7 +684,12 @@ defmodule FounderPadWeb.TeamLive do
                     )
                   ]}
                 >
-                  <span class={["material-symbols-outlined text-lg mb-1 block", if(@invite_role == role_key, do: "text-primary", else: "text-on-surface-variant")]}>{role_icon}</span>
+                  <span class={[
+                    "material-symbols-outlined text-lg mb-1 block",
+                    if(@invite_role == role_key, do: "text-primary", else: "text-on-surface-variant")
+                  ]}>
+                    {role_icon}
+                  </span>
                   <p class="text-xs font-bold text-on-surface">{role_name}</p>
                   <p class="text-[10px] text-on-surface-variant mt-0.5">{role_desc}</p>
                 </button>
@@ -581,18 +702,26 @@ defmodule FounderPadWeb.TeamLive do
               class="w-full primary-gradient py-3 rounded-lg text-sm font-bold transition-all flex items-center justify-center gap-2"
             >
               <span class="material-symbols-outlined text-lg">group_add</span>
-              {if length(@invite_emails) > 0, do: "Add #{length(@invite_emails)} Member(s)", else: "Add Member"}
+              {if length(@invite_emails) > 0,
+                do: "Add #{length(@invite_emails)} Member(s)",
+                else: "Add Member"}
             </button>
           </div>
         </div>
       </div>
 
       <%!-- ═══ Manage Seats Modal ═══ --%>
-      <div :if={@show_seats_modal} class="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm">
+      <div
+        :if={@show_seats_modal}
+        class="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm"
+      >
         <div class="bg-surface-container rounded-2xl p-8 w-full max-w-md shadow-2xl space-y-6">
           <div class="flex justify-between items-center">
             <h2 class="text-xl font-bold font-headline text-on-surface">Manage Seats</h2>
-            <button phx-click="close_seats_modal" class="p-1 text-on-surface-variant hover:text-on-surface rounded-lg hover:bg-surface-container-high transition-colors">
+            <button
+              phx-click="close_seats_modal"
+              class="p-1 text-on-surface-variant hover:text-on-surface rounded-lg hover:bg-surface-container-high transition-colors"
+            >
               <span class="material-symbols-outlined">close</span>
             </button>
           </div>
@@ -603,25 +732,35 @@ defmodule FounderPadWeb.TeamLive do
                 <p class="text-sm font-bold text-on-surface">Current Plan</p>
                 <p class="text-xs text-on-surface-variant">{@total_seats} seats included</p>
               </div>
-              <span class="font-mono text-2xl font-bold text-primary">{@used_seats}<span class="text-sm text-on-surface-variant/40">/{@total_seats}</span></span>
+              <span class="font-mono text-2xl font-bold text-primary">
+                {@used_seats}<span class="text-sm text-on-surface-variant/40">/{@total_seats}</span>
+              </span>
             </div>
 
             <div class="space-y-2">
               <div class="flex justify-between text-xs text-on-surface-variant">
                 <span>Seats used</span>
-                <span class="font-mono">{min(round(@used_seats / max(@total_seats, 1) * 100), 100)}%</span>
+                <span class="font-mono">
+                  {min(round(@used_seats / max(@total_seats, 1) * 100), 100)}%
+                </span>
               </div>
               <div class="h-2 bg-surface-container-highest rounded-full overflow-hidden">
-                <div class={[
-                  "h-full rounded-full transition-all",
-                  if(@used_seats / max(@total_seats, 1) > 0.8, do: "bg-error", else: "bg-primary")
-                ]} style={"width: #{min(round(@used_seats / max(@total_seats, 1) * 100), 100)}%"}></div>
+                <div
+                  class={[
+                    "h-full rounded-full transition-all",
+                    if(@used_seats / max(@total_seats, 1) > 0.8, do: "bg-error", else: "bg-primary")
+                  ]}
+                  style={"width: #{min(round(@used_seats / max(@total_seats, 1) * 100), 100)}%"}
+                >
+                </div>
               </div>
             </div>
 
             <%!-- Adjust Seats Controls --%>
             <div class="p-4 bg-surface-container-high/50 rounded-xl">
-              <p class="text-xs font-bold uppercase tracking-wider text-on-surface-variant mb-3">Adjust Seats</p>
+              <p class="text-xs font-bold uppercase tracking-wider text-on-surface-variant mb-3">
+                Adjust Seats
+              </p>
               <div class="flex items-center justify-center gap-4">
                 <button
                   phx-click="decrement_seats"
@@ -630,7 +769,9 @@ defmodule FounderPadWeb.TeamLive do
                 >
                   <span class="material-symbols-outlined text-xl">remove</span>
                 </button>
-                <span class="font-mono text-3xl font-bold text-on-surface min-w-[3ch] text-center">{@new_seat_count}</span>
+                <span class="font-mono text-3xl font-bold text-on-surface min-w-[3ch] text-center">
+                  {@new_seat_count}
+                </span>
                 <button
                   phx-click="increment_seats"
                   class="w-10 h-10 rounded-lg bg-surface-container-highest flex items-center justify-center text-on-surface hover:bg-primary/10 hover:text-primary transition-colors"
@@ -638,22 +779,36 @@ defmodule FounderPadWeb.TeamLive do
                   <span class="material-symbols-outlined text-xl">add</span>
                 </button>
               </div>
-              <p :if={@new_seat_count != @total_seats} class="text-center text-xs text-on-surface-variant mt-2">
-                {if @new_seat_count > @total_seats, do: "Adding #{@new_seat_count - @total_seats} seat(s)", else: "Removing #{@total_seats - @new_seat_count} seat(s)"}
+              <p
+                :if={@new_seat_count != @total_seats}
+                class="text-center text-xs text-on-surface-variant mt-2"
+              >
+                {if @new_seat_count > @total_seats,
+                  do: "Adding #{@new_seat_count - @total_seats} seat(s)",
+                  else: "Removing #{@total_seats - @new_seat_count} seat(s)"}
               </p>
             </div>
 
             <div class="p-4 bg-primary/5 rounded-xl">
               <p class="text-xs text-on-surface-variant leading-relaxed">
-                <span class="material-symbols-outlined text-primary text-sm align-middle mr-1">info</span>
+                <span class="material-symbols-outlined text-primary text-sm align-middle mr-1">
+                  info
+                </span>
                 Seat changes will be reflected in your next billing cycle.
-                Visit the <.link navigate="/billing" class="text-primary font-semibold hover:underline">Billing page</.link> for plan details.
+                Visit the
+                <.link navigate="/billing" class="text-primary font-semibold hover:underline">
+                  Billing page
+                </.link>
+                for plan details.
               </p>
             </div>
           </div>
 
           <div class="flex gap-3">
-            <button phx-click="close_seats_modal" class="flex-1 bg-surface-container-highest hover:bg-surface-container-high text-on-surface py-3 rounded-lg text-sm font-semibold transition-colors">
+            <button
+              phx-click="close_seats_modal"
+              class="flex-1 bg-surface-container-highest hover:bg-surface-container-high text-on-surface py-3 rounded-lg text-sm font-semibold transition-colors"
+            >
               Cancel
             </button>
             <button
@@ -775,7 +930,11 @@ defmodule FounderPadWeb.TeamLive do
       case FounderPad.Accounts.User |> Ash.Query.filter(email == ^email) |> Ash.read() do
         {:ok, [user | _]} ->
           case FounderPad.Accounts.Membership
-               |> Ash.Changeset.for_create(:create, %{role: role, user_id: user.id, organisation_id: org_id})
+               |> Ash.Changeset.for_create(:create, %{
+                 role: role,
+                 user_id: user.id,
+                 organisation_id: org_id
+               })
                |> Ash.create() do
             {:ok, _} -> {success + 1, errors}
             {:error, _} -> {success, errors ++ ["#{email}: already a member"]}

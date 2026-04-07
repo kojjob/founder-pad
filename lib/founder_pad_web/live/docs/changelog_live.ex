@@ -1,64 +1,24 @@
 defmodule FounderPadWeb.Docs.ChangelogLive do
   use FounderPadWeb, :live_view
 
-  @releases [
-    %{
-      version: "v1.1.0",
-      date: "March 20, 2026",
-      title: "Production Polish",
-      expanded_default: true,
-      changes: [
-        %{type: :feature, text: "Working agent chat with PubSub streaming"},
-        %{type: :feature, text: "Stripe checkout controller with graceful degradation"},
-        %{type: :feature, text: "Magic link + password reset emails via Swoosh"},
-        %{type: :feature, text: "Mobile sidebar drawer with slide animation"},
-        %{type: :feature, text: "Styled toast notifications with auto-dismiss"},
-        %{type: :feature, text: "Custom 404/500 error pages"},
-        %{type: :feature, text: "Landing page scroll animations"},
-        %{type: :feature, text: "Dynamic dashboard with auto-refresh"},
-        %{type: :feature, text: "All settings functional: 2FA, theme, compact UI, high contrast"},
-        %{type: :feature, text: "Login history from audit trail"},
-        %{type: :feature, text: "Fully dynamic billing, team, and agents pages"}
-      ]
-    },
-    %{
-      version: "v1.0.0",
-      date: "March 19, 2026",
-      title: "Initial Release",
-      expanded_default: true,
-      changes: [
-        %{
-          type: :feature,
-          text:
-            "8 Ash domains: Accounts, Billing, AI, Notifications, Audit, Feature Flags, Webhooks, Analytics"
-        },
-        %{type: :feature, text: "13 LiveView screens with Midnight Architect design system"},
-        %{
-          type: :feature,
-          text: "Multi-provider AI: Anthropic Claude + OpenAI GPT-4o with streaming"
-        },
-        %{type: :feature, text: "Stripe billing with 4-tier plans and webhook processing"},
-        %{type: :feature, text: "AshAuthentication: password, magic link, OAuth2 ready"},
-        %{type: :feature, text: "Full dark/light theme with CSS variable switching"},
-        %{type: :feature, text: "REST + GraphQL API auto-derived from Ash resources"},
-        %{type: :feature, text: "Rate limiting, audit logging, feature flags"},
-        %{type: :feature, text: "Docker + Fly.io deployment config"},
-        %{type: :fix, text: "196 tests, 0 failures"}
-      ]
-    }
-  ]
+  require Ash.Query
 
   def mount(_params, _session, socket) do
+    entries =
+      FounderPad.Content.ChangelogEntry
+      |> Ash.Query.for_read(:published)
+      |> Ash.Query.load([:author])
+      |> Ash.read!()
+
     expanded =
-      @releases
-      |> Enum.filter(& &1.expanded_default)
+      entries
       |> Enum.map(& &1.version)
       |> MapSet.new()
 
     {:ok,
      assign(socket,
        page_title: "Changelog -- FounderPad",
-       releases: @releases,
+       entries: entries,
        expanded: expanded
      ), layout: false}
   end
@@ -101,7 +61,7 @@ defmodule FounderPadWeb.Docs.ChangelogLive do
           </div>
 
           <div class="space-y-8">
-            <%= for release <- @releases do %>
+            <%= for entry <- @entries do %>
               <div class="relative">
                 <%!-- Timeline dot --%>
                 <div class="absolute left-[12px] top-7 w-[15px] h-[15px] rounded-full bg-primary/20 hidden sm:flex items-center justify-center">
@@ -113,41 +73,46 @@ defmodule FounderPadWeb.Docs.ChangelogLive do
                   <%!-- Card header --%>
                   <button
                     phx-click="toggle_release"
-                    phx-value-version={release.version}
+                    phx-value-version={entry.version}
                     class="w-full text-left px-6 py-5 flex items-start sm:items-center gap-4 hover:bg-surface-container-high/30 transition-colors cursor-pointer"
                   >
                     <div class="flex flex-col sm:flex-row sm:items-center gap-3 flex-1">
                       <span class="inline-flex items-center px-3 py-1 rounded-lg bg-primary/10 text-primary text-sm font-bold font-mono">
-                        {release.version}
+                        {entry.version}
                       </span>
-                      <h2 class="text-lg font-bold font-headline">{release.title}</h2>
-                      <span class="text-sm text-on-surface-variant/50">{release.date}</span>
+                      <h2 class="text-lg font-bold font-headline">{entry.title}</h2>
+                      <.type_badge type={entry.type} />
+                      <span class="text-sm text-on-surface-variant/50">
+                        {if entry.published_at,
+                          do: Calendar.strftime(entry.published_at, "%B %d, %Y"),
+                          else: ""}
+                      </span>
                     </div>
                     <span class={"material-symbols-outlined text-on-surface-variant/40 text-lg transition-transform mt-1 " <>
-                      if(MapSet.member?(@expanded, release.version), do: "rotate-180", else: "")}>
+                      if(MapSet.member?(@expanded, entry.version), do: "rotate-180", else: "")}>
                       expand_more
                     </span>
                   </button>
 
                   <%!-- Card content --%>
-                  <%= if MapSet.member?(@expanded, release.version) do %>
+                  <%= if MapSet.member?(@expanded, entry.version) do %>
                     <div class="px-6 pb-6">
                       <div class="h-px bg-outline-variant/10 mb-5"></div>
-                      <ul class="space-y-3">
-                        <%= for change <- release.changes do %>
-                          <li class="flex items-start gap-3">
-                            <.change_badge type={change.type} />
-                            <span class="text-sm text-on-surface leading-relaxed">
-                              {change.text}
-                            </span>
-                          </li>
-                        <% end %>
-                      </ul>
+                      <div class="prose prose-sm max-w-none text-on-surface prose-headings:text-on-surface prose-a:text-primary">
+                        {Phoenix.HTML.raw(entry.body || "")}
+                      </div>
                     </div>
                   <% end %>
                 </div>
               </div>
             <% end %>
+          </div>
+
+          <div
+            :if={@entries == []}
+            class="text-center text-on-surface-variant py-16"
+          >
+            <p class="text-lg">No changelog entries yet. Stay tuned!</p>
           </div>
         </div>
       </div>
@@ -159,11 +124,12 @@ defmodule FounderPadWeb.Docs.ChangelogLive do
 
   # -- Components --
 
-  defp change_badge(assigns) do
+  defp type_badge(assigns) do
     {bg, text, label} =
       case assigns.type do
         :feature -> {"bg-primary/10", "text-primary", "Feature"}
         :fix -> {"bg-emerald-500/10", "text-emerald-400", "Fix"}
+        :improvement -> {"bg-amber-500/10", "text-amber-400", "Improvement"}
         :breaking -> {"bg-red-500/10", "text-red-400", "Breaking"}
         _ -> {"bg-surface-container-high", "text-on-surface-variant", "Update"}
       end
@@ -191,13 +157,22 @@ defmodule FounderPadWeb.Docs.ChangelogLive do
         </a>
 
         <div class="hidden md:flex items-center gap-8 text-sm font-medium text-on-surface-variant">
-          <a href="/docs" class={"hover:text-on-surface transition-colors " <> if(@active == "docs", do: "text-primary", else: "")}>
+          <a
+            href="/docs"
+            class={"hover:text-on-surface transition-colors " <> if(@active == "docs", do: "text-primary", else: "")}
+          >
             Docs
           </a>
-          <a href="/docs/api" class={"hover:text-on-surface transition-colors " <> if(@active == "api", do: "text-primary", else: "")}>
+          <a
+            href="/docs/api"
+            class={"hover:text-on-surface transition-colors " <> if(@active == "api", do: "text-primary", else: "")}
+          >
             API
           </a>
-          <a href="/docs/changelog" class={"hover:text-on-surface transition-colors " <> if(@active == "changelog", do: "text-primary", else: "")}>
+          <a
+            href="/docs/changelog"
+            class={"hover:text-on-surface transition-colors " <> if(@active == "changelog", do: "text-primary", else: "")}
+          >
             Changelog
           </a>
           <a href="/auth/login" class="hover:text-on-surface transition-colors">Login</a>

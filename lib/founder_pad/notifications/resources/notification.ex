@@ -4,67 +4,75 @@ defmodule FounderPad.Notifications.Notification do
     data_layer: AshPostgres.DataLayer
 
   postgres do
-    table "notifications"
-    repo FounderPad.Repo
+    table("notifications")
+    repo(FounderPad.Repo)
   end
 
   attributes do
-    uuid_primary_key :id
+    uuid_primary_key(:id)
 
     attribute :type, :atom do
-      constraints one_of: [
-        :team_invite, :team_removed, :billing_warning, :billing_updated,
-        :agent_completed, :agent_failed, :system_announcement
-      ]
-      allow_nil? false
-      public? true
+      constraints(
+        one_of: [
+          :team_invite,
+          :team_removed,
+          :billing_warning,
+          :billing_updated,
+          :agent_completed,
+          :agent_failed,
+          :system_announcement
+        ]
+      )
+
+      allow_nil?(false)
+      public?(true)
     end
 
     attribute :title, :string do
-      allow_nil? false
-      public? true
+      allow_nil?(false)
+      public?(true)
     end
 
-    attribute :body, :string, public?: true
+    attribute(:body, :string, public?: true)
 
-    attribute :read_at, :utc_datetime, public?: true
+    attribute(:read_at, :utc_datetime, public?: true)
 
-    attribute :action_url, :string, public?: true
+    attribute(:action_url, :string, public?: true)
 
-    attribute :metadata, :map, default: %{}, public?: true
+    attribute(:metadata, :map, default: %{}, public?: true)
 
     timestamps()
   end
 
   relationships do
     belongs_to :user, FounderPad.Accounts.User do
-      allow_nil? false
-      public? true
+      allow_nil?(false)
+      public?(true)
     end
   end
 
   actions do
-    defaults [:read, :destroy]
+    defaults([:read, :destroy])
 
     create :create do
-      accept [:type, :title, :body, :action_url, :metadata]
-      argument :user_id, :uuid, allow_nil?: false
-      change manage_relationship(:user_id, :user, type: :append)
+      accept([:type, :title, :body, :action_url, :metadata])
+      argument(:user_id, :uuid, allow_nil?: false)
+      change(manage_relationship(:user_id, :user, type: :append))
     end
 
     update :mark_read do
-      accept []
-      change set_attribute(:read_at, &DateTime.utc_now/0)
+      accept([])
+      change(set_attribute(:read_at, &DateTime.utc_now/0))
     end
 
     update :mark_all_read do
-      accept []
-      change set_attribute(:read_at, &DateTime.utc_now/0)
+      accept([])
+      change(set_attribute(:read_at, &DateTime.utc_now/0))
     end
 
     read :unread do
-      argument :user_id, :uuid, allow_nil?: false
-      filter expr(user_id == ^arg(:user_id) and is_nil(read_at))
+      argument(:user_id, :uuid, allow_nil?: false)
+      filter(expr(user_id == ^arg(:user_id) and is_nil(read_at)))
     end
   end
 end

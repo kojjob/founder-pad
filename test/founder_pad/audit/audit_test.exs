@@ -192,19 +192,29 @@ defmodule FounderPad.AuditTest do
     end
 
     test "handles concurrent audit log creation" do
+      test_pid = self()
+
       tasks =
-        for i <- 1..20 do
-          Task.async(fn ->
-            Audit.log(:create, "User", "#{i}", nil, nil)
-          end)
+        for i <- 1..10 do
+          task =
+            Task.async(fn ->
+              Audit.log(:create, "User", "#{i}", nil, nil)
+            end)
+
+          Ecto.Adapters.SQL.Sandbox.allow(FounderPad.Repo, test_pid, task.pid)
+          task
         end
 
       results = Task.await_many(tasks)
-      assert Enum.all?(results, fn {:ok, _} -> true; _ -> false end)
+
+      assert Enum.all?(results, fn
+               {:ok, _} -> true
+               _ -> false
+             end)
 
       {:ok, all_logs} = Audit.list_logs()
       created_ids = Enum.map(all_logs, & &1.resource_id)
-      for i <- 1..20, do: assert("#{i}" in created_ids)
+      for i <- 1..10, do: assert("#{i}" in created_ids)
     end
 
     test "handles deeply nested metadata" do

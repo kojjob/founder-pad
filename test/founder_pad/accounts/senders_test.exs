@@ -8,7 +8,12 @@ defmodule FounderPad.Accounts.SendersTest do
   end
 
   test "magic link sender handles email string" do
-    assert :ok = FounderPad.Accounts.Senders.MagicLinkSender.send("test@example.com", "test-token", [])
+    assert :ok =
+             FounderPad.Accounts.Senders.MagicLinkSender.send(
+               "test@example.com",
+               "test-token",
+               []
+             )
   end
 
   test "password reset sender handles user struct" do

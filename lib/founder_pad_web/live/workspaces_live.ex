@@ -36,7 +36,11 @@ defmodule FounderPadWeb.WorkspacesLive do
         # Link current user as owner
         if user = socket.assigns[:current_user] do
           FounderPad.Accounts.Membership
-          |> Ash.Changeset.for_create(:create, %{role: :owner, user_id: user.id, organisation_id: org.id})
+          |> Ash.Changeset.for_create(:create, %{
+            role: :owner,
+            user_id: user.id,
+            organisation_id: org.id
+          })
           |> Ash.create()
         end
 
@@ -48,7 +52,12 @@ defmodule FounderPadWeb.WorkspacesLive do
 
         {:noreply,
          socket
-         |> assign(organisations: orgs, primary_org: List.first(orgs), show_create: false, create_name: "")
+         |> assign(
+           organisations: orgs,
+           primary_org: List.first(orgs),
+           show_create: false,
+           create_name: ""
+         )
          |> assign(stats: compute_stats(orgs))
          |> put_flash(:info, "Workspace \"#{trimmed}\" created")}
 
@@ -109,10 +118,16 @@ defmodule FounderPadWeb.WorkspacesLive do
           </p>
         </div>
         <div class="flex items-center gap-3">
-          <button phx-click="export_logs" class="px-4 py-2.5 rounded-lg text-sm font-medium bg-surface-container-high hover:bg-surface-container-highest transition-colors text-on-surface flex items-center gap-2">
+          <button
+            phx-click="export_logs"
+            class="px-4 py-2.5 rounded-lg text-sm font-medium bg-surface-container-high hover:bg-surface-container-highest transition-colors text-on-surface flex items-center gap-2"
+          >
             <span class="material-symbols-outlined text-sm">download</span> Export Logs
           </button>
-          <button phx-click="toggle_create" class="primary-gradient px-4 py-2.5 rounded-lg text-sm font-medium transition-transform hover:scale-[1.02] active:scale-95 flex items-center gap-2">
+          <button
+            phx-click="toggle_create"
+            class="primary-gradient px-4 py-2.5 rounded-lg text-sm font-medium transition-transform hover:scale-[1.02] active:scale-95 flex items-center gap-2"
+          >
             <span class="material-symbols-outlined text-sm">add</span> Create Workspace
           </button>
         </div>
@@ -130,8 +145,16 @@ defmodule FounderPadWeb.WorkspacesLive do
             autofocus
             class="flex-1 bg-surface-container-highest rounded-lg px-4 py-2.5 text-sm text-on-surface placeholder:text-on-surface-variant/50 focus:ring-1 focus:ring-primary"
           />
-          <button type="submit" class="primary-gradient px-6 py-2.5 rounded-lg text-sm font-semibold">Create</button>
-          <button type="button" phx-click="toggle_create" class="px-4 py-2.5 rounded-lg text-sm font-medium text-on-surface-variant hover:text-on-surface">Cancel</button>
+          <button type="submit" class="primary-gradient px-6 py-2.5 rounded-lg text-sm font-semibold">
+            Create
+          </button>
+          <button
+            type="button"
+            phx-click="toggle_create"
+            class="px-4 py-2.5 rounded-lg text-sm font-medium text-on-surface-variant hover:text-on-surface"
+          >
+            Cancel
+          </button>
         </form>
       </div>
 
@@ -157,14 +180,19 @@ defmodule FounderPadWeb.WorkspacesLive do
               <span class="text-sm font-medium text-secondary">{@stats.agents_pct}%</span>
             </div>
             <div class="w-full bg-surface-container-highest/50 rounded-full h-1.5 overflow-hidden flex">
-              <div class="bg-secondary h-full rounded-full transition-all duration-500" style={"width: #{@stats.agents_pct}%; box-shadow: 0 0 10px rgba(var(--fp-chart-secondary), 0.5);"}></div>
+              <div
+                class="bg-secondary h-full rounded-full transition-all duration-500"
+                style={"width: #{@stats.agents_pct}%; box-shadow: 0 0 10px rgba(var(--fp-chart-secondary), 0.5);"}
+              >
+              </div>
             </div>
           </div>
         </div>
 
         <%!-- Priority Workspace (Right Col) --%>
         <div class="lg:col-span-8 bg-surface-container/50 rounded-xl p-8 relative overflow-hidden">
-          <div class="absolute -top-24 -right-24 w-64 h-64 bg-primary/5 rounded-full blur-3xl pointer-events-none"></div>
+          <div class="absolute -top-24 -right-24 w-64 h-64 bg-primary/5 rounded-full blur-3xl pointer-events-none">
+          </div>
 
           <div class="flex flex-col h-full justify-between relative z-10">
             <div>
@@ -179,18 +207,26 @@ defmodule FounderPadWeb.WorkspacesLive do
                 {if @primary_org, do: @primary_org.name, else: "No workspace yet"}
               </h2>
               <p class="text-on-surface-variant max-w-xl leading-relaxed">
-                {if @primary_org, do: "Your main workspace for AI agent deployments and team collaboration.", else: "Create your first workspace to start deploying agents."}
+                {if @primary_org,
+                  do: "Your main workspace for AI agent deployments and team collaboration.",
+                  else: "Create your first workspace to start deploying agents."}
               </p>
             </div>
 
             <div class="flex items-end justify-between mt-8">
               <div class="flex items-center">
                 <div class="flex -space-x-2">
-                  <div :for={i <- 1..min(@members_count, 3)} class="w-8 h-8 rounded-full bg-primary-fixed flex items-center justify-center text-[10px] font-bold text-primary ring-2 ring-surface-container">
+                  <div
+                    :for={i <- 1..min(@members_count, 3)}
+                    class="w-8 h-8 rounded-full bg-primary-fixed flex items-center justify-center text-[10px] font-bold text-primary ring-2 ring-surface-container"
+                  >
                     {String.at("ABCDEFGH", i - 1)}
                   </div>
                 </div>
-                <div :if={@members_count > 3} class="ml-3 bg-surface-container-high px-2 py-1 rounded text-xs font-medium text-on-surface-variant">
+                <div
+                  :if={@members_count > 3}
+                  class="ml-3 bg-surface-container-high px-2 py-1 rounded text-xs font-medium text-on-surface-variant"
+                >
                   +{@members_count - 3}
                 </div>
               </div>
@@ -198,7 +234,9 @@ defmodule FounderPadWeb.WorkspacesLive do
               <div class="flex gap-4">
                 <div class="bg-surface-container-high/50 rounded-lg p-4 min-w-[140px]">
                   <div class="text-xs text-on-surface-variant mb-1">Agents</div>
-                  <div class="text-lg font-mono font-medium text-on-surface">{@stats.agents_count}</div>
+                  <div class="text-lg font-mono font-medium text-on-surface">
+                    {@stats.agents_count}
+                  </div>
                 </div>
                 <div class="bg-surface-container-high/50 rounded-lg p-4 min-w-[140px]">
                   <div class="text-xs text-on-surface-variant mb-1">Members</div>
@@ -216,7 +254,14 @@ defmodule FounderPadWeb.WorkspacesLive do
           <h2 class="text-xl font-bold font-headline text-on-surface">All Workspaces</h2>
           <div class="flex items-center text-sm">
             <span class="text-on-surface-variant mr-2">Sort by:</span>
-            <button phx-click="sort_by" phx-value-sort="last_active" class={["font-medium flex items-center gap-1 transition-opacity", if(@sort_by == :last_active, do: "text-on-surface", else: "text-on-surface-variant")]}>
+            <button
+              phx-click="sort_by"
+              phx-value-sort="last_active"
+              class={[
+                "font-medium flex items-center gap-1 transition-opacity",
+                if(@sort_by == :last_active, do: "text-on-surface", else: "text-on-surface-variant")
+              ]}
+            >
               Last Active <span class="material-symbols-outlined text-lg">filter_list</span>
             </button>
           </div>
@@ -224,10 +269,17 @@ defmodule FounderPadWeb.WorkspacesLive do
 
         <%!-- Empty state --%>
         <div :if={@organisations == []} class="text-center py-16">
-          <span class="material-symbols-outlined text-6xl text-on-surface-variant/30 mb-4 block">grid_view</span>
+          <span class="material-symbols-outlined text-6xl text-on-surface-variant/30 mb-4 block">
+            grid_view
+          </span>
           <h3 class="text-xl font-bold font-headline text-on-surface mb-2">No workspaces yet</h3>
-          <p class="text-on-surface-variant mb-6">Create your first workspace to organize agents and team members.</p>
-          <button phx-click="toggle_create" class="primary-gradient px-6 py-2.5 rounded-lg text-sm font-semibold inline-flex items-center gap-2">
+          <p class="text-on-surface-variant mb-6">
+            Create your first workspace to organize agents and team members.
+          </p>
+          <button
+            phx-click="toggle_create"
+            class="primary-gradient px-6 py-2.5 rounded-lg text-sm font-semibold inline-flex items-center gap-2"
+          >
             <span class="material-symbols-outlined text-lg">add</span> Create Workspace
           </button>
         </div>
@@ -267,10 +319,16 @@ defmodule FounderPadWeb.WorkspacesLive do
 
             <%!-- Actions --%>
             <div class="w-full md:w-3/12 flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-              <a href="/team" class="px-3 py-1.5 rounded-lg text-xs font-medium text-primary hover:bg-primary/10 transition-colors">
+              <a
+                href="/team"
+                class="px-3 py-1.5 rounded-lg text-xs font-medium text-primary hover:bg-primary/10 transition-colors"
+              >
                 Manage Team
               </a>
-              <a href="/agents" class="px-3 py-1.5 rounded-lg text-xs font-medium text-primary hover:bg-primary/10 transition-colors">
+              <a
+                href="/agents"
+                class="px-3 py-1.5 rounded-lg text-xs font-medium text-primary hover:bg-primary/10 transition-colors"
+              >
                 View Agents
               </a>
               <button
@@ -333,13 +391,16 @@ defmodule FounderPadWeb.WorkspacesLive do
     total_agents =
       Enum.reduce(orgs, 0, fn org, acc -> acc + count_org_agents(org.id) end)
 
-    plan = case FounderPad.Billing.Plan |> Ash.Query.sort(sort_order: :asc) |> Ash.read() do
-      {:ok, [_ | _] = plans} -> Enum.find(plans, List.first(plans), &(&1.slug == "pro"))
-      _ -> nil
-    end
+    plan =
+      case FounderPad.Billing.Plan |> Ash.Query.sort(sort_order: :asc) |> Ash.read() do
+        {:ok, [_ | _] = plans} -> Enum.find(plans, List.first(plans), &(&1.slug == "pro"))
+        _ -> nil
+      end
 
     agents_limit = if plan, do: plan.max_agents, else: 3
-    agents_pct = if agents_limit > 0, do: min(round(total_agents / agents_limit * 100), 100), else: 0
+
+    agents_pct =
+      if agents_limit > 0, do: min(round(total_agents / agents_limit * 100), 100), else: 0
 
     %{
       agents_count: total_agents,
@@ -348,7 +409,9 @@ defmodule FounderPadWeb.WorkspacesLive do
     }
   end
 
-  defp sorted_workspaces(orgs, :last_active), do: Enum.sort_by(orgs, & &1.updated_at, {:desc, DateTime})
+  defp sorted_workspaces(orgs, :last_active),
+    do: Enum.sort_by(orgs, & &1.updated_at, {:desc, DateTime})
+
   defp sorted_workspaces(orgs, :name), do: Enum.sort_by(orgs, & &1.name)
   defp sorted_workspaces(orgs, _), do: orgs
 end

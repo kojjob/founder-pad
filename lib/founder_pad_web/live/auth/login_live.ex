@@ -126,6 +126,7 @@ defmodule FounderPadWeb.Auth.LoginLive do
         # Log the login to audit trail (safely — connect_info may not be available)
         try do
           ua = Phoenix.LiveView.get_connect_info(socket, :user_agent) || "LiveView"
+
           FounderPad.Audit.log(:login, "User", to_string(user.id), user.id, nil,
             user_agent: ua,
             ip_address: "unknown"

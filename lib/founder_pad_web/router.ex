@@ -12,7 +12,12 @@ defmodule FounderPadWeb.Router do
 
   pipeline :api do
     plug :accepts, ["json"]
+    plug FounderPadWeb.Plugs.ApiKeyAuth
     plug FounderPadWeb.Plugs.RateLimiter, limit: 100, window_ms: 60_000
+  end
+
+  pipeline :api_public do
+    plug :accepts, ["json"]
   end
 
   # Auth session controller (sets/clears session cookie)
@@ -20,6 +25,7 @@ defmodule FounderPadWeb.Router do
     pipe_through :browser
     get "/session", AuthSessionController, :create
     delete "/session", AuthSessionController, :delete
+    get "/oauth/:provider/callback", OAuthCallbackController, :callback
   end
 
   # Auth routes (no layout - full-page auth screens)
@@ -29,9 +35,44 @@ defmodule FounderPadWeb.Router do
     live "/register", RegisterLive
   end
 
+  # Unsubscribe route (public, no auth required)
+  scope "/", FounderPadWeb do
+    pipe_through :browser
+    get "/unsubscribe/:token", UnsubscribeController, :unsubscribe
+  end
+
+  # RSS feed routes (controller, not LiveView)
+  scope "/", FounderPadWeb do
+    pipe_through :browser
+    get "/blog/feed.xml", FeedController, :blog_feed
+    get "/changelog/feed.xml", FeedController, :changelog_feed
+  end
+
+  # Public blog routes
+  scope "/blog", FounderPadWeb.Blog do
+    pipe_through :browser
+    live "/", BlogIndexLive
+    live "/category/:slug", BlogCategoryLive
+    live "/tag/:slug", BlogTagLive
+    live "/:slug", BlogPostLive
+  end
+
+  # Help center routes (public, no auth required)
+  scope "/help", FounderPadWeb.Help do
+    pipe_through :browser
+    live "/", HelpIndexLive
+    live "/search", HelpSearchLive
+    live "/contact", HelpContactLive
+    live "/:category_slug", HelpCategoryLive
+    live "/:category_slug/:slug", HelpArticleLive
+  end
+
   scope "/", FounderPadWeb do
     pipe_through :browser
 
+    live "/status", StatusLive
+    live "/privacy", PrivacyLive
+    live "/terms", TermsLive
     get "/sitemap.xml", SitemapController, :index
     post "/checkout/:plan_slug", CheckoutController, :create
     live "/", LandingLive
@@ -50,15 +91,96 @@ defmodule FounderPadWeb.Router do
       live "/dashboard", DashboardLive
       live "/activity", ActivityLive
       live "/workspaces", WorkspacesLive
-      live "/agents", AgentsLive
-      live "/agents/new", AgentCreateLive
-      live "/agents/:id", AgentDetailLive
+
+      if FounderPad.FeatureConfig.ai_enabled?() do
+        live "/agents", AgentsLive
+        live "/agents/new", AgentCreateLive
+        live "/agents/templates", AgentTemplatesLive
+        live "/agents/:id", AgentDetailLive
+        live "/agents/:id/analytics", AgentAnalyticsLive
+        live "/agents/:id/widget", WidgetConfigLive
+      end
+
       live "/billing", BillingLive
       live "/team", TeamLive
       live "/settings", SettingsLive
+      live "/settings/two-factor", TwoFactorLive
+      live "/api-keys", ApiKeysLive
+      live "/webhooks", WebhookLogsLive
+      live "/audit-log", AuditLogLive
+      live "/usage", UsageLive
+      live "/referrals", ReferralsLive
+    end
+
+    # Admin impersonation controller routes (must be before live_session)
+    scope "/admin", Admin do
+      get "/impersonate/:id", ImpersonationController, :start
+      get "/stop-impersonation", ImpersonationController, :stop
+    end
+
+    # Admin routes with admin authorization
+    live_session :admin,
+      layout: {FounderPadWeb.Layouts, :app},
+      on_mount: [
+        {FounderPadWeb.Hooks.AssignDefaults, :default},
+        {FounderPadWeb.Hooks.RequireAuth, :default},
+        {FounderPadWeb.Hooks.RequireAdmin, :default}
+      ] do
+      scope "/admin", Admin do
+        live "/", AdminDashboardLive
+        live "/users", UsersLive
+        live "/users/:id", UserDetailLive
+        live "/organisations", OrganisationsLive
+        live "/subscriptions", SubscriptionsLive
+        live "/feature-flags", FeatureFlagsLive
+        live "/blog", BlogListLive
+        live "/blog/new", BlogEditorLive
+        live "/blog/:id/edit", BlogEditorLive
+        live "/blog/categories", BlogCategoriesLive
+        live "/blog/tags", BlogTagsLive
+        live "/changelog", ChangelogListLive
+        live "/changelog/new", ChangelogEditorLive
+        live "/changelog/:id/edit", ChangelogEditorLive
+        live "/seo", SeoDashboardLive
+        live "/help", HelpArticlesLive
+        live "/help/new", HelpArticleEditorLive
+        live "/help/:id/edit", HelpArticleEditorLive
+        live "/incidents", IncidentsLive
+
+        if FounderPad.FeatureConfig.ai_enabled?() do
+          live "/templates", AgentTemplatesLive
+        end
+      end
     end
 
     live "/onboarding", OnboardingLive
+  end
+
+  # Widget routes (public, no auth required)
+  if FounderPad.FeatureConfig.ai_enabled?() do
+    scope "/widget", FounderPadWeb do
+      pipe_through :api_public
+      get "/embed/:agent_id", WidgetController, :script
+      get "/chat/:agent_id", WidgetController, :chat
+    end
+  end
+
+  # Global search API (no API key required)
+  scope "/api", FounderPadWeb do
+    pipe_through :api_public
+    get "/search", SearchController, :search
+  end
+
+  # Push notification subscription (no API key required)
+  scope "/api/push", FounderPadWeb do
+    pipe_through :api_public
+    post "/subscribe", PushSubscriptionController, :create
+  end
+
+  # Public privacy API (no API key required)
+  scope "/api/privacy", FounderPadWeb do
+    pipe_through :api_public
+    post "/cookie-consent", CookieConsentController, :create
   end
 
   # Webhook routes (no CSRF, raw body needed)

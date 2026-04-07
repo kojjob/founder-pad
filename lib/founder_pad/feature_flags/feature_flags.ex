@@ -3,10 +3,10 @@ defmodule FounderPad.FeatureFlags do
 
   resources do
     resource FounderPad.FeatureFlags.FeatureFlag do
-      define :create_flag, action: :create
-      define :list_flags, action: :read
-      define :get_flag, action: :read, get_by: [:id]
-      define :get_flag_by_key, action: :read, get_by: [:key]
+      define(:create_flag, action: :create)
+      define(:list_flags, action: :read)
+      define(:get_flag, action: :read, get_by: [:id])
+      define(:get_flag_by_key, action: :read, get_by: [:key])
     end
   end
 
