@@ -53,5 +53,24 @@ defmodule FounderPad.Compliance do
       define(:create_idempotency_key, action: :create)
       define(:find_idempotency_key, action: :by_org_key, args: [:organisation_id, :key])
     end
+
+    resource FounderPad.Compliance.EvidenceItem do
+      define(:request_evidence_upload, action: :request_upload)
+      define(:mark_evidence_uploaded, action: :mark_uploaded)
+
+      define(:list_evidence_by_verification,
+        action: :by_verification,
+        args: [:individual_verification_id]
+      )
+    end
+
+    resource FounderPad.Compliance.LivenessCheck do
+      define(:create_liveness_check, action: :create)
+
+      define(:list_liveness_by_verification,
+        action: :by_verification,
+        args: [:individual_verification_id]
+      )
+    end
   end
 end

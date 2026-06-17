@@ -60,22 +60,56 @@ defmodule FounderPadWeb.Api.OpenApi do
         "get" => %{
           summary: "Retrieve an individual verification",
           operationId: "getIndividualVerification",
-          parameters: [
-            %{
-              name: "id",
-              in: "path",
-              required: true,
-              schema: %{type: "string", format: "uuid"}
-            }
-          ],
+          parameters: [id_param()],
           responses: %{
             "200" => json_response("OK", "IndividualVerification"),
             "401" => error_response("Authentication failed"),
             "404" => error_response("Verification not found")
           }
         }
+      },
+      "/v1/individual_verifications/{id}/evidence_uploads" => %{
+        "post" => %{
+          summary: "Request a signed URL to upload evidence (selfie/document)",
+          operationId: "createEvidenceUpload",
+          parameters: [id_param()],
+          requestBody: %{
+            required: true,
+            content: %{
+              "application/json" => %{
+                schema: %{
+                  type: "object",
+                  required: ["type"],
+                  properties: %{
+                    type: %{
+                      type: "string",
+                      enum: [
+                        "selfie",
+                        "document_front",
+                        "document_back",
+                        "proof_of_address",
+                        "business_document"
+                      ]
+                    },
+                    content_type: %{type: "string", example: "image/jpeg"}
+                  }
+                }
+              }
+            }
+          },
+          responses: %{
+            "201" => json_response("Signed upload URL issued", "EvidenceUpload"),
+            "403" => error_response("Permission denied"),
+            "404" => error_response("Verification not found"),
+            "422" => error_response("Invalid evidence type")
+          }
+        }
       }
     }
+  end
+
+  defp id_param do
+    %{name: "id", in: "path", required: true, schema: %{type: "string", format: "uuid"}}
   end
 
   defp components do
@@ -156,6 +190,17 @@ defmodule FounderPadWeb.Api.OpenApi do
             consent_receipt_id: %{type: "string", format: "uuid", nullable: true},
             created_at: %{type: "string", format: "date-time"},
             completed_at: %{type: "string", format: "date-time", nullable: true}
+          }
+        },
+        "EvidenceUpload" => %{
+          type: "object",
+          properties: %{
+            evidence_id: %{type: "string", format: "uuid"},
+            upload_url: %{
+              type: "string",
+              description: "Short-lived signed URL — PUT the bytes here."
+            },
+            expires_at: %{type: "string", format: "date-time"}
           }
         },
         "Error" => %{

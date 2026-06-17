@@ -19,7 +19,8 @@ defmodule FounderPadWeb.VerificationDetailLive do
          assign(socket,
            page_title: "Verification #{short(ivf.id)}",
            active_nav: :verifications,
-           ivf: ivf
+           ivf: ivf,
+           liveness: FounderPad.Compliance.list_liveness_by_verification!(ivf.id)
          )}
     end
   end
@@ -68,6 +69,19 @@ defmodule FounderPadWeb.VerificationDetailLive do
       </section>
 
       <section class="bg-surface-container rounded-lg p-5">
+        <h2 class="text-sm font-bold uppercase text-on-surface-variant mb-2">Liveness</h2>
+        <p :if={@liveness == []} class="text-on-surface-variant text-sm">No liveness check yet.</p>
+        <ul :if={@liveness != []} class="space-y-1">
+          <li :for={l <- @liveness} class="flex items-center gap-3 text-sm">
+            <span class={["px-2 py-0.5 rounded text-xs font-bold", liveness_badge(l.status)]}>
+              {l.status}
+            </span>
+            <span class="text-on-surface-variant">confidence {l.confidence_score}</span>
+          </li>
+        </ul>
+      </section>
+
+      <section class="bg-surface-container rounded-lg p-5">
         <h2 class="text-sm font-bold uppercase text-on-surface-variant mb-2">Consent</h2>
         <p class="font-mono text-xs">{@ivf.consent_receipt_id || "No consent receipt (test mode)"}</p>
       </section>
@@ -106,6 +120,10 @@ defmodule FounderPadWeb.VerificationDetailLive do
       [] -> nil
     end
   end
+
+  defp liveness_badge(:passed), do: "bg-primary/10 text-primary"
+  defp liveness_badge(:failed), do: "bg-error/10 text-error"
+  defp liveness_badge(_), do: "bg-secondary/10 text-secondary"
 
   defp short(id), do: String.slice(id, 0..7)
 end

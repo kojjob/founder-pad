@@ -78,4 +78,58 @@ defmodule FounderPad.Compliance.Verifications do
   def provider do
     Application.get_env(:founder_pad, :identity_provider, FounderPad.Compliance.Providers.Sandbox)
   end
+
+  @doc """
+  Run a liveness/selfie check for a verification against the uploaded evidence
+  `reference`, record the normalized result, and open a review case if it did not
+  pass (manual review before risky automation).
+  """
+  @spec run_liveness(IndividualVerification.t(), String.t()) ::
+          {:ok, FounderPad.Compliance.LivenessCheck.t()} | {:error, term()}
+  def run_liveness(%IndividualVerification{} = verification, reference) do
+    case liveness_provider().check(%{reference: reference}) do
+      {:ok, result} ->
+        with {:ok, check} <- record_liveness(verification, result) do
+          maybe_open_liveness_review(verification, result.status)
+          {:ok, check}
+        end
+
+      {:error, reason} ->
+        {:error, reason}
+    end
+  end
+
+  @doc "The configured liveness provider module (sandbox by default)."
+  def liveness_provider do
+    Application.get_env(
+      :founder_pad,
+      :liveness_provider,
+      FounderPad.Compliance.Providers.SandboxLiveness
+    )
+  end
+
+  defp record_liveness(verification, result) do
+    FounderPad.Compliance.LivenessCheck
+    |> Ash.Changeset.for_create(:create, %{
+      organisation_id: verification.organisation_id,
+      individual_verification_id: verification.id,
+      provider_name: result.provider_name,
+      provider_reference: result.provider_reference,
+      status: result.status,
+      confidence_score: Decimal.from_float(result.confidence_score),
+      reason_codes: result.reason_codes
+    })
+    |> Ash.create()
+  end
+
+  defp maybe_open_liveness_review(_verification, :passed), do: :ok
+
+  defp maybe_open_liveness_review(verification, _status) do
+    Compliance.open_review_case(%{
+      organisation_id: verification.organisation_id,
+      subject_type: :individual_verification,
+      subject_id: verification.id,
+      priority: :high
+    })
+  end
 end

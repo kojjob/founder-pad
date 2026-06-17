@@ -219,6 +219,7 @@ defmodule FounderPadWeb.Router do
 
     post "/individual_verifications", IndividualVerificationController, :create
     get "/individual_verifications/:id", IndividualVerificationController, :show
+    post "/individual_verifications/:id/evidence_uploads", EvidenceUploadController, :create
   end
 
   # JSON:API (REST) — auto-derived from Ash resources

@@ -85,6 +85,19 @@ GET /v1/individual_verifications/{id}
 Returns status, `identity` (verified/match_level/provider_reference), `risk`
 (level/score/reason_codes), `consent_receipt_id` and timestamps.
 
+### Evidence upload (selfie / document)
+
+```http
+POST /v1/individual_verifications/{id}/evidence_uploads
+{ "type": "selfie", "content_type": "image/jpeg" }
+```
+
+`201` → `{ evidence_id, upload_url, expires_at }`. PUT the bytes directly to
+`upload_url` (object storage via a short-lived signed URL) — they never transit
+GhanaTrust or its database. Types: `selfie`, `document_front`, `document_back`,
+`proof_of_address`, `business_document`. A liveness/selfie check is then recorded
+against the evidence; a non-pass opens a review case automatically.
+
 ### Sandbox fixtures (deterministic)
 
 | Ghana Card number | Outcome |
