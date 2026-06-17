@@ -20,6 +20,14 @@ defmodule FounderPadWeb.Router do
     plug :accepts, ["json"]
   end
 
+  # GhanaTrust public REST API (/v1) — API key required.
+  pipeline :public_api_v1 do
+    plug :accepts, ["json"]
+    plug FounderPadWeb.Plugs.ApiKeyAuth
+    plug FounderPadWeb.Plugs.RequireApiKey
+    plug FounderPadWeb.Plugs.RateLimiter, limit: 300, window_ms: 60_000
+  end
+
   # Auth session controller (sets/clears session cookie)
   scope "/auth", FounderPadWeb do
     pipe_through :browser
@@ -105,6 +113,9 @@ defmodule FounderPadWeb.Router do
       live "/team", TeamLive
       live "/settings", SettingsLive
       live "/settings/two-factor", TwoFactorLive
+      live "/verifications", VerificationsLive
+      live "/verifications/:id", VerificationDetailLive
+      live "/reviews", ReviewQueueLive
       live "/api-keys", ApiKeysLive
       live "/webhooks", WebhookLogsLive
       live "/audit-log", AuditLogLive
@@ -187,6 +198,14 @@ defmodule FounderPadWeb.Router do
   scope "/webhooks", FounderPadWeb do
     pipe_through :api
     post "/stripe", WebhookController, :stripe
+  end
+
+  # GhanaTrust public REST API (hand-authored contract per API_SPEC.md)
+  scope "/v1", FounderPadWeb.Api.V1 do
+    pipe_through :public_api_v1
+
+    post "/individual_verifications", IndividualVerificationController, :create
+    get "/individual_verifications/:id", IndividualVerificationController, :show
   end
 
   # JSON:API (REST) — auto-derived from Ash resources

@@ -40,6 +40,21 @@
 
       <div class="h-px bg-outline-variant/10 my-2"></div>
 
+      <.nav_link
+        href="/verifications"
+        icon="verified_user"
+        label="Verifications"
+        active={@active_nav == :verifications}
+      />
+      <.nav_link
+        href="/reviews"
+        icon="gavel"
+        label="Review Queue"
+        active={@active_nav == :reviews}
+      />
+
+      <div class="h-px bg-outline-variant/10 my-2"></div>
+
       <.nav_link href="/billing" icon="payments" label="Billing" active={@active_nav == :billing} />
       <.nav_link href="/team" icon="group" label="Team" active={@active_nav == :team} />
       <.nav_link
