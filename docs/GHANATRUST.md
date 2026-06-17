@@ -36,6 +36,10 @@ orgs, API keys, webhooks, audit, billing are inherited from the base platform).
 
 ## Public API (`/v1`)
 
+Machine-readable contract: **`GET /v1/openapi.json`** (OpenAPI 3, public, no key) —
+load it into Swagger UI / Redoc / Stoplight or generate clients from it.
+
+
 Authenticate with `Authorization: Bearer <api_key>`. The key's scopes gate access
 (`:write` to create, `:read` to retrieve; `:admin` implies both). The key's mode
 (`test`/`live`) sets the verification mode.
@@ -66,7 +70,11 @@ Content-Type: application/json
 ```
 
 `201` → `{ id, status, mode, external_id, created_at, links.self }`.
-Re-POSTing the same `external_id` for a tenant returns the existing check (`200`) — idempotent.
+Re-POSTing the same `external_id` for a tenant returns the existing check (`200`).
+
+**Idempotency.** Send an `Idempotency-Key: <unique>` header on writes. A retry with the
+same key and body replays the original response (no duplicate work, no re-fired
+webhooks). The same key with a different body returns `409 duplicate_idempotency_key`.
 
 ### Retrieve
 
@@ -90,8 +98,8 @@ Returns status, `identity` (verified/match_level/provider_reference), `risk`
 ### Error codes
 
 `authentication_failed` (401), `permission_denied` (403), `verification_not_found`
-(404), `validation_failed` / `consent_required` (422). Envelope:
-`{ "error": { "code", "message", "request_id" } }`.
+(404), `validation_failed` / `consent_required` (422), `duplicate_idempotency_key`
+(409). Envelope: `{ "error": { "code", "message", "request_id" } }`.
 
 ## Webhooks
 
@@ -130,4 +138,4 @@ PII handling (planned) are in place.
 - Business verification (KYB), AML screening and evidence upload (signed URLs).
 - Encrypted-at-rest card storage (Cloak) to enable true async live provider calls.
 - `gt_test_`/`gt_live_` key prefixes and granular `verifications:write` scopes.
-- Internal ops console (provider health, failed jobs) and an `Idempotency-Key` store.
+- Internal ops console (provider health, failed jobs).

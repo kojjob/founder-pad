@@ -115,6 +115,7 @@ defmodule FounderPadWeb.Router do
       live "/settings/two-factor", TwoFactorLive
       live "/verifications", VerificationsLive
       live "/verifications/:id", VerificationDetailLive
+      live "/consent", ConsentReceiptsLive
       live "/reviews", ReviewQueueLive
       live "/api-keys", ApiKeysLive
       live "/webhooks", WebhookLogsLive
@@ -198,6 +199,18 @@ defmodule FounderPadWeb.Router do
   scope "/webhooks", FounderPadWeb do
     pipe_through :api
     post "/stripe", WebhookController, :stripe
+  end
+
+  # Liveness probe (public, no auth) for load balancers / Fly health checks
+  scope "/", FounderPadWeb do
+    pipe_through :api_public
+    get "/health", HealthController, :index
+  end
+
+  # GhanaTrust OpenAPI document (public — no API key required)
+  scope "/v1", FounderPadWeb.Api.V1 do
+    pipe_through :api_public
+    get "/openapi.json", OpenApiController, :show
   end
 
   # GhanaTrust public REST API (hand-authored contract per API_SPEC.md)

@@ -13,8 +13,22 @@ defmodule FounderPadWeb.VerificationsLive do
        page_title: "Verifications",
        active_nav: :verifications,
        org: org,
-       verifications: verifications
+       verifications: verifications,
+       summary: summarise(verifications)
      )}
+  end
+
+  # Verification volume by status — the compliance "usage" view (distinct from
+  # billing usage).
+  defp summarise(verifications) do
+    counts = Enum.frequencies_by(verifications, & &1.status)
+
+    %{
+      total: length(verifications),
+      verified: Map.get(counts, :verified, 0),
+      requires_review: Map.get(counts, :requires_review, 0),
+      failed: Map.get(counts, :failed, 0)
+    }
   end
 
   def render(assigns) do
@@ -29,6 +43,13 @@ defmodule FounderPadWeb.VerificationsLive do
           Individual identity checks against the Ghana Card, with risk and consent.
         </p>
       </header>
+
+      <dl class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <.stat label="Total" value={@summary.total} />
+        <.stat label="Verified" value={@summary.verified} tone="text-primary" />
+        <.stat label="Needs review" value={@summary.requires_review} tone="text-secondary" />
+        <.stat label="Failed" value={@summary.failed} tone="text-error" />
+      </dl>
 
       <div :if={@verifications == []} class="text-center py-16">
         <span class="material-symbols-outlined text-6xl text-on-surface-variant/30 mb-4 block">
@@ -72,6 +93,19 @@ defmodule FounderPadWeb.VerificationsLive do
           </tr>
         </tbody>
       </table>
+    </div>
+    """
+  end
+
+  attr :label, :string, required: true
+  attr :value, :integer, required: true
+  attr :tone, :string, default: "text-on-surface"
+
+  defp stat(assigns) do
+    ~H"""
+    <div class="bg-surface-container rounded-lg p-4">
+      <dt class="text-xs uppercase text-on-surface-variant">{@label}</dt>
+      <dd class={["text-2xl font-extrabold mt-1", @tone]}>{@value}</dd>
     </div>
     """
   end

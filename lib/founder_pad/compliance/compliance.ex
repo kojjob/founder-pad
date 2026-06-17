@@ -48,5 +48,10 @@ defmodule FounderPad.Compliance do
       define(:create_review_note, action: :create)
       define(:list_review_notes, action: :by_case, args: [:review_case_id])
     end
+
+    resource FounderPad.Compliance.IdempotencyKey do
+      define(:create_idempotency_key, action: :create)
+      define(:find_idempotency_key, action: :by_org_key, args: [:organisation_id, :key])
+    end
   end
 end
