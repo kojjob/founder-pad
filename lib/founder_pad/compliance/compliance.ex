@@ -72,5 +72,15 @@ defmodule FounderPad.Compliance do
         args: [:individual_verification_id]
       )
     end
+
+    resource FounderPad.Compliance.BusinessVerification do
+      define(:create_business_verification, action: :create)
+      define(:apply_business_verification_result, action: :apply_provider_result)
+
+      define(:list_business_verifications_by_organisation,
+        action: :by_organisation,
+        args: [:organisation_id]
+      )
+    end
   end
 end

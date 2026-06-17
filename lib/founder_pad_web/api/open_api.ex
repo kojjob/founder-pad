@@ -104,6 +104,41 @@ defmodule FounderPadWeb.Api.OpenApi do
             "422" => error_response("Invalid evidence type")
           }
         }
+      },
+      "/v1/business_verifications" => %{
+        "post" => %{
+          summary: "Create a business (KYB) verification",
+          operationId: "createBusinessVerification",
+          parameters: [idempotency_key_header()],
+          requestBody: %{
+            required: true,
+            content: %{
+              "application/json" => %{
+                schema: %{"$ref" => "#/components/schemas/BusinessVerificationRequest"}
+              }
+            }
+          },
+          responses: %{
+            "201" => json_response("Created", "BusinessVerification"),
+            "200" => json_response("Existing (idempotent)", "BusinessVerification"),
+            "401" => error_response("Authentication failed"),
+            "403" => error_response("Permission denied"),
+            "409" => error_response("Idempotency-Key reused with a different body"),
+            "422" => error_response("Validation failed")
+          }
+        }
+      },
+      "/v1/business_verifications/{id}" => %{
+        "get" => %{
+          summary: "Retrieve a business verification",
+          operationId: "getBusinessVerification",
+          parameters: [id_param()],
+          responses: %{
+            "200" => json_response("OK", "BusinessVerification"),
+            "401" => error_response("Authentication failed"),
+            "404" => error_response("Business verification not found")
+          }
+        }
       }
     }
   end
@@ -188,6 +223,44 @@ defmodule FounderPadWeb.Api.OpenApi do
               }
             },
             consent_receipt_id: %{type: "string", format: "uuid", nullable: true},
+            created_at: %{type: "string", format: "date-time"},
+            completed_at: %{type: "string", format: "date-time", nullable: true}
+          }
+        },
+        "BusinessVerificationRequest" => %{
+          type: "object",
+          required: ["business"],
+          properties: %{
+            external_id: %{type: "string"},
+            business: %{
+              type: "object",
+              required: ["registration_number"],
+              properties: %{
+                registered_name: %{type: "string"},
+                registration_number: %{type: "string", example: "CS-TEST-VERIFIED-1"},
+                tin: %{type: "string"}
+              }
+            }
+          }
+        },
+        "BusinessVerification" => %{
+          type: "object",
+          properties: %{
+            id: %{type: "string", format: "uuid"},
+            status: %{type: "string", enum: ["pending", "verified", "failed", "requires_review"]},
+            mode: %{type: "string", enum: ["test", "live"]},
+            external_id: %{type: "string"},
+            business: %{
+              type: "object",
+              properties: %{registered_name: %{type: "string"}}
+            },
+            risk: %{
+              type: "object",
+              properties: %{
+                level: %{type: "string", enum: ["low", "medium", "high"]},
+                reason_codes: %{type: "array", items: %{type: "string"}}
+              }
+            },
             created_at: %{type: "string", format: "date-time"},
             completed_at: %{type: "string", format: "date-time", nullable: true}
           }

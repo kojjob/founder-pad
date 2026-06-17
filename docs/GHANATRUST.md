@@ -98,6 +98,22 @@ GhanaTrust or its database. Types: `selfie`, `document_front`, `document_back`,
 `proof_of_address`, `business_document`. A liveness/selfie check is then recorded
 against the evidence; a non-pass opens a review case automatically.
 
+### Business verification (KYB)
+
+```http
+POST /v1/business_verifications
+{ "external_id": "merchant_1",
+  "business": { "registered_name": "Example Trading Ltd",
+                "registration_number": "CS-TEST-VERIFIED-1", "tin": "P000..." } }
+```
+
+`201` → `{ id, status, mode, external_id, created_at, links.self }`. `GET
+/v1/business_verifications/{id}` returns status, `business.registered_name`, `risk`.
+Registration number and TIN are hashed (never stored raw). Sandbox fixtures:
+`CS-TEST-VERIFIED-1`, `CS-TEST-REVIEW-1`, `CS-TEST-FAILED-1`, `CS-TEST-PROVIDER-DOWN`.
+A `requires_review` outcome opens a review case and emits
+`business_verification.requires_review`.
+
 ### Sandbox fixtures (deterministic)
 
 | Ghana Card number | Outcome |

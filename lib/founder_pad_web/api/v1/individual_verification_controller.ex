@@ -12,22 +12,14 @@ defmodule FounderPadWeb.Api.V1.IndividualVerificationController do
 
   alias FounderPad.Compliance
   alias FounderPad.Compliance.{IndividualVerification, Verifications}
-  alias FounderPadWeb.Api.{Errors, RequestId}
+  alias FounderPadWeb.Api.{Errors, Idempotency, RequestId}
 
   plug :require_scope, "write" when action in [:create]
   plug :require_scope, "read" when action in [:show]
 
   def create(conn, params) do
     org = conn.assigns.current_organisation
-
-    case idempotency_key(conn) do
-      nil ->
-        {status, body} = resolve(conn, org, params)
-        respond(conn, status, body)
-
-      idem ->
-        with_idempotency(conn, org, idem, params)
-    end
+    Idempotency.handle(conn, org, params, fn -> resolve(conn, org, params) end)
   end
 
   def show(conn, %{"id" => id}) do
@@ -35,44 +27,10 @@ defmodule FounderPadWeb.Api.V1.IndividualVerificationController do
 
     case Ash.get(IndividualVerification, id, authorize?: false) do
       {:ok, %{organisation_id: org_id} = ivf} when org_id == org.id ->
-        respond(conn, 200, detail(ivf))
+        Idempotency.respond(conn, 200, detail(ivf))
 
       _ ->
         Errors.send(conn, 404, "verification_not_found", "No verification with that id.")
-    end
-  end
-
-  # Replay the stored response for a repeated key; conflict on a different body;
-  # otherwise run the work once and cache the response.
-  defp with_idempotency(conn, org, idem, params) do
-    fingerprint = fingerprint(params)
-
-    case lookup_idempotency(org, idem) do
-      nil ->
-        {status, body} = resolve(conn, org, params)
-        maybe_store_idempotency(org, idem, fingerprint, status, body)
-        respond(conn, status, body)
-
-      %{request_fingerprint: ^fingerprint} = record ->
-        respond(conn, record.response_status, record.response_body)
-
-      _record ->
-        respond(
-          conn,
-          409,
-          error_body(
-            conn,
-            "duplicate_idempotency_key",
-            "This Idempotency-Key was already used with a different request body."
-          )
-        )
-    end
-  end
-
-  defp lookup_idempotency(org, idem) do
-    case Compliance.find_idempotency_key(org.id, idem) do
-      {:ok, record} -> record
-      _ -> nil
     end
   end
 
@@ -85,7 +43,7 @@ defmodule FounderPadWeb.Api.V1.IndividualVerificationController do
 
     cond do
       is_nil(card) or card == "" ->
-        {422, error_body(conn, "validation_failed", "person.ghana_card_number is required.")}
+        {422, Errors.body(conn, "validation_failed", "person.ghana_card_number is required.")}
 
       existing = idempotent_match(org, Map.get(params, "external_id")) ->
         {200, detail(existing)}
@@ -112,13 +70,13 @@ defmodule FounderPadWeb.Api.V1.IndividualVerificationController do
         if consent_error?(error) do
           {422, consent_required_error(conn)}
         else
-          {422, error_body(conn, "validation_failed", Exception.message(error))}
+          {422, Errors.body(conn, "validation_failed", Exception.message(error))}
         end
     end
   end
 
   defp consent_required_error(conn) do
-    error_body(
+    Errors.body(
       conn,
       "consent_required",
       "A consent receipt is required before live identity verification."
@@ -260,45 +218,6 @@ defmodule FounderPadWeb.Api.V1.IndividualVerificationController do
       _ -> nil
     end
   end
-
-  defp respond(conn, status, body) do
-    conn |> put_status(status) |> json(body)
-  end
-
-  defp error_body(conn, code, message) do
-    %{error: %{code: code, message: message, request_id: RequestId.get(conn)}}
-  end
-
-  defp idempotency_key(conn) do
-    case get_req_header(conn, "idempotency-key") do
-      [key | _] when key != "" -> key
-      _ -> nil
-    end
-  end
-
-  # Content fingerprint independent of map key ordering.
-  defp fingerprint(params) do
-    :crypto.hash(:sha256, :erlang.term_to_binary(params, [:deterministic]))
-    |> Base.encode16(case: :lower)
-  end
-
-  # Only successful responses are cached, so a client can correct and retry a
-  # rejected request with the same key. Ignore races on the unique index.
-  defp maybe_store_idempotency(org, key, fingerprint, status, body) when status in 200..299 do
-    Compliance.create_idempotency_key(%{
-      organisation_id: org.id,
-      key: key,
-      request_fingerprint: fingerprint,
-      response_status: status,
-      response_body: jsonable(body)
-    })
-  rescue
-    _ -> :ok
-  end
-
-  defp maybe_store_idempotency(_org, _key, _fingerprint, _status, _body), do: :ok
-
-  defp jsonable(body), do: body |> Jason.encode!() |> Jason.decode!()
 
   defp summary(ivf) do
     %{

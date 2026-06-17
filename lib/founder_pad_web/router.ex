@@ -115,6 +115,7 @@ defmodule FounderPadWeb.Router do
       live "/settings/two-factor", TwoFactorLive
       live "/verifications", VerificationsLive
       live "/verifications/:id", VerificationDetailLive
+      live "/business-verifications", BusinessVerificationsLive
       live "/consent", ConsentReceiptsLive
       live "/reviews", ReviewQueueLive
       live "/api-keys", ApiKeysLive
@@ -220,6 +221,8 @@ defmodule FounderPadWeb.Router do
     post "/individual_verifications", IndividualVerificationController, :create
     get "/individual_verifications/:id", IndividualVerificationController, :show
     post "/individual_verifications/:id/evidence_uploads", EvidenceUploadController, :create
+    post "/business_verifications", BusinessVerificationController, :create
+    get "/business_verifications/:id", BusinessVerificationController, :show
   end
 
   # JSON:API (REST) — auto-derived from Ash resources

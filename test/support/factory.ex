@@ -296,6 +296,21 @@ defmodule FounderPad.Factory do
     |> Ash.create!()
   end
 
+  def create_business_verification!(attrs \\ %{}) do
+    org = Map.get_lazy(attrs, :organisation, fn -> create_organisation!() end)
+
+    FounderPad.Compliance.BusinessVerification
+    |> Ash.Changeset.for_create(:create, %{
+      organisation_id: org.id,
+      external_id: Map.get(attrs, :external_id, "merchant_#{System.unique_integer([:positive])}"),
+      mode: Map.get(attrs, :mode, :test),
+      registered_name: Map.get(attrs, :registered_name, "Example Trading Ltd"),
+      registration_number: Map.get(attrs, :registration_number, "CS-TEST-VERIFIED-1"),
+      tin: Map.get(attrs, :tin, "P0001234567")
+    })
+    |> Ash.create!()
+  end
+
   def create_review_case!(attrs \\ %{}) do
     org = Map.get_lazy(attrs, :organisation, fn -> create_organisation!() end)
 

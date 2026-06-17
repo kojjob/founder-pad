@@ -9,13 +9,12 @@ defmodule FounderPadWeb.Api.Errors do
   def send(conn, status, code, message) do
     conn
     |> put_status(status)
-    |> json(%{
-      error: %{
-        code: code,
-        message: message,
-        request_id: RequestId.get(conn)
-      }
-    })
+    |> json(body(conn, code, message))
     |> halt()
+  end
+
+  @doc "Build the error envelope map (without sending) for `{status, body}` flows."
+  def body(conn, code, message) do
+    %{error: %{code: code, message: message, request_id: RequestId.get(conn)}}
   end
 end
