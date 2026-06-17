@@ -11,7 +11,7 @@ defmodule FounderPadWeb.Api.V1.IndividualVerificationController do
   require Ash.Query
 
   alias FounderPad.Compliance
-  alias FounderPad.Compliance.{IndividualVerification, Verifications}
+  alias FounderPad.Compliance.{AmlScreening, IndividualVerification, Verifications}
   alias FounderPadWeb.Api.{Errors, Idempotency, RequestId}
 
   plug :require_scope, "write" when action in [:create]
@@ -61,6 +61,7 @@ defmodule FounderPadWeb.Api.V1.IndividualVerificationController do
       processed = process_or_keep(ivf, card)
       audit(conn, "individual_verification.completed", processed, %{status: processed.status})
       dispatch_webhook(org, processed)
+      maybe_run_aml(conn, org, :person, processed.id, person_name(person), params)
       {201, summary(processed)}
     else
       {:error, :consent_required} ->
@@ -217,6 +218,33 @@ defmodule FounderPadWeb.Api.V1.IndividualVerificationController do
       [ua | _] -> ua
       _ -> nil
     end
+  end
+
+  # Optional AML screen. A hit is recorded and routed to review by AmlScreening;
+  # here we just trigger it and audit. Never blocks the verification response.
+  defp maybe_run_aml(conn, org, subject_type, subject_id, name, params) do
+    if get_in(params, ["options", "run_aml_screen"]) == true and name not in [nil, ""] do
+      case AmlScreening.screen(org.id, subject_type, subject_id, name) do
+        {:ok, screen} ->
+          FounderPad.Audit.log(:create, "AmlScreen", screen.id, nil, org.id,
+            metadata: %{
+              event: "aml_screen.completed",
+              actor_type: "api_key",
+              api_key_id: conn.assigns.api_key.id,
+              status: screen.status
+            }
+          )
+
+        _ ->
+          :ok
+      end
+    end
+  end
+
+  defp person_name(person) do
+    [Map.get(person, "first_name"), Map.get(person, "last_name")]
+    |> Enum.reject(&(&1 in [nil, ""]))
+    |> Enum.join(" ")
   end
 
   defp summary(ivf) do

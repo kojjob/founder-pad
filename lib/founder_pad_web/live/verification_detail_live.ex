@@ -76,7 +76,7 @@ defmodule FounderPadWeb.VerificationDetailLive do
             <span class={["px-2 py-0.5 rounded text-xs font-bold", liveness_badge(l.status)]}>
               {l.status}
             </span>
-            <span class="text-on-surface-variant">confidence {l.confidence_score}</span>
+            <span class="text-on-surface-variant">confidence {to_string(l.confidence_score)}</span>
           </li>
         </ul>
       </section>

@@ -185,7 +185,8 @@ defmodule FounderPadWeb.Api.OpenApi do
                 accepted_at: %{type: "string", format: "date-time"},
                 privacy_notice_version: %{type: "string"}
               }
-            }
+            },
+            options: %{"$ref" => "#/components/schemas/VerificationOptions"}
           }
         },
         "IndividualVerification" => %{
@@ -240,6 +241,17 @@ defmodule FounderPadWeb.Api.OpenApi do
                 registration_number: %{type: "string", example: "CS-TEST-VERIFIED-1"},
                 tin: %{type: "string"}
               }
+            },
+            options: %{"$ref" => "#/components/schemas/VerificationOptions"}
+          }
+        },
+        "VerificationOptions" => %{
+          type: "object",
+          properties: %{
+            require_liveness: %{type: "boolean"},
+            run_aml_screen: %{
+              type: "boolean",
+              description: "Run sanctions/PEP/adverse-media screening; matches route to review."
             }
           }
         },

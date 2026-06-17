@@ -82,5 +82,14 @@ defmodule FounderPad.Compliance do
         args: [:organisation_id]
       )
     end
+
+    resource FounderPad.Compliance.AmlScreen do
+      define(:create_aml_screen, action: :create)
+
+      define(:list_aml_screens_by_organisation,
+        action: :by_organisation,
+        args: [:organisation_id]
+      )
+    end
   end
 end

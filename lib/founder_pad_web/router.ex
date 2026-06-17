@@ -116,6 +116,7 @@ defmodule FounderPadWeb.Router do
       live "/verifications", VerificationsLive
       live "/verifications/:id", VerificationDetailLive
       live "/business-verifications", BusinessVerificationsLive
+      live "/aml-screens", AmlScreensLive
       live "/consent", ConsentReceiptsLive
       live "/reviews", ReviewQueueLive
       live "/api-keys", ApiKeysLive

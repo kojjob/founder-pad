@@ -114,6 +114,16 @@ Registration number and TIN are hashed (never stored raw). Sandbox fixtures:
 A `requires_review` outcome opens a review case and emits
 `business_verification.requires_review`.
 
+### AML screening
+
+Pass `options.run_aml_screen: true` on an individual or business verification to run
+sanctions/PEP/adverse-media screening. **No automated final AML decision**: any name
+hit returns `possible_match` (never auto-`confirmed_match`) and opens a review case —
+a human confirms. Sandbox fixtures (in the name): `AML-PEP`, `AML-SANCTION`,
+`AML-ADVERSE` → `possible_match`; `AML-DOWN` → outage; otherwise `clear`. Screens are
+visible under **AML Screening** in the dashboard. `Risk.combine_aml/2` (rules_v2)
+folds the screen into risk (it can only raise risk, never lower it).
+
 ### Sandbox fixtures (deterministic)
 
 | Ghana Card number | Outcome |

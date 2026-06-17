@@ -8,7 +8,7 @@ defmodule FounderPadWeb.Api.V1.BusinessVerificationController do
   use FounderPadWeb, :controller
   require Ash.Query
 
-  alias FounderPad.Compliance.{BusinessVerification, KybVerifications}
+  alias FounderPad.Compliance.{AmlScreening, BusinessVerification, KybVerifications}
   alias FounderPadWeb.Api.{Errors, Idempotency, RequestId}
 
   plug :require_scope, "write" when action in [:create]
@@ -60,6 +60,7 @@ defmodule FounderPadWeb.Api.V1.BusinessVerificationController do
         processed = process_or_keep(bv, reg)
         audit(conn, "business_verification.completed", processed, %{status: processed.status})
         dispatch_webhook(org, processed)
+        maybe_run_aml(conn, org, processed, Map.get(business, "registered_name"), params)
         {201, summary(processed)}
 
       {:error, %Ash.Error.Invalid{} = error} ->
@@ -130,11 +131,32 @@ defmodule FounderPadWeb.Api.V1.BusinessVerificationController do
       "BusinessVerification",
       bv.id,
       nil,
-      bv.organisation_id, metadata: metadata)
+      bv.organisation_id,
+      metadata: metadata
+    )
   end
 
   defp audit_action("business_verification.completed"), do: :update
   defp audit_action(_), do: :create
+
+  defp maybe_run_aml(conn, org, bv, name, params) do
+    if get_in(params, ["options", "run_aml_screen"]) == true and name not in [nil, ""] do
+      case AmlScreening.screen(org.id, :business, bv.id, name) do
+        {:ok, screen} ->
+          FounderPad.Audit.log(:create, "AmlScreen", screen.id, nil, org.id,
+            metadata: %{
+              event: "aml_screen.completed",
+              actor_type: "api_key",
+              api_key_id: conn.assigns.api_key.id,
+              status: screen.status
+            }
+          )
+
+        _ ->
+          :ok
+      end
+    end
+  end
 
   defp summary(bv) do
     %{

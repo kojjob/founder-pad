@@ -42,6 +42,18 @@ defmodule FounderPad.Compliance.Risk do
   def final_status(:verified, _risk), do: :requires_review
   def final_status(provider_status, _risk), do: provider_status
 
+  @doc """
+  rules_v2: fold an AML screen status into a base risk level. A clear screen leaves
+  the level unchanged; a possible match escalates to at least medium; a confirmed
+  match is high. AML can only raise risk, never lower it.
+  """
+  @spec combine_aml(:low | :medium | :high, atom()) :: :low | :medium | :high
+  def combine_aml(base, :clear), do: base
+  def combine_aml(_base, :confirmed_match), do: :high
+  def combine_aml(:high, :possible_match), do: :high
+  def combine_aml(_base, :possible_match), do: :medium
+  def combine_aml(base, _status), do: base
+
   # Strong, confirmed identity → low. Weak/partial → medium. No match/failure → high.
   defp base_score(:verified, :strong), do: 15
   defp base_score(:verified, :medium), do: 45
