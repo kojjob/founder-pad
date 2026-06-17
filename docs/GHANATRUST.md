@@ -170,11 +170,23 @@ A live provider implements the `FounderPad.Compliance.Providers.IdentityProvider
 behaviour and is enabled only once an approved NIA/partner route and encrypted-at-rest
 PII handling (planned) are in place.
 
+## Operations
+
+- **Retention:** `FounderPad.Compliance.Workers.RetentionWorker` (daily Oban cron)
+  redacts webhook payloads past the window and marks expired evidence deleted.
+  Window via `config :founder_pad, :retention, webhook_payload_days: 30`.
+- **Provider health:** `/admin/provider-health` (admin only) lists the configured
+  provider seams (identity/liveness/KYB/AML/storage), their sandbox/live mode, and a
+  failed-job count.
+
 ## Remaining (not yet built)
 
-- LiveView dashboard for verifications, consent and the review queue (review-case
-  decision UI, plus decision-side audit/webhook emission).
-- Business verification (KYB), AML screening and evidence upload (signed URLs).
-- Encrypted-at-rest card storage (Cloak) to enable true async live provider calls.
-- `gt_test_`/`gt_live_` key prefixes and granular `verifications:write` scopes.
-- Internal ops console (provider health, failed jobs).
+- **Encrypted-at-rest PII (Cloak)** — enables a true async live provider via Oban.
+  Lower urgency today: Ghana Card numbers, phone, reg# and TIN are already
+  *hashed and not stored raw*; Cloak would additionally encrypt display fields
+  (names, DOB). Best done deliberately alongside the live-provider work.
+- `gt_test_`/`gt_live_` key prefixes and granular `verifications:write` scopes
+  (cosmetic; deferred to avoid churning the existing `fp_`/scope model).
+- Mobile PWA field-capture UI (the backend it uses — signed upload URLs + liveness —
+  is complete).
+- First live `IdentityProvider`/`AmlProvider` adapters (gated on contracts/credentials).

@@ -115,7 +115,8 @@ config :founder_pad, Oban,
      crontab: [
        {"*/5 * * * *", FounderPad.Content.Workers.PublishScheduledPostsWorker},
        {"0 3 * * *", FounderPad.Privacy.Workers.HardDeleteWorker},
-       {"0 9 * * 1", FounderPad.Notifications.Workers.WeeklyDigestWorker}
+       {"0 9 * * 1", FounderPad.Notifications.Workers.WeeklyDigestWorker},
+       {"30 3 * * *", FounderPad.Compliance.Workers.RetentionWorker}
      ]}
   ]
 

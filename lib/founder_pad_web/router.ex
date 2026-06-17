@@ -160,6 +160,7 @@ defmodule FounderPadWeb.Router do
         live "/help/new", HelpArticleEditorLive
         live "/help/:id/edit", HelpArticleEditorLive
         live "/incidents", IncidentsLive
+        live "/provider-health", ProviderHealthLive
 
         if FounderPad.FeatureConfig.ai_enabled?() do
           live "/templates", AgentTemplatesLive
