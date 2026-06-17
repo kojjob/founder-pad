@@ -8,7 +8,7 @@ defmodule FounderPadWeb.Api.V1.BusinessVerificationController do
   use FounderPadWeb, :controller
   require Ash.Query
 
-  alias FounderPad.Compliance.{AmlScreening, BusinessVerification, KybVerifications}
+  alias FounderPad.Compliance.{AmlScreening, BusinessVerification, KybVerifications, Metering}
   alias FounderPadWeb.Api.{Errors, Idempotency, RequestId}
 
   plug :require_scope, "write" when action in [:create]
@@ -61,6 +61,7 @@ defmodule FounderPadWeb.Api.V1.BusinessVerificationController do
         audit(conn, "business_verification.completed", processed, %{status: processed.status})
         dispatch_webhook(org, processed)
         maybe_run_aml(conn, org, processed, Map.get(business, "registered_name"), params)
+        Metering.meter(org.id, "business_verification", mode)
         {201, summary(processed)}
 
       {:error, %Ash.Error.Invalid{} = error} ->
@@ -151,6 +152,8 @@ defmodule FounderPadWeb.Api.V1.BusinessVerificationController do
               status: screen.status
             }
           )
+
+          Metering.meter(org.id, "aml_screen", conn.assigns.api_key.mode)
 
         _ ->
           :ok

@@ -11,7 +11,7 @@ defmodule FounderPadWeb.Api.V1.IndividualVerificationController do
   require Ash.Query
 
   alias FounderPad.Compliance
-  alias FounderPad.Compliance.{AmlScreening, IndividualVerification, Verifications}
+  alias FounderPad.Compliance.{AmlScreening, IndividualVerification, Metering, Verifications}
   alias FounderPadWeb.Api.{Errors, Idempotency, RequestId}
 
   plug :require_scope, "write" when action in [:create]
@@ -62,6 +62,7 @@ defmodule FounderPadWeb.Api.V1.IndividualVerificationController do
       audit(conn, "individual_verification.completed", processed, %{status: processed.status})
       dispatch_webhook(org, processed)
       maybe_run_aml(conn, org, :person, processed.id, person_name(person), params)
+      Metering.meter(org.id, "individual_verification", mode)
       {201, summary(processed)}
     else
       {:error, :consent_required} ->
@@ -234,6 +235,8 @@ defmodule FounderPadWeb.Api.V1.IndividualVerificationController do
               status: screen.status
             }
           )
+
+          Metering.meter(org.id, "aml_screen", conn.assigns.api_key.mode)
 
         _ ->
           :ok
