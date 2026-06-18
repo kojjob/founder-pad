@@ -155,11 +155,13 @@ defmodule FounderPad.Compliance.ConsentReceipt do
   Returns true when the receipt may be relied upon for live processing:
   it is `:active` and not past its `expires_at`.
   """
-  def active?(%__MODULE__{status: :active, expires_at: nil}), do: true
+  # Match on plain maps rather than `%__MODULE__{}` — referencing the resource's own
+  # struct inside the module fails on a cold compile (Ash defines the struct late).
+  def active?(%{status: :active, expires_at: nil}), do: true
 
-  def active?(%__MODULE__{status: :active, expires_at: expires_at}) do
+  def active?(%{status: :active, expires_at: expires_at}) do
     DateTime.compare(expires_at, DateTime.utc_now()) == :gt
   end
 
-  def active?(%__MODULE__{}), do: false
+  def active?(%{}), do: false
 end
