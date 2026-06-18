@@ -227,6 +227,11 @@ defmodule FounderPadWeb.Router do
     get "/business_verifications", BusinessVerificationController, :index
     post "/business_verifications", BusinessVerificationController, :create
     get "/business_verifications/:id", BusinessVerificationController, :show
+
+    post "/webhook_endpoints", WebhookController, :create_endpoint
+    get "/webhook_endpoints", WebhookController, :list_endpoints
+    get "/webhook_deliveries", WebhookController, :list_deliveries
+    post "/webhook_deliveries/:id/retry", WebhookController, :retry_delivery
   end
 
   # JSON:API (REST) — auto-derived from Ash resources

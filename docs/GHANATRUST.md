@@ -152,6 +152,18 @@ folds the screen into risk (it can only raise risk, never lower it).
 
 ## Webhooks
 
+Manage endpoints from the API:
+
+```http
+POST /v1/webhook_endpoints     { "url": "...", "events": ["individual_verification.completed"] }
+GET  /v1/webhook_endpoints
+GET  /v1/webhook_deliveries?webhook_endpoint_id={id}
+POST /v1/webhook_deliveries/{id}/retry
+```
+
+The signing `secret` is generated server-side and returned **once** on creation
+(never echoed in listings). Retry re-enqueues the delivery.
+
 When a check reaches a terminal state, a signed delivery (Oban, with retry) is enqueued
 to every active org webhook subscribed to the event:
 

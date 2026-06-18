@@ -151,6 +151,70 @@ defmodule FounderPadWeb.Api.OpenApi do
             "404" => error_response("Business verification not found")
           }
         }
+      },
+      "/v1/webhook_endpoints" => %{
+        "get" => %{
+          summary: "List webhook endpoints",
+          operationId: "listWebhookEndpoints",
+          parameters: list_params(),
+          responses: %{"200" => json_response("OK", "VerificationList")}
+        },
+        "post" => %{
+          summary: "Register a webhook endpoint (secret returned once)",
+          operationId: "createWebhookEndpoint",
+          requestBody: %{
+            required: true,
+            content: %{
+              "application/json" => %{
+                schema: %{
+                  type: "object",
+                  required: ["url"],
+                  properties: %{
+                    url: %{type: "string", format: "uri"},
+                    events: %{type: "array", items: %{type: "string"}}
+                  }
+                }
+              }
+            }
+          },
+          responses: %{
+            "201" => json_response("Created", "WebhookEndpoint"),
+            "403" => error_response("Permission denied"),
+            "422" => error_response("Validation failed")
+          }
+        }
+      },
+      "/v1/webhook_deliveries" => %{
+        "get" => %{
+          summary: "List webhook deliveries for an endpoint",
+          operationId: "listWebhookDeliveries",
+          parameters:
+            [
+              %{
+                name: "webhook_endpoint_id",
+                in: "query",
+                required: true,
+                schema: %{type: "string", format: "uuid"}
+              }
+            ] ++
+              list_params(),
+          responses: %{
+            "200" => json_response("OK", "VerificationList"),
+            "404" => error_response("Webhook endpoint not found")
+          }
+        }
+      },
+      "/v1/webhook_deliveries/{id}/retry" => %{
+        "post" => %{
+          summary: "Retry a webhook delivery",
+          operationId: "retryWebhookDelivery",
+          parameters: [id_param()],
+          responses: %{
+            "202" => json_response("Retrying", "WebhookEndpoint"),
+            "403" => error_response("Permission denied"),
+            "404" => error_response("Delivery not found")
+          }
+        }
       }
     }
   end
@@ -308,6 +372,16 @@ defmodule FounderPadWeb.Api.OpenApi do
                 offset: %{type: "integer"}
               }
             }
+          }
+        },
+        "WebhookEndpoint" => %{
+          type: "object",
+          properties: %{
+            id: %{type: "string", format: "uuid"},
+            url: %{type: "string", format: "uri"},
+            events: %{type: "array", items: %{type: "string"}},
+            active: %{type: "boolean"},
+            secret: %{type: "string", description: "Signing secret — returned only on creation."}
           }
         },
         "EvidenceUpload" => %{
