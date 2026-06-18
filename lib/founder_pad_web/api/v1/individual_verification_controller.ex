@@ -15,11 +15,26 @@ defmodule FounderPadWeb.Api.V1.IndividualVerificationController do
   alias FounderPadWeb.Api.{Errors, Idempotency, RequestId}
 
   plug :require_scope, "write" when action in [:create]
-  plug :require_scope, "read" when action in [:show]
+  plug :require_scope, "read" when action in [:show, :index]
 
   def create(conn, params) do
     org = conn.assigns.current_organisation
     Idempotency.handle(conn, org, params, fn -> resolve(conn, org, params) end)
+  end
+
+  def index(conn, params) do
+    org = conn.assigns.current_organisation
+    {limit, offset} = FounderPadWeb.Api.Pagination.parse(params)
+
+    query =
+      IndividualVerification
+      |> Ash.Query.for_read(:by_organisation, %{organisation_id: org.id})
+      |> FounderPadWeb.Api.Pagination.maybe_filter_status(params)
+      |> Ash.Query.limit(limit)
+      |> Ash.Query.offset(offset)
+
+    data = query |> Ash.read!(authorize?: false) |> Enum.map(&list_item/1)
+    Idempotency.respond(conn, 200, %{data: data, pagination: %{limit: limit, offset: offset}})
   end
 
   def show(conn, %{"id" => id}) do
@@ -248,6 +263,17 @@ defmodule FounderPadWeb.Api.V1.IndividualVerificationController do
     [Map.get(person, "first_name"), Map.get(person, "last_name")]
     |> Enum.reject(&(&1 in [nil, ""]))
     |> Enum.join(" ")
+  end
+
+  defp list_item(ivf) do
+    %{
+      id: ivf.id,
+      status: ivf.status,
+      mode: ivf.mode,
+      external_id: ivf.external_id,
+      risk_level: ivf.risk_level,
+      created_at: ivf.inserted_at
+    }
   end
 
   defp summary(ivf) do

@@ -76,6 +76,16 @@ Re-POSTing the same `external_id` for a tenant returns the existing check (`200`
 same key and body replays the original response (no duplicate work, no re-fired
 webhooks). The same key with a different body returns `409 duplicate_idempotency_key`.
 
+### List
+
+```http
+GET /v1/individual_verifications?limit=20&offset=0&status=verified
+GET /v1/business_verifications?limit=20&offset=0
+```
+
+`200` → `{ "data": [ … ], "pagination": { "limit", "offset" } }`. Tenant-scoped,
+read-scope, newest first. Optional `status` filter.
+
 ### Retrieve
 
 ```http

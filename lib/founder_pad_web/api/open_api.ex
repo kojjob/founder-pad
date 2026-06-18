@@ -30,6 +30,12 @@ defmodule FounderPadWeb.Api.OpenApi do
   defp paths do
     %{
       "/v1/individual_verifications" => %{
+        "get" => %{
+          summary: "List individual verifications",
+          operationId: "listIndividualVerifications",
+          parameters: list_params(),
+          responses: %{"200" => json_response("OK", "VerificationList")}
+        },
         "post" => %{
           summary: "Create an individual verification",
           operationId: "createIndividualVerification",
@@ -106,6 +112,12 @@ defmodule FounderPadWeb.Api.OpenApi do
         }
       },
       "/v1/business_verifications" => %{
+        "get" => %{
+          summary: "List business verifications",
+          operationId: "listBusinessVerifications",
+          parameters: list_params(),
+          responses: %{"200" => json_response("OK", "VerificationList")}
+        },
         "post" => %{
           summary: "Create a business (KYB) verification",
           operationId: "createBusinessVerification",
@@ -145,6 +157,14 @@ defmodule FounderPadWeb.Api.OpenApi do
 
   defp id_param do
     %{name: "id", in: "path", required: true, schema: %{type: "string", format: "uuid"}}
+  end
+
+  defp list_params do
+    [
+      %{name: "limit", in: "query", schema: %{type: "integer", default: 20, maximum: 100}},
+      %{name: "offset", in: "query", schema: %{type: "integer", default: 0}},
+      %{name: "status", in: "query", schema: %{type: "string"}}
+    ]
   end
 
   defp components do
@@ -275,6 +295,19 @@ defmodule FounderPadWeb.Api.OpenApi do
             },
             created_at: %{type: "string", format: "date-time"},
             completed_at: %{type: "string", format: "date-time", nullable: true}
+          }
+        },
+        "VerificationList" => %{
+          type: "object",
+          properties: %{
+            data: %{type: "array", items: %{type: "object"}},
+            pagination: %{
+              type: "object",
+              properties: %{
+                limit: %{type: "integer"},
+                offset: %{type: "integer"}
+              }
+            }
           }
         },
         "EvidenceUpload" => %{

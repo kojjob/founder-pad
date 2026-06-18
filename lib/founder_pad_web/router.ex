@@ -220,9 +220,11 @@ defmodule FounderPadWeb.Router do
   scope "/v1", FounderPadWeb.Api.V1 do
     pipe_through :public_api_v1
 
+    get "/individual_verifications", IndividualVerificationController, :index
     post "/individual_verifications", IndividualVerificationController, :create
     get "/individual_verifications/:id", IndividualVerificationController, :show
     post "/individual_verifications/:id/evidence_uploads", EvidenceUploadController, :create
+    get "/business_verifications", BusinessVerificationController, :index
     post "/business_verifications", BusinessVerificationController, :create
     get "/business_verifications/:id", BusinessVerificationController, :show
   end

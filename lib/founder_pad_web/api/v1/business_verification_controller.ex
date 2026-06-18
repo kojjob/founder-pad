@@ -12,11 +12,27 @@ defmodule FounderPadWeb.Api.V1.BusinessVerificationController do
   alias FounderPadWeb.Api.{Errors, Idempotency, RequestId}
 
   plug :require_scope, "write" when action in [:create]
-  plug :require_scope, "read" when action in [:show]
+  plug :require_scope, "read" when action in [:show, :index]
 
   def create(conn, params) do
     org = conn.assigns.current_organisation
     Idempotency.handle(conn, org, params, fn -> resolve(conn, org, params) end)
+  end
+
+  def index(conn, params) do
+    org = conn.assigns.current_organisation
+    {limit, offset} = FounderPadWeb.Api.Pagination.parse(params)
+
+    data =
+      BusinessVerification
+      |> Ash.Query.for_read(:by_organisation, %{organisation_id: org.id})
+      |> FounderPadWeb.Api.Pagination.maybe_filter_status(params)
+      |> Ash.Query.limit(limit)
+      |> Ash.Query.offset(offset)
+      |> Ash.read!(authorize?: false)
+      |> Enum.map(&list_item/1)
+
+    Idempotency.respond(conn, 200, %{data: data, pagination: %{limit: limit, offset: offset}})
   end
 
   def show(conn, %{"id" => id}) do
@@ -159,6 +175,18 @@ defmodule FounderPadWeb.Api.V1.BusinessVerificationController do
           :ok
       end
     end
+  end
+
+  defp list_item(bv) do
+    %{
+      id: bv.id,
+      status: bv.status,
+      mode: bv.mode,
+      external_id: bv.external_id,
+      registered_name: bv.registered_name,
+      risk_level: bv.risk_level,
+      created_at: bv.inserted_at
+    }
   end
 
   defp summary(bv) do
