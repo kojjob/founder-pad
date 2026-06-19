@@ -60,6 +60,19 @@ config :logger, :default_formatter,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
+# Redact sensitive identity fields from request logs (compliance requirement:
+# raw Ghana Card numbers, phone numbers and secrets must never be logged).
+config :phoenix, :filter_parameters, [
+  "password",
+  "ghana_card_number",
+  "phone_number",
+  "registration_number",
+  "tin",
+  "date_of_birth",
+  "secret",
+  "token"
+]
+
 # Ash Framework
 config :founder_pad,
   # To disable AI agents, set :ai_enabled to false and remove FounderPad.AI from ash_domains
@@ -77,7 +90,8 @@ config :founder_pad,
     FounderPad.HelpCenter,
     FounderPad.Privacy,
     FounderPad.System,
-    FounderPad.Referrals
+    FounderPad.Referrals,
+    FounderPad.Compliance
   ]
 
 # Token signing secret — loaded from env var; fallback only for dev/test
@@ -101,7 +115,8 @@ config :founder_pad, Oban,
      crontab: [
        {"*/5 * * * *", FounderPad.Content.Workers.PublishScheduledPostsWorker},
        {"0 3 * * *", FounderPad.Privacy.Workers.HardDeleteWorker},
-       {"0 9 * * 1", FounderPad.Notifications.Workers.WeeklyDigestWorker}
+       {"0 9 * * 1", FounderPad.Notifications.Workers.WeeklyDigestWorker},
+       {"30 3 * * *", FounderPad.Compliance.Workers.RetentionWorker}
      ]}
   ]
 

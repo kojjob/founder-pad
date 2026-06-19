@@ -33,6 +33,15 @@ defmodule FounderPad.ApiKeys.ApiKey do
       public?(true)
     end
 
+    # GhanaTrust: keys are bound to a test or live environment. Verifications
+    # created with a key inherit its mode, keeping sandbox and live data separate.
+    attribute :mode, :atom do
+      constraints(one_of: [:test, :live])
+      default(:test)
+      allow_nil?(false)
+      public?(true)
+    end
+
     attribute :last_used_at, :utc_datetime_usec do
       public?(true)
     end
@@ -69,7 +78,7 @@ defmodule FounderPad.ApiKeys.ApiKey do
     defaults([:read, :destroy])
 
     create :create do
-      accept([:name, :scopes, :expires_at, :organisation_id, :created_by_id])
+      accept([:name, :scopes, :mode, :expires_at, :organisation_id, :created_by_id])
 
       change(fn changeset, _context ->
         raw_key = generate_raw_key()

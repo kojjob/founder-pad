@@ -20,6 +20,14 @@ defmodule FounderPadWeb.Router do
     plug :accepts, ["json"]
   end
 
+  # GhanaTrust public REST API (/v1) — API key required.
+  pipeline :public_api_v1 do
+    plug :accepts, ["json"]
+    plug FounderPadWeb.Plugs.ApiKeyAuth
+    plug FounderPadWeb.Plugs.RequireApiKey
+    plug FounderPadWeb.Plugs.RateLimiter, limit: 300, window_ms: 60_000
+  end
+
   # Auth session controller (sets/clears session cookie)
   scope "/auth", FounderPadWeb do
     pipe_through :browser
@@ -105,6 +113,12 @@ defmodule FounderPadWeb.Router do
       live "/team", TeamLive
       live "/settings", SettingsLive
       live "/settings/two-factor", TwoFactorLive
+      live "/verifications", VerificationsLive
+      live "/verifications/:id", VerificationDetailLive
+      live "/business-verifications", BusinessVerificationsLive
+      live "/aml-screens", AmlScreensLive
+      live "/consent", ConsentReceiptsLive
+      live "/reviews", ReviewQueueLive
       live "/api-keys", ApiKeysLive
       live "/webhooks", WebhookLogsLive
       live "/audit-log", AuditLogLive
@@ -146,6 +160,7 @@ defmodule FounderPadWeb.Router do
         live "/help/new", HelpArticleEditorLive
         live "/help/:id/edit", HelpArticleEditorLive
         live "/incidents", IncidentsLive
+        live "/provider-health", ProviderHealthLive
 
         if FounderPad.FeatureConfig.ai_enabled?() do
           live "/templates", AgentTemplatesLive
@@ -187,6 +202,36 @@ defmodule FounderPadWeb.Router do
   scope "/webhooks", FounderPadWeb do
     pipe_through :api
     post "/stripe", WebhookController, :stripe
+  end
+
+  # Liveness probe (public, no auth) for load balancers / Fly health checks
+  scope "/", FounderPadWeb do
+    pipe_through :api_public
+    get "/health", HealthController, :index
+  end
+
+  # GhanaTrust OpenAPI document (public — no API key required)
+  scope "/v1", FounderPadWeb.Api.V1 do
+    pipe_through :api_public
+    get "/openapi.json", OpenApiController, :show
+  end
+
+  # GhanaTrust public REST API (hand-authored contract per API_SPEC.md)
+  scope "/v1", FounderPadWeb.Api.V1 do
+    pipe_through :public_api_v1
+
+    get "/individual_verifications", IndividualVerificationController, :index
+    post "/individual_verifications", IndividualVerificationController, :create
+    get "/individual_verifications/:id", IndividualVerificationController, :show
+    post "/individual_verifications/:id/evidence_uploads", EvidenceUploadController, :create
+    get "/business_verifications", BusinessVerificationController, :index
+    post "/business_verifications", BusinessVerificationController, :create
+    get "/business_verifications/:id", BusinessVerificationController, :show
+
+    post "/webhook_endpoints", WebhookController, :create_endpoint
+    get "/webhook_endpoints", WebhookController, :list_endpoints
+    get "/webhook_deliveries", WebhookController, :list_deliveries
+    post "/webhook_deliveries/:id/retry", WebhookController, :retry_delivery
   end
 
   # JSON:API (REST) — auto-derived from Ash resources

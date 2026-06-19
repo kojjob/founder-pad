@@ -1,0 +1,214 @@
+# GhanaTrust API — Compliance Layer
+
+GhanaTrust is a Ghana-first KYC/KYB/AML/consent/audit API. This document covers the
+**compliance domain** built on top of the FounderPad SaaS platform (auth, multi-tenant
+orgs, API keys, webhooks, audit, billing are inherited from the base platform).
+
+> Not legal advice. Confirm NIA/verification access, Data Protection Commission
+> registration, AML obligations and BoG positioning with qualified Ghanaian experts
+> before processing live personal data. Live identity verification stays **disabled**
+> until an approved provider route exists (ADR-003).
+
+## What's implemented
+
+| Capability | Module(s) |
+|---|---|
+| Consent receipts (immutable-except-status) | `FounderPad.Compliance.ConsentReceipt` |
+| Individual identity verification | `FounderPad.Compliance.IndividualVerification` |
+| Identity provider seam + sandbox | `FounderPad.Compliance.Providers.{IdentityProvider, Sandbox}` |
+| Risk scoring (rules_v1, explainable) | `FounderPad.Compliance.Risk` |
+| Verification orchestration | `FounderPad.Compliance.Verifications` |
+| Manual review queue | `FounderPad.Compliance.{ReviewCase, ReviewNote}` |
+| Public REST API | `FounderPadWeb.Api.V1.IndividualVerificationController` |
+| Audit + webhooks on lifecycle | wired via `FounderPad.Audit` / `FounderPad.Webhooks` |
+
+## Security invariants
+
+- **Raw Ghana Card / phone numbers are never stored.** The create action takes them as
+  transient arguments, hashes (SHA-256) and persists only `*_hash` columns.
+- **Consent before live processing.** `:live` verifications cannot be created without an
+  `:active` `ConsentReceipt` — enforced at the data layer, no code path bypasses it.
+- **Tenant isolation.** Every record is `organisation_id`-scoped; the API `show` endpoint
+  returns 404 across tenants.
+- **Immutable audit.** Every verification create/complete and consent capture emits an
+  append-only `AuditLog` event with actor (API key), IP, user agent and request id.
+- **Mode separation.** API keys carry `:test`/`:live` mode; verifications inherit it.
+
+## Public API (`/v1`)
+
+Machine-readable contract: **`GET /v1/openapi.json`** (OpenAPI 3, public, no key) —
+load it into Swagger UI / Redoc / Stoplight or generate clients from it.
+
+
+Authenticate with `Authorization: Bearer <api_key>`. The key's scopes gate access
+(`:write` to create, `:read` to retrieve; `:admin` implies both). The key's mode
+(`test`/`live`) sets the verification mode.
+
+### Create
+
+```http
+POST /v1/individual_verifications
+Authorization: Bearer fp_xxx
+Content-Type: application/json
+
+{
+  "external_id": "customer_123",
+  "person": {
+    "ghana_card_number": "GHA-TEST-VERIFIED-1",
+    "first_name": "Ama",
+    "last_name": "Mensah",
+    "date_of_birth": "1995-04-12",
+    "phone_number": "+233241234567"
+  },
+  "consent": {                      // required for live mode
+    "purpose": "customer_onboarding",
+    "channel": "api",
+    "accepted_at": "2026-06-17T12:00:00Z",
+    "privacy_notice_version": "2026-01"
+  }
+}
+```
+
+`201` → `{ id, status, mode, external_id, created_at, links.self }`.
+Re-POSTing the same `external_id` for a tenant returns the existing check (`200`).
+
+**Idempotency.** Send an `Idempotency-Key: <unique>` header on writes. A retry with the
+same key and body replays the original response (no duplicate work, no re-fired
+webhooks). The same key with a different body returns `409 duplicate_idempotency_key`.
+
+### List
+
+```http
+GET /v1/individual_verifications?limit=20&offset=0&status=verified
+GET /v1/business_verifications?limit=20&offset=0
+```
+
+`200` → `{ "data": [ … ], "pagination": { "limit", "offset" } }`. Tenant-scoped,
+read-scope, newest first. Optional `status` filter.
+
+### Retrieve
+
+```http
+GET /v1/individual_verifications/{id}
+```
+
+Returns status, `identity` (verified/match_level/provider_reference), `risk`
+(level/score/reason_codes), `consent_receipt_id` and timestamps.
+
+### Evidence upload (selfie / document)
+
+```http
+POST /v1/individual_verifications/{id}/evidence_uploads
+{ "type": "selfie", "content_type": "image/jpeg" }
+```
+
+`201` → `{ evidence_id, upload_url, expires_at }`. PUT the bytes directly to
+`upload_url` (object storage via a short-lived signed URL) — they never transit
+GhanaTrust or its database. Types: `selfie`, `document_front`, `document_back`,
+`proof_of_address`, `business_document`. A liveness/selfie check is then recorded
+against the evidence; a non-pass opens a review case automatically.
+
+### Business verification (KYB)
+
+```http
+POST /v1/business_verifications
+{ "external_id": "merchant_1",
+  "business": { "registered_name": "Example Trading Ltd",
+                "registration_number": "CS-TEST-VERIFIED-1", "tin": "P000..." } }
+```
+
+`201` → `{ id, status, mode, external_id, created_at, links.self }`. `GET
+/v1/business_verifications/{id}` returns status, `business.registered_name`, `risk`.
+Registration number and TIN are hashed (never stored raw). Sandbox fixtures:
+`CS-TEST-VERIFIED-1`, `CS-TEST-REVIEW-1`, `CS-TEST-FAILED-1`, `CS-TEST-PROVIDER-DOWN`.
+A `requires_review` outcome opens a review case and emits
+`business_verification.requires_review`.
+
+### AML screening
+
+Pass `options.run_aml_screen: true` on an individual or business verification to run
+sanctions/PEP/adverse-media screening. **No automated final AML decision**: any name
+hit returns `possible_match` (never auto-`confirmed_match`) and opens a review case —
+a human confirms. Sandbox fixtures (in the name): `AML-PEP`, `AML-SANCTION`,
+`AML-ADVERSE` → `possible_match`; `AML-DOWN` → outage; otherwise `clear`. Screens are
+visible under **AML Screening** in the dashboard. `Risk.combine_aml/2` (rules_v2)
+folds the screen into risk (it can only raise risk, never lower it).
+
+### Sandbox fixtures (deterministic)
+
+| Ghana Card number | Outcome |
+|---|---|
+| `GHA-TEST-VERIFIED-1` | `verified`, low risk |
+| `GHA-TEST-REVIEW-1` | `requires_review` (opens a review case) |
+| `GHA-TEST-FAILED-1` | `failed`, high risk |
+| `GHA-TEST-PROVIDER-DOWN` | provider outage → check left unfinished |
+| any other non-empty value | deterministic `verified` |
+
+### Error codes
+
+`authentication_failed` (401), `permission_denied` (403), `verification_not_found`
+(404), `validation_failed` / `consent_required` (422), `duplicate_idempotency_key`
+(409). Envelope: `{ "error": { "code", "message", "request_id" } }`.
+
+## Webhooks
+
+Manage endpoints from the API:
+
+```http
+POST /v1/webhook_endpoints     { "url": "...", "events": ["individual_verification.completed"] }
+GET  /v1/webhook_endpoints
+GET  /v1/webhook_deliveries?webhook_endpoint_id={id}
+POST /v1/webhook_deliveries/{id}/retry
+```
+
+The signing `secret` is generated server-side and returned **once** on creation
+(never echoed in listings). Retry re-enqueues the delivery.
+
+When a check reaches a terminal state, a signed delivery (Oban, with retry) is enqueued
+to every active org webhook subscribed to the event:
+
+- `individual_verification.completed` — verified/failed
+- `individual_verification.requires_review` — needs manual review
+
+## Running locally
+
+```bash
+mix setup                 # deps + assets
+mix ash.setup             # create DB + run migrations
+mix run priv/repo/ghanatrust_seeds.exs   # demo tenant + sandbox key
+mix phx.server
+mix test                  # full suite (run with --seed 0 for determinism)
+```
+
+## Provider configuration
+
+The identity provider is swappable by config (defaults to sandbox):
+
+```elixir
+config :founder_pad, :identity_provider, FounderPad.Compliance.Providers.Sandbox
+```
+
+A live provider implements the `FounderPad.Compliance.Providers.IdentityProvider`
+behaviour and is enabled only once an approved NIA/partner route and encrypted-at-rest
+PII handling (planned) are in place.
+
+## Operations
+
+- **Retention:** `FounderPad.Compliance.Workers.RetentionWorker` (daily Oban cron)
+  redacts webhook payloads past the window and marks expired evidence deleted.
+  Window via `config :founder_pad, :retention, webhook_payload_days: 30`.
+- **Provider health:** `/admin/provider-health` (admin only) lists the configured
+  provider seams (identity/liveness/KYB/AML/storage), their sandbox/live mode, and a
+  failed-job count.
+
+## Remaining (not yet built)
+
+- **Encrypted-at-rest PII (Cloak)** — enables a true async live provider via Oban.
+  Lower urgency today: Ghana Card numbers, phone, reg# and TIN are already
+  *hashed and not stored raw*; Cloak would additionally encrypt display fields
+  (names, DOB). Best done deliberately alongside the live-provider work.
+- `gt_test_`/`gt_live_` key prefixes and granular `verifications:write` scopes
+  (cosmetic; deferred to avoid churning the existing `fp_`/scope model).
+- Mobile PWA field-capture UI (the backend it uses — signed upload URLs + liveness —
+  is complete).
+- First live `IdentityProvider`/`AmlProvider` adapters (gated on contracts/credentials).

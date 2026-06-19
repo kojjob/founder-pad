@@ -31,6 +31,10 @@ config :logger, level: :warning
 # Initialize plugs at runtime for faster test compilation
 config :phoenix, :plug_init_mode, :runtime
 
+# Update api_key.last_used_at synchronously in tests so it stays inside the SQL
+# sandbox (the async Task would race the sandbox and intermittently fail).
+config :founder_pad, :async_touch_last_used, false
+
 # Enable helpful, but potentially expensive runtime checks
 config :phoenix_live_view,
   enable_expensive_runtime_checks: true

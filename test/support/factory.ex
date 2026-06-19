@@ -116,7 +116,9 @@ defmodule FounderPad.Factory do
         name: Map.get(attrs, :name, "Category #{System.unique_integer([:positive])}"),
         slug: Map.get(attrs, :slug, nil),
         description: Map.get(attrs, :description, "A test category")
-      }, actor: admin)
+      },
+      actor: admin
+    )
     |> Ash.create!()
   end
 
@@ -129,7 +131,9 @@ defmodule FounderPad.Factory do
       %{
         name: Map.get(attrs, :name, "Tag #{System.unique_integer([:positive])}"),
         slug: Map.get(attrs, :slug, nil)
-      }, actor: admin)
+      },
+      actor: admin
+    )
     |> Ash.create!()
   end
 
@@ -152,7 +156,9 @@ defmodule FounderPad.Factory do
         status: Map.get(attrs, :status, :draft),
         published_at: Map.get(attrs, :published_at, nil),
         author_id: admin.id
-      }, actor: admin)
+      },
+      actor: admin
+    )
     |> Ash.create!()
   end
 
@@ -177,7 +183,9 @@ defmodule FounderPad.Factory do
         body: Map.get(attrs, :body, "<p>Release notes</p>"),
         type: Map.get(attrs, :type, :feature),
         author_id: admin.id
-      }, actor: admin)
+      },
+      actor: admin
+    )
     |> Ash.create!()
   end
 
@@ -186,6 +194,7 @@ defmodule FounderPad.Factory do
     |> Ash.Changeset.for_create(:create, %{
       name: Map.get(attrs, :name, "Test Key #{System.unique_integer([:positive])}"),
       scopes: Map.get(attrs, :scopes, [:read]),
+      mode: Map.get(attrs, :mode, :test),
       organisation_id: org.id,
       created_by_id: user.id
     })
@@ -204,7 +213,9 @@ defmodule FounderPad.Factory do
         description: Map.get(attrs, :description, "Help category"),
         icon: Map.get(attrs, :icon, "help"),
         position: Map.get(attrs, :position, 0)
-      }, actor: admin)
+      },
+      actor: admin
+    )
     |> Ash.create!()
   end
 
@@ -222,7 +233,9 @@ defmodule FounderPad.Factory do
         status: Map.get(attrs, :status, :draft),
         position: Map.get(attrs, :position, 0),
         category_id: category.id
-      }, actor: admin)
+      },
+      actor: admin
+    )
     |> Ash.create!()
   end
 
@@ -242,6 +255,71 @@ defmodule FounderPad.Factory do
       token: Map.get(attrs, :token, "test_token_#{System.unique_integer([:positive])}"),
       device_name: Map.get(attrs, :device_name, "Test Browser"),
       user_id: user.id
+    })
+    |> Ash.create!()
+  end
+
+  def create_consent_receipt!(attrs \\ %{}) do
+    org = Map.get_lazy(attrs, :organisation, fn -> create_organisation!() end)
+
+    params = %{
+      organisation_id: org.id,
+      external_subject_id:
+        Map.get(attrs, :external_subject_id, "subject_#{System.unique_integer([:positive])}"),
+      purpose: Map.get(attrs, :purpose, "customer_onboarding"),
+      data_categories: Map.get(attrs, :data_categories, [:identity]),
+      channel: Map.get(attrs, :channel, :api),
+      privacy_notice_version: Map.get(attrs, :privacy_notice_version, "2026-01"),
+      accepted_at: Map.get(attrs, :accepted_at, DateTime.utc_now()),
+      ip_address: Map.get(attrs, :ip_address, "41.66.0.1"),
+      user_agent: Map.get(attrs, :user_agent, "Test/1.0"),
+      retention_policy: Map.get(attrs, :retention_policy, "kyc_default")
+    }
+
+    FounderPad.Compliance.ConsentReceipt
+    |> Ash.Changeset.for_create(:create, params)
+    |> Ash.create!()
+  end
+
+  def create_individual_verification!(attrs \\ %{}) do
+    org = Map.get_lazy(attrs, :organisation, fn -> create_organisation!() end)
+
+    FounderPad.Compliance.IndividualVerification
+    |> Ash.Changeset.for_create(:create, %{
+      organisation_id: org.id,
+      external_id: Map.get(attrs, :external_id, "ext_#{System.unique_integer([:positive])}"),
+      mode: Map.get(attrs, :mode, :test),
+      ghana_card_number: Map.get(attrs, :ghana_card_number, "GHA-TEST-VERIFIED-1"),
+      first_name: Map.get(attrs, :first_name, "Ama"),
+      last_name: Map.get(attrs, :last_name, "Mensah")
+    })
+    |> Ash.create!()
+  end
+
+  def create_business_verification!(attrs \\ %{}) do
+    org = Map.get_lazy(attrs, :organisation, fn -> create_organisation!() end)
+
+    FounderPad.Compliance.BusinessVerification
+    |> Ash.Changeset.for_create(:create, %{
+      organisation_id: org.id,
+      external_id: Map.get(attrs, :external_id, "merchant_#{System.unique_integer([:positive])}"),
+      mode: Map.get(attrs, :mode, :test),
+      registered_name: Map.get(attrs, :registered_name, "Example Trading Ltd"),
+      registration_number: Map.get(attrs, :registration_number, "CS-TEST-VERIFIED-1"),
+      tin: Map.get(attrs, :tin, "P0001234567")
+    })
+    |> Ash.create!()
+  end
+
+  def create_review_case!(attrs \\ %{}) do
+    org = Map.get_lazy(attrs, :organisation, fn -> create_organisation!() end)
+
+    FounderPad.Compliance.ReviewCase
+    |> Ash.Changeset.for_create(:open, %{
+      organisation_id: org.id,
+      subject_type: Map.get(attrs, :subject_type, :individual_verification),
+      subject_id: Map.get(attrs, :subject_id, Ash.UUID.generate()),
+      priority: Map.get(attrs, :priority, :normal)
     })
     |> Ash.create!()
   end
